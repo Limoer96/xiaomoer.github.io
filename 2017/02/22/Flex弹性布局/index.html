@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Flex弹性布局 | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="说起布局，我脑子里一下就想到了DIV+CSS布局，毕竟曾经被那么多写着DIV+CSS网页开发的书籍洗过脑，然后到现在还不怎么会用这种大众的布局方式。当然了，其实页面还有其它的一些布局方式，比如表格布局，框架布局这样已经逐渐被淘汰的布局方式，也有今天的主角–一颗冉冉上升的新星，弹性盒子布局。  Flex是Flexible Box的简称，我们这里把其翻译为弹性布局，至于为什么不叫“灵活的盒子布局”。">
+<meta name="keywords" content="CSS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flex弹性布局">
+<meta property="og:url" content="http://yoursite.com/2017/02/22/Flex弹性布局/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="说起布局，我脑子里一下就想到了DIV+CSS布局，毕竟曾经被那么多写着DIV+CSS网页开发的书籍洗过脑，然后到现在还不怎么会用这种大众的布局方式。当然了，其实页面还有其它的一些布局方式，比如表格布局，框架布局这样已经逐渐被淘汰的布局方式，也有今天的主角–一颗冉冉上升的新星，弹性盒子布局。  Flex是Flexible Box的简称，我们这里把其翻译为弹性布局，至于为什么不叫“灵活的盒子布局”。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://olro3ke8a.bkt.clouddn.com/images/hexoSimulator%20Screen%20Shot%2022%20Feb%202017,%209.38.36%20PM.png">
+<meta property="og:updated_time" content="2017-02-22T14:23:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flex弹性布局">
+<meta name="twitter:description" content="说起布局，我脑子里一下就想到了DIV+CSS布局，毕竟曾经被那么多写着DIV+CSS网页开发的书籍洗过脑，然后到现在还不怎么会用这种大众的布局方式。当然了，其实页面还有其它的一些布局方式，比如表格布局，框架布局这样已经逐渐被淘汰的布局方式，也有今天的主角–一颗冉冉上升的新星，弹性盒子布局。  Flex是Flexible Box的简称，我们这里把其翻译为弹性布局，至于为什么不叫“灵活的盒子布局”。">
+<meta name="twitter:image" content="http://olro3ke8a.bkt.clouddn.com/images/hexoSimulator%20Screen%20Shot%2022%20Feb%202017,%209.38.36%20PM.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-Flex弹性布局" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Flex弹性布局
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/22/Flex弹性布局/">
+            <time datetime="2017-02-22T08:09:48.000Z" itemprop="datePublished">2017-02-22</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/CSS/">CSS</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>说起布局，我脑子里一下就想到了DIV+CSS布局，毕竟曾经被那么多写着DIV+CSS网页开发的书籍洗过脑，然后到现在还不怎么会用这种大众的布局方式。当然了，其实页面还有其它的一些布局方式，比如表格布局，框架布局这样已经逐渐被淘汰的布局方式，也有今天的主角–一颗冉冉上升的新星，弹性盒子布局。</p>
+</blockquote>
+<p>Flex是Flexible Box的简称，我们这里把其翻译为弹性布局，至于为什么不叫“灵活的盒子布局”。额，这个问题也许会在读完本篇文章找到答案。好吧，正式开始。</p>
+<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>flex是display的一个属性，当然对于行内元素还有一个叫做flex-inline的属性，这里我们不多说，但是要注意的是，一旦对一个元素的display属性设为flex，那么它的子元素就不能使用“浮动(float)”这个神奇的属性，而这个元素将会一跃成为容器(container)，而其的子元素将会成为项目。好吧，先从容器说起。</p>
+<p>一旦把一个元素的display属性设置成为’flex’，这个元素就成为一个<code>容器</code>，<code>容器</code>有几个比较重要的属性，学习和掌握这几个属性是学习弹性布局的关键。它们分别是：</p>
+<ol>
+<li>flex-direction: 决定子元素(项目)的排列方向。</li>
+<li>justify-content: 指定子元素在主轴上的对齐方式。</li>
+<li>flex-wrap: 指定多行显示以及显示形式。</li>
+<li>align-items: 决定项目在交叉轴上的对齐方式。</li>
+<li>align-content: 定义项目在多轴线上的对齐方式。</li>
+</ol>
+<p>好吧，大概就是这几个了，我们注意到在上面解释的时候提到了<code>主轴</code>和<code>交叉轴</code>，这里我先简单解释一下：对于这个概念，我们可以很简单的在一个容器上画一个十字坐标轴，如果我们设置flex-direction为row(行)，那么横坐标就为主轴，纵坐标就是交叉轴，这里要注意坐标轴的指向，因为同样有一个属性为<code>row-reverse</code>，此时主轴的方向指向和设置为<code>row</code>的相反方向。</p>
+<h3 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h3><p>作为容器的子元素，项目同样有几个重要的属性：</p>
+<ol>
+<li>order: 控制项目的排列，默认为0，值越小则越靠前。</li>
+<li>flex-grow: 用于定义Flex项目的放大比例，默认为0，即使存在剩余空间，也不放大。</li>
+<li>flex-shrink: 用于定义Flex项目的缩小比例，默认为1，即空间不足，Flex项目将等比缩小。</li>
+<li>align-self: 允许单个Flex项目有不同于其他Flex项目的对齐方式。</li>
+</ol>
+<h3 id="然后"><a href="#然后" class="headerlink" title="然后"></a>然后</h3><p>我并不会把每一个属性具体来讲，因为这样的文章在网络上的确太多了。我正在学习RN，所以在这里就写一个界面，其中的布局将会采用弹性布局，中途我会对布局进行简单的分析，以加深理解。<br>当写到这里的时候我就开始布局这个简单的页面，然后到现在才布局好，时间用了那么长，感觉像是过了一年…好了，不多说了，最终的界面如下图所示。<br><img src="http://olro3ke8a.bkt.clouddn.com/images/hexoSimulator%20Screen%20Shot%2022%20Feb%202017,%209.38.36%20PM.png" width="300px" height="500px"><br>其实我也不知道自己写了啥，还是勉为其难的就叫其“登录页面”吧，现在我来分析一下这个页面哪些元素是容器和项目(当然都是项目啦)，又在什么地方使用了什么属性。</p>
+<p>页面整体采用了弹性布局，所以从整体来看我们一定使用了flex-direction属性，并且其值是<code>column</code>，所以这里的主轴一定是Y轴并且是方向向上。并且我们能够观察到，页面上所有的元素都是居中的，我们于是想到了在交叉轴上的对齐方式是: align-items: ‘center’，而其主轴上的对齐方式则是默认的justify-content: ‘flex-start’。</p>
+<p>接下来来看两个不明显的，页面上有两个输入框，每个输入框其实都是一个<code>View</code>组件包裹，那么在这个组件内部，我们仍然使用了弹性布局(竖轴为主轴)，为了让输入框上下居中，这里必须让justify-content: ‘center’；紧接着最后一行有两个按钮，这两个按钮同样在一个<code>View</code>组件中，并且这个<code>View</code>也是弹性布局，并且一定要设置flex-direction: ‘row’才能让这两个按钮排列在一行。我们同样可以给每个按钮赋予不同的order值，让其进行排序。</p>
+<p>总结一下：<br>我们是用弹性布局完成了一个基本页面的布局(虽然这真的很丑陋)，在这个简单的布局中我们使用到的属性并不多，但是的确比使用css+div布局来得更快，尤其是垂直上的居中，css是比较难以实现的。这里我们一共有四个容器，分别是最外层容器，每一个输入框外层容器，按钮组外层容器，当然，这里面所有的元素都能称为项目，这里就不在多说。</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>说了这么多，那么我对flex布局的态度到底是什么？一句话总结，学习它，了解它，使用它。弹性布局我在刚开始学习React的时候就有了解过，过了也快半年了吧，当时看着阮一峰老师的文章，感觉怎么都不明白，然后渐渐抛之脑后。直到学期开始，我开始学习RN，再一次接触到Flex布局，才想起来画一些时间去了解，然后试着使用，最后再让自己记忆下来。相比第一次我接触Flex布局，我做出了改变，而这种改变是在时间并不充裕的情况下，弥足珍贵的。希望自己能够加油，也希望和我有同样压力的同学加油！</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="cjla85vxz0003e8udoz52k55f" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/02/22/Flex弹性布局/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/22/Flex弹性布局/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/02/28/兑水的心灵鸡汤/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    兑水的心灵鸡汤
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/02/11/生成器/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">生成器</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 12px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2017/02/22/Flex弹性布局/';
+        
+        this.page.identifier = 'Flex弹性布局';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

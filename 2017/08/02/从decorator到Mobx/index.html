@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>从Decorator到Mobx | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="最近在开发一款视频编辑器，其中就用到了Mobx作为状态管理工具。Mobx中很重要的概念例如可观察(observable)的状态，可计算(computed)的值都用到了decorator(当然在使用Mobx时可以不用)。Decorator作为ES7引入的新特性，用于给类/属性添加新行为。对于不少初学者而言，可能对其并不是很了解，所以在这里从装饰器开始，聊聊我对Decorator和Mobx的理解。如">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Decorator到Mobx">
+<meta property="og:url" content="http://yoursite.com/2017/08/02/从decorator到Mobx/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="最近在开发一款视频编辑器，其中就用到了Mobx作为状态管理工具。Mobx中很重要的概念例如可观察(observable)的状态，可计算(computed)的值都用到了decorator(当然在使用Mobx时可以不用)。Decorator作为ES7引入的新特性，用于给类/属性添加新行为。对于不少初学者而言，可能对其并不是很了解，所以在这里从装饰器开始，聊聊我对Decorator和Mobx的理解。如">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-08-07T02:13:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从Decorator到Mobx">
+<meta name="twitter:description" content="最近在开发一款视频编辑器，其中就用到了Mobx作为状态管理工具。Mobx中很重要的概念例如可观察(observable)的状态，可计算(computed)的值都用到了decorator(当然在使用Mobx时可以不用)。Decorator作为ES7引入的新特性，用于给类/属性添加新行为。对于不少初学者而言，可能对其并不是很了解，所以在这里从装饰器开始，聊聊我对Decorator和Mobx的理解。如">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-从decorator到Mobx" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            从Decorator到Mobx
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/08/02/从decorator到Mobx/">
+            <time datetime="2017-08-02T06:03:25.000Z" itemprop="datePublished">2017-08-02</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>最近在开发一款视频编辑器，其中就用到了Mobx作为状态管理工具。Mobx中很重要的概念例如可观察(observable)的状态，可计算(computed)的值都用到了decorator(当然在使用Mobx时可以不用)。Decorator作为ES7引入的新特性，用于给类/属性添加新行为。对于不少初学者而言，可能对其并不是很了解，所以在这里从装饰器开始，聊聊我对Decorator和Mobx的理解。如果你正在学习Mobx，希望能对你快速上手Mobx能有所帮助。</p>
+</blockquote>
+<h3 id="先说装饰器-Decorator"><a href="#先说装饰器-Decorator" class="headerlink" title="先说装饰器(Decorator)"></a>先说装饰器(Decorator)</h3><p>装饰器是ES7中引入的，其目的在于修改类/方法的行为。例如我们可以在不修改“类”的情况下为其增加新的功能。</p>
+<p>例如：我们定义了一个学生“类”，其中有<code>name</code>，<code>age</code>两个属性，以及<code>showInfo</code>一个方法。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">	<span class="keyword">constructor</span>(name, age) &#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">		<span class="keyword">this</span>.age = age;</span><br><span class="line">	&#125;</span><br><span class="line">	showInfo = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="string">`name:<span class="subst">$&#123;<span class="keyword">this</span>.name&#125;</span>, age: <span class="subst">$&#123;<span class="keyword">this</span>.age&#125;</span>`</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果此时我们想为这个类添加一个属性<code>school</code>用于标明学校，，在不修改“类”的情况下，我们可以使用装饰器这么做：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addSchool</span>(<span class="params">target</span>) </span>&#123;</span><br><span class="line">	target.prototype.school = <span class="string">'SDU'</span>;</span><br><span class="line">&#125;</span><br><span class="line">@addId</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">	<span class="comment">//	...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">	@decorator</span></span><br><span class="line"><span class="comment">	class A&#123;&#125;</span></span><br><span class="line"><span class="comment">	等价于</span></span><br><span class="line"><span class="comment">	A = decorator(A);</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> limoer = <span class="keyword">new</span> Student(<span class="string">'limoer'</span>, <span class="number">21</span>);</span><br><span class="line"><span class="built_in">console</span>.log(limoer.school); <span class="comment">// &gt; SDU</span></span><br></pre></td></tr></table></figure>
+<p>addSchool()给Student“类”的原型对象上添加了一个属性，现在所有实例都可以取到<code>school</code>这个属性。</p>
+<p>更深入一步，上面看到用于装饰的函数只接收一个目标“类”作为参数，如果我们有多个参数的话，可以写成高阶函数的形式(即返回一个函数)。同样是上面的例子，现在学校由参数指定，我们可以这样写：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addSchool</span>(<span class="params">school_name</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">target</span>) </span>&#123;</span><br><span class="line">		target.prototype.school = school_name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">@addSchool(<span class="string">'CQMU'</span>)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">	<span class="comment">//	...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> lin = <span class="keyword">new</span> Student(<span class="string">'lin'</span>, <span class="number">20</span>);</span><br><span class="line"><span class="built_in">console</span>.log(lin.school); <span class="comment">// &gt; CQMU</span></span><br></pre></td></tr></table></figure>
+<p>装饰器不但可以装饰“类”，也可以对方法(…属性)进行修饰，使用的方式类似于对“类”的修饰，不过用于修饰的函数接收三个参数,<code>target</code>将要被修饰的对象, <code>name</code>被修饰的属性名, <code>descriptor</code>被修饰的属性的描述对象(ES5中详细介绍过)。 写一个简单的例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showCount</span>(<span class="params">target, name, descriptor</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">let</span> prev = descriptor.value;</span><br><span class="line">	descriptor.value = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="string">'count:'</span> + StudentList.list.length);</span><br><span class="line">		prev.call(<span class="literal">null</span>, <span class="built_in">arguments</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> descriptor;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StudentList</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">static</span> list = [<span class="string">'limoer'</span>, <span class="string">'lin'</span>];</span><br><span class="line"></span><br><span class="line">	@showCount</span><br><span class="line">	showNames () &#123;</span><br><span class="line">		<span class="built_in">console</span>.log(StudentList.list.join(<span class="string">' '</span>));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> list = <span class="keyword">new</span> StudentList();</span><br><span class="line">list.showNames(); <span class="comment">// count:2 \n limoer lin</span></span><br></pre></td></tr></table></figure>
+<p>上面的代码给<code>StudentList</code>类的<code>showNames</code>方法添加了打印数量的功能，并且是在不改变原有“类”结构的情况下。</p>
+<blockquote>
+<p>说明，在现有的浏览器环境和Node都不能运行上面的代码(暂不支持装饰器)，如果想运行的话，可以借用babel 并且使用相关插件(babel-plugin-transform-decorators-legacy)的前提下进行compile，之后就可以进行了。推荐开发过程中webpack和babel结合使用，效果更佳！</p>
+</blockquote>
+<p>好了，关于Decorator简单介绍到此到一段落，更多的相关知识请自行发掘和学习。接下来，是时候了解并使用Mobx了！</p>
+<h3 id="Mobx？想说爱你不容易！"><a href="#Mobx？想说爱你不容易！" class="headerlink" title="Mobx？想说爱你不容易！"></a>Mobx？想说爱你不容易！</h3><p>在文章最开头谈到我在最近的学习开发中使用了Mobx作为状态管理工具，最主要的原因是其相比Redux，学习和快速上手成本的确消了很多，并且它足够简单。但是在后来的开发过程中，虽然其可以没有redux中action，也不存在reducer，更是告别了单一而庞大的store，我们可以定义多个state用于保存状态，让每个状态或者是每个类属性添加注解，让其编程可观察的状态，而为了能够自动的更新值，我们可以通过使用computed这个装饰器或者autorun函数来完成。可是，在使用过程中，定义多少个状态，每个状态的结构又是如何，等等等等，都困扰着我，远没有使用redux来得清晰和直观。这也许是因为我对mobx目前刚好达到基本使用的程度，并没有深入的了解。基于此，接下来，我只谈谈Mobx入门，至于该如何优雅的使用，请自行摸索。</p>
+<h4 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h4><ol>
+<li>可观察的状态</li>
+</ol>
+<p>这也许是Mobx最基础也是最重要的概念了。我们可以使用Mobx提供的<code>observable</code>装饰器，让基本的数据结构(数组、对象、原始值等)变成可观察的。使用的方式如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> TimeState = observable(&#123;</span><br><span class="line">	currentTime: <span class="built_in">Date</span>.now()</span><br><span class="line">&#125;)</span><br><span class="line">TimeState.set(<span class="string">"currentTime"</span>, <span class="keyword">new</span> <span class="built_in">Date</span>().toString());</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	@observable list = [<span class="string">'limoer'</span>, <span class="string">'lin'</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> state = <span class="keyword">new</span> AppState();</span><br><span class="line"><span class="built_in">console</span>.log(state.list.length); <span class="comment">// &gt; 2</span></span><br></pre></td></tr></table></figure>
+<p>好了，最简单的例子就是这样，我们使用ES5和ES6 decorator的方式分别创建了两个state，第一个state我们适应装饰器让一个对象(Map)变得可观察，而第二个我们则是对一个“类”属性(为一个数组)进行了修饰，让其变成可观察的。</p>
+<p>这里值得注意的是，如果一个数据结构变得可观察，那么其类型也会发生改变，例如我们让一个数据变得可观察，此时其已经变成了一个 <code>Observable Array</code>， 这是一种Mobx定义的数据结构，拥有其独特的API，此时使用<code>Array.isArray(state.list)</code>讲返回false，因为<code>Observable Array</code> 并不是一种数组类型。</p>
+<p>好了，当看到这里，你是否有这样一个疑问：让一个数据结构变得可观察，其作用到底在哪里呢？其实很简单，我们都知道Mobx是React的小伙伴，其目的是在于替换React本身的<code>state</code>，我们都知道对于React而言，如果一旦state发生改变，就将导致页面更新并且重新渲染，基于此，让数据结构变得可观察，其目的是在于当被观察的数据发生改变，React也能做出相应的更新和重绘操作等，并且，这样的重绘是经过Mobx优化的，只进行必要的重绘来增加性能！</p>
+<ol start="2">
+<li>可计算值</li>
+</ol>
+<p>可计算值是通过现有状态和其它可计算值派生出来的值。这很好理解，我们在使用React的时候，往往要通过state衍生出很多的值，例如如果state的一部分是一个数组，那么我们通过衍生得到的数组长度就是一个计算值，并且在Mobx中，一旦可观察的state或者其他computed value 发生改变，可计算值就会重新计算。其实，在实际的React项目中，我们在很多地方都使用到了计算值。</p>
+<p>还是上面<code>AppState</code>的例子，现在我们给其增加一个计算值，</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	@observable list = [<span class="string">'limoer'</span>, <span class="string">'lin'</span>];</span><br><span class="line">	@computed get count() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.list.length;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> state = <span class="keyword">new</span> AppState();</span><br><span class="line"><span class="built_in">console</span>.log(state.count); <span class="comment">// &gt; 2</span></span><br><span class="line">state.list.push(<span class="string">'lindo'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(state.count); <span class="comment">// &gt; 3</span></span><br></pre></td></tr></table></figure>
+<p><code>count</code>是一个计算值，一旦list发生变化，其就会自动重新计算，可以保证，<code>count</code>的值每次都是最新的，并且都是等于list数组的长度。</p>
+<ol start="3">
+<li>autorun</li>
+</ol>
+<p>其作用和函数名一样好理解，其会自动执行；<code>autorun</code>其本身是一个响应式函数，其使用到的依赖关系state/computed value等一旦发生改变，其就会自动执行一次，效果和计算值类似，但是计算值和<code>autorun</code>的应用场景是不一样的，<code>computed value</code>通常会产生一个新值而<code>autorun</code>达到某种目的而不产生新值，例如生成日志，处理网络请求等。<br>还是上面的例子，我们继续扩展：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	<span class="comment">// ...省略前面的代码</span></span><br><span class="line">	<span class="keyword">let</span> logcount = autorun(<span class="function"><span class="params">()</span> =&gt;</span> &#123;<span class="built_in">console</span>.log(<span class="string">'count: '</span> + <span class="keyword">this</span>.count)&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们在<code>autorun</code>中使用了<code>computed value</code>， 一旦发生<code>count</code>改变，就会自动打印出新的<code>count</code>值；当然，初始化state实例对象的时候，就会先执行一次。</p>
+<ol start="4">
+<li>action</li>
+</ol>
+<p>动作是用来修改状态的。并且只应该对修改状态的函数使用<code>action</code>，要使用动作很简单，使用<code>@action</code>修饰一个函数或者使用<code>action(fn)</code>，把要修饰的函数作为参数即可。继续上面的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 省略上面的代码</span></span><br><span class="line">	@action.bound</span><br><span class="line">	addOne(name) &#123;</span><br><span class="line">		<span class="keyword">this</span>.list.push(name);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 或者</span></span><br><span class="line">	@action</span><br><span class="line">	addOne = <span class="function">(<span class="params">name</span>) =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.list.push(name);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面我们定义了一个函数，用于向列表中添加一个姓名。请注意，ES6 class的写法无法自动绑定到对象，所以使用<a href="mailto:`@action.bound" target="_blank" rel="noopener">`@action.bound</a>` 或者是使用ES6中引入的箭头函数(推荐)。</p>
+<h4 id="与React使用"><a href="#与React使用" class="headerlink" title="与React使用"></a>与React使用</h4><ol start="5">
+<li>observer<br><code>observer</code>是由<code>mobx-react</code>包(需独立安装)提供的用于让组件变成响应式组件的decorator。官方文档中写到：它用 <code>mobx.autorun</code> 包装了组件的 <code>render</code> 函数以确保任何组件渲染中使用的数据变化时都可以强制刷新组件。</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; Component &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; render &#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="comment">// 其余依赖省略</span></span><br><span class="line">@observer</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NameList</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">	addUser = <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">		e.preventDefault();</span><br><span class="line">		<span class="keyword">if</span>(<span class="keyword">this</span>.uname.value)&#123;</span><br><span class="line">			<span class="keyword">this</span>.props.appstate.addOne(<span class="keyword">this</span>.uname.value);</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="built_in">console</span>.log(<span class="string">'must input user name!'</span>);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line">			&lt;ul&gt;</span><br><span class="line">				&#123;</span><br><span class="line">					this.props.appstate.list.map((index, name) =&gt; &#123;</span><br><span class="line">						return &lt;li key=&#123;index + 10&#125;&gt;&#123;name&#125;&lt;/li&gt;</span><br><span class="line">					&#125;)</span><br><span class="line">				&#125;</span><br><span class="line"><span class="xml">			<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span></span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;p&gt;当前用户人数：&#123;this.props.appstate.count&#125;&lt;/p&gt;</span><br><span class="line">				&lt;label for="uname"&gt;姓名&lt;/label&gt;</span><br><span class="line">				&lt;input type="text" name="uname" ref=&#123;(ref) =&gt; this.uname = ref&#125;/&gt;</span><br><span class="line">				&lt;button onClick=&#123;this.addUser&#125;&gt;+&lt;/button&gt;</span><br><span class="line">			&lt;/div&gt;</span><br><span class="line"><span class="xml">		<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">	&#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line">render(&lt;NameList appstate=&#123;appstate&#125; /&gt;, document.getElementById('app'));</span><br></pre></td></tr></table></figure>
+<p>上面是一个响应式组件的例子，结合了上面定义的状态，我们可以查看所有的姓名、数量，并且可以通过点击按钮来改变state。其实<code>observer</code>对非响应式组件仍然有效，同样是上面的例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> List = observer(<span class="function">(<span class="params">&#123;appstate&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span></span><br><span class="line"><span class="xml">		appstate.list.map((index, name) =&gt; &#123;</span></span><br><span class="line"><span class="xml">			return <span class="tag">&lt;<span class="name">li</span> <span class="attr">key</span>=<span class="string">&#123;index</span> + <span class="attr">19</span>&#125;&gt;</span>&#123;name&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span></span><br><span class="line"><span class="xml">		&#125;)</span></span><br><span class="line"><span class="xml">	<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>好了，对于<code>observer</code>的介绍就告一段落，更多的Mobx和React连接的方式，以及Mobx提供的生命钩子函数等相关知识你可以查看官方文档来了解。</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><blockquote>
+<p>自从放了暑假回了家，效率下降特别多，在学校的时候以为回家可以安心学习，到了家才知道一切都变了，该做的事情还没做，还有更多的知识要学习。所以，早早回学校也许是一个不错的选择！所以再过几天，就要启程回学校了，在最后一年里，期待所有的努力都没有白费，期待一个新(好)的开始！</p>
+</blockquote>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="cjla85vyh000qe8ud76gwivu6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/08/02/从decorator到Mobx/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/08/02/从decorator到Mobx/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/08/24/three-js/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    Three.js
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/07/31/响应式布局的那些事/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">响应式布局的那些事</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 12px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2017/08/02/从decorator到Mobx/';
+        
+        this.page.identifier = '从decorator到Mobx';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

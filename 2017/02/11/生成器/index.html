@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>生成器 | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="大家对于异步这个词想必都不陌生，看到异步我可能最先想到的就是使用回调，再者我会使用Promise，可是使用回调处理异步控制流是有缺陷的：第一，基于回调的异步方式实在不适合大脑对于任务的思考(这点我深有体会)；第二，存在控制反转的问题。而Promise链提供了我们以顺序的方式处理和表达异步流。而这篇文章的主角生成器(generator)也是一种顺序和看似同步的处理异步的方式，并且它比Promise">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="生成器">
+<meta property="og:url" content="http://yoursite.com/2017/02/11/生成器/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="大家对于异步这个词想必都不陌生，看到异步我可能最先想到的就是使用回调，再者我会使用Promise，可是使用回调处理异步控制流是有缺陷的：第一，基于回调的异步方式实在不适合大脑对于任务的思考(这点我深有体会)；第二，存在控制反转的问题。而Promise链提供了我们以顺序的方式处理和表达异步流。而这篇文章的主角生成器(generator)也是一种顺序和看似同步的处理异步的方式，并且它比Promise">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-02-14T04:15:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="生成器">
+<meta name="twitter:description" content="大家对于异步这个词想必都不陌生，看到异步我可能最先想到的就是使用回调，再者我会使用Promise，可是使用回调处理异步控制流是有缺陷的：第一，基于回调的异步方式实在不适合大脑对于任务的思考(这点我深有体会)；第二，存在控制反转的问题。而Promise链提供了我们以顺序的方式处理和表达异步流。而这篇文章的主角生成器(generator)也是一种顺序和看似同步的处理异步的方式，并且它比Promise">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-生成器" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            生成器
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/11/生成器/">
+            <time datetime="2017-02-11T04:10:07.000Z" itemprop="datePublished">2017-02-11</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>大家对于<em>异步</em>这个词想必都不陌生，看到异步我可能最先想到的就是使用回调，再者我会使用Promise，可是使用回调处理异步控制流是有缺陷的：第一，基于回调的异步方式实在不适合大脑对于任务的思考(这点我深有体会)；第二，存在控制反转的问题。而Promise链提供了我们以顺序的方式处理和表达异步流。而这篇文章的主角生成器(generator)也是一种顺序和看似同步的处理异步的方式，并且它比Promise更加优秀。</p>
+</blockquote>
+<h3 id="有关函数"><a href="#有关函数" class="headerlink" title="有关函数"></a>有关函数</h3><p>不知道大家有没有这样思考过，一个函数一旦执行，其是否能够中断，我也没有仔细想这个问题，并且当看到这个问题，我会经验判断函数在执行过程中不会中断。到底是否中断，我们先写一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  bar();</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">&#125;</span><br><span class="line">foo(); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
+<p>运行上面这个例子，最终的结果是3，这就意味着，当函数执行完a++后，函数foo从表面上来看被中断了，然后执行了bar函数，最后执行权交给foo，函数返回已经被修改的变量a的值。虽然通过上面的小例子，并且因为JS单线程的特性，我们似乎能够肯定JS是抢占式的，但实际情况是JS并不是抢占式的，虽然函数bar的执行打断了函数foo的执行，但这其实是一种“关联”(参考原型继承)。</p>
+<h3 id="初识生成器"><a href="#初识生成器" class="headerlink" title="初识生成器"></a>初识生成器</h3><p>现在让我们来认识生成器表达式，<br>同样是上面的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;   </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> iter = foo();</span><br><span class="line">iter.next();</span><br><span class="line">bar();</span><br><span class="line">iter.next(); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
+<p>分析一下：<br>首先我们创建了一个生成器foo(注意*)，该函数里面多了一个yield，有过python经验的大概知道这是干什么的。然后创建了一个函数bar；再来看执行，这里var iter = foo()并没有执行生成器foo，而是构建了一个迭代器，然后使用next方法启动了迭代器foo，并且在碰到yield停止执行，此时已经执行了x++，然后执行函数bar，执行完后，x经过两轮自增，此时x的值为3；最后我们调用next方法，从上一次中断处继续执行，并且没有碰到yield表达式，一直执行到函数结束，打印变量x的值为3。</p>
+<p>现在我们来回答什么是生成器，其是一个特殊的函数，在函数声明的时候函数名前面包含一个”*“，并且能够多次启动和暂停。好了，我认为仅此而已。</p>
+<h3 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h3><p>为了把生成器运用到异步流程控制中，我们还需要更深层次的了解生成器。</p>
+<h4 id="生成器仍然是一种函数"><a href="#生成器仍然是一种函数" class="headerlink" title="生成器仍然是一种函数"></a>生成器仍然是一种函数</h4><p>既然说生成器其本质上还是一种函数，所以其仍然具备函数最基本的特性，能够传递参数，也能返回值。我们不妨写一个例子测试一下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">test</span>(<span class="params">a, b</span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span>;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = test(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">it.next();</span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure></p>
+<p>其实生成器和普通函数的一个很大区别是在运行期间，它不会直接运行，而是创建了一个迭代器，然后每调用迭代器的next方法，便向下执行直到到碰到yield或者执行完成暂停。而我们注意到调用next方法返回的其实是一个对象，其包含一个value属性，如果生成器返回值的话，那么该属性的值就为生成器返回的值。总的来说，生成器的运行到目前为止完全是依托迭代器。</p>
+<p>好了，继续。</p>
+<p>继续来看例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params">a, b</span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span> a;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line"><span class="keyword">var</span> mid = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(mid.value); <span class="comment">// 2</span></span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.next); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure></p>
+<p>这个例子想表达的就是对于生成器而言，yield表达式总会返回一个值，而我们可以通过迭代器next方法生成的对象来得到。</p>
+<p>继续来看一个更复杂的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params">a</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> b = a + (<span class="keyword">yield</span> <span class="string">'ok return!'</span>);</span><br><span class="line">  <span class="keyword">return</span> b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// ok return!</span></span><br><span class="line">res = it.next(<span class="number">2</span>);</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
+<p>这个例子向我们展示了生成器是如何双向传递消息的，yield表达式可以发出消息响应next(…)的调用，而next(…)可以向暂停的yield表达式发送值。</p>
+<h4 id="多个迭代器"><a href="#多个迭代器" class="headerlink" title="多个迭代器"></a>多个迭代器</h4><p>一个生成器的多个实例可以并发执行，并且可以彼此交互。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">gen</span>(<span class="params">a</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> b = a + (<span class="keyword">yield</span>)</span><br><span class="line">  <span class="keyword">return</span> b</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it1 = gen(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">var</span> it2 = gen(<span class="number">2</span>);</span><br><span class="line">it1.next();</span><br><span class="line"><span class="keyword">var</span> res = it1.next(<span class="number">3</span>).value;</span><br><span class="line">it2.next();</span><br><span class="line"><span class="built_in">console</span>.log(it2.next(res).value); <span class="comment">// 6</span></span><br></pre></td></tr></table></figure></p>
+<p>这个例子想说明的是一个生成器的多个实例可以并发执行，并且是互不干扰的。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="cjla85vza002ee8udwarcrcsu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/02/11/生成器/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/11/生成器/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/02/22/Flex弹性布局/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    Flex弹性布局
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/02/03/Prototype/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Prototype</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 12px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2017/02/11/生成器/';
+        
+        this.page.identifier = '生成器';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>前端路由拦截和http响应拦截 | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="问题由来最近在制作毕业设计的时候，遇到一个问题，那就是用户的访问控制。简单点来说，就是未登录用户只能访问某些特定的页面、API。最初我的想法是用户登录后返回一个凭证，用户以后的每次http请求都带上该凭证，进行验证，只有验证成功才能继续请求。然后在每个页面进行判断，如果用户是未登录或者凭证失效，则进行相应的提示和路由跳转。刚开始的时候，这个方法是完全可行的，但是在开发过程中，随着业务逻辑变得复杂、">
+<meta name="keywords" content="Vue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端路由拦截和http响应拦截">
+<meta property="og:url" content="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="问题由来最近在制作毕业设计的时候，遇到一个问题，那就是用户的访问控制。简单点来说，就是未登录用户只能访问某些特定的页面、API。最初我的想法是用户登录后返回一个凭证，用户以后的每次http请求都带上该凭证，进行验证，只有验证成功才能继续请求。然后在每个页面进行判断，如果用户是未登录或者凭证失效，则进行相应的提示和路由跳转。刚开始的时候，这个方法是完全可行的，但是在开发过程中，随着业务逻辑变得复杂、">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-05T06:08:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="前端路由拦截和http响应拦截">
+<meta name="twitter:description" content="问题由来最近在制作毕业设计的时候，遇到一个问题，那就是用户的访问控制。简单点来说，就是未登录用户只能访问某些特定的页面、API。最初我的想法是用户登录后返回一个凭证，用户以后的每次http请求都带上该凭证，进行验证，只有验证成功才能继续请求。然后在每个页面进行判断，如果用户是未登录或者凭证失效，则进行相应的提示和路由跳转。刚开始的时候，这个方法是完全可行的，但是在开发过程中，随着业务逻辑变得复杂、">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-前端路由拦截和http响应拦截" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            前端路由拦截和http响应拦截
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/04/05/前端路由拦截和http响应拦截/">
+            <time datetime="2018-04-05T05:12:41.000Z" itemprop="datePublished">2018-04-05</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Vue/">Vue</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="问题由来"><a href="#问题由来" class="headerlink" title="问题由来"></a>问题由来</h3><p>最近在制作毕业设计的时候，遇到一个问题，那就是用户的访问控制。简单点来说，就是未登录用户只能访问某些特定的页面、API。最初我的想法是用户登录后返回一个凭证，用户以后的每次http请求都带上该凭证，进行验证，只有验证成功才能继续请求。然后在每个<code>页面</code>进行判断，如果用户是未登录或者凭证失效，则进行相应的提示和路由跳转。刚开始的时候，这个方法是完全可行的，但是在开发过程中，随着业务逻辑变得复杂、页面增多，重复代码太多，这样的方式也许并不合适。</p>
+<h3 id="如何解决"><a href="#如何解决" class="headerlink" title="如何解决"></a>如何解决</h3><p>首先是后端，我使用了<code>jsonwebtoken</code>，用户登录成功都会生成一个具有一定时效的    <code>token</code>，这个token会发回到客户端，并且接下来每次发起http请求，都在http头的<code>authorization</code>字段带上这个<code>token</code>。我这里使用了<a href="https://www.npmjs.com/package/axios" target="_blank" rel="noopener">axios</a>这个http请求库，只需要在拿到<code>token</code>后：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axios.defaults.headers.common.authorization = <span class="string">`Bearer <span class="subst">$&#123;token&#125;</span>`</span>;</span><br></pre></td></tr></table></figure></p>
+<p>就可以了。</p>
+<p>由于在开发过程中涉及到跨域，这里我使用CORS来解决：通过设置一系列<code>Access-Control-Allow-*</code>响应头进行访问控制，上面提到了在请求头的<code>authorization</code>字段中设置token，因此发出的请求都不是简单请求，所以注意在每次发起http请求时，就会自动发起一个<code>OPTIONS</code>请求。</p>
+<p>我服务器端用的是<code>Express</code>框架，我们需要写一个中间件来处理每一个请求。处理逻辑为：针对每个<code>OPTIONS</code>请求，直接放行；对于某些请求，如果在白名单中(例如登录、注册等不需要验证的路由)，放行；对于其他请求，我们拿到其携带的token，并且进行验证，如果验证通过，放行，否则结束请求，返回未授权。具体的代码如下，这里我使用<code>jsonwebtoken</code>这个package，用于生成<code>token</code>和进行<code>token</code>验证。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'methods'</span> ,req.method);</span><br><span class="line">  <span class="keyword">if</span>( req.method === <span class="string">'OPTIONS'</span> ) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'option请求直接通过'</span>);</span><br><span class="line">    next();</span><br><span class="line">  &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 除去某些特定的API，其余的都做token的验证</span></span><br><span class="line">    <span class="keyword">let</span> &#123; path &#125; = req;</span><br><span class="line">    <span class="keyword">if</span>(path === <span class="string">'/api/users/auth'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/auth_vc'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/check_id_validation'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/regist'</span></span><br><span class="line">      || path === <span class="string">'/api/users/send_reset_email'</span></span><br><span class="line">      || path === <span class="string">'/api/users/reset_password'</span></span><br><span class="line">    ) </span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'本次请求不需要验证权限'</span>);</span><br><span class="line">      next();</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> token = req.headers.authorization ? req.headers.authorization.split(<span class="string">' '</span>)[<span class="number">1</span>] : <span class="string">''</span>;</span><br><span class="line">      req.token = token;</span><br><span class="line">      jwt.verify(token, KEY, (err, decoded) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span>(err) &#123;</span><br><span class="line">          res.status(<span class="number">401</span>).json(&#123; <span class="attr">status</span>: <span class="number">3</span>, <span class="attr">error</span>: <span class="string">'用户认证失败'</span>, <span class="attr">data</span>: <span class="string">''</span> &#125;)</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'验证权限通过'</span>);</span><br><span class="line">          req.decoded = decoded;</span><br><span class="line">          next();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>然后是前端，我想如果能像后端拦截每个请求一样，写一个逻辑拦截所有的相应，并进行处理，信号，<code>axios</code>自带拦截器，我们只需要写我们的逻辑就可以了。我的想法是，拦截每一个相应，如果其状态码是<code>401</code>，那么久提示<code>token</code>失效，并且进行路由跳转。<br>以<code>vue-cli</code>构建的应用为例，在<code>main.js</code>中，下面是实现：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.response.use(<span class="function"><span class="params">data</span> =&gt;</span> data, (error) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span>(error.response) &#123;</span><br><span class="line">    <span class="keyword">switch</span>(error.response.status) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">401</span>: &#123;</span><br><span class="line">        localStorage.removeItem(<span class="string">'token'</span>);</span><br><span class="line">        router.replace(&#123;</span><br><span class="line">          path: <span class="string">'/auth'</span>,</span><br><span class="line">          query: &#123;<span class="attr">redirect</span>: router.currentRoute.fullPath&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>值得说明的是，如果我们在某个访问的过程中，<code>token</code>失效，我们需要跳转到登录页面，但是想登录过后再跳转回来，所以这里在进行路由跳转的时候，我设置了一个参数, <code>redirect</code>，表示传入当前的路径，当我们登录成功后，在跳转回来即可。</p>
+<p>最后是路由拦截，这里我使用了<code>vue-router</code>，其实<code>vue-router</code>的路由对象提供一个钩子函数<code>beforeEach</code>，其会在每一次路由跳转之前，执行这个函数，我们就在这里进行路由拦截。原理很简单，使用一个标志位标明每个路由是否需要用户权限，如果需要的话，我们检查保存在本地的凭证，一般存在<code>localStorage</code>中，如果不含凭证就直接跳转到登录页面。</p>
+<p>好了，找到根路由文件，添加：</p>
+<pre><code class="javascript">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span> , next</span>) =&gt;</span> {
+  <span class="keyword">if</span>(to.matched.some(<span class="function"><span class="params">res</span> =&gt;</span> res.meta.requireAuth)) {
+    <span class="keyword">if</span>(localStorage.getItem(<span class="string">'token'</span>)) {
+      next();
+    }<span class="keyword">else</span> {
+      next({
+        path: <span class="string">'/auth'</span>,
+        query: { <span class="attr">redirect</span>: to.fullPath }
+      })
+    }
+  }<span class="keyword">else</span> {
+    next();
+  }
+})
+
+</code></pre>
+<p>这里要注意的是，<code>res.meta.requireAuth</code>是你自己在声明路由的时候自定义的。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>差不多，这算是一个比较好的解决方案了。但是有这样一个情况：如果用户凭证有效期是1小时，那么如果我浏览网页超过一个小时了，凭证还是保存在本地的，当我们进行路由跳转的时候，并没有验证凭证是否失效，所以还是会进行路由跳转。这里不用担心，因为进入进入了一个路由后，一旦发起http请求，<code>token</code>失效，http相应拦截就会生效，进而跳转到登录页面。</p>
+<p>加油！</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="cjla85vyt001ee8udaavxo8g2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2018/05/01/Hello-Goodbye-Hello/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    Hello Goodbye &amp; Hello
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2018/02/24/最近这段时间/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">最近这段时间</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 12px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/';
+        
+        this.page.identifier = '前端路由拦截和http响应拦截';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

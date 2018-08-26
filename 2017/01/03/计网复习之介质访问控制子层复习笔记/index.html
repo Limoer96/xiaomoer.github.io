@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>计网复习之介质访问控制子层复习笔记 | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="介质访问控制子层传统信道分配FDM&amp;amp;TDM的缺点是带宽利用率不高，并且存在高延迟动态信道分配 多路访问协议纯ALOHA协议：当用户有数据时就传送，解决冲突的办法是，在一个站发送了一个帧过后，把该帧广播到所有其他站。不监听信道，所以冲突是很容易发生的。 分槽ALOHA：将时间分成离散的时间间隔，这些时间间隔就为时间槽，每个时间槽对应一帧。最佳的效率为1/e 载波监听多路访问协议：站监听是否存">
+<meta name="keywords" content="计算机网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计网复习之介质访问控制子层复习笔记">
+<meta property="og:url" content="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="介质访问控制子层传统信道分配FDM&amp;amp;TDM的缺点是带宽利用率不高，并且存在高延迟动态信道分配 多路访问协议纯ALOHA协议：当用户有数据时就传送，解决冲突的办法是，在一个站发送了一个帧过后，把该帧广播到所有其他站。不监听信道，所以冲突是很容易发生的。 分槽ALOHA：将时间分成离散的时间间隔，这些时间间隔就为时间槽，每个时间槽对应一帧。最佳的效率为1/e 载波监听多路访问协议：站监听是否存">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-01-07T12:37:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="计网复习之介质访问控制子层复习笔记">
+<meta name="twitter:description" content="介质访问控制子层传统信道分配FDM&amp;amp;TDM的缺点是带宽利用率不高，并且存在高延迟动态信道分配 多路访问协议纯ALOHA协议：当用户有数据时就传送，解决冲突的办法是，在一个站发送了一个帧过后，把该帧广播到所有其他站。不监听信道，所以冲突是很容易发生的。 分槽ALOHA：将时间分成离散的时间间隔，这些时间间隔就为时间槽，每个时间槽对应一帧。最佳的效率为1/e 载波监听多路访问协议：站监听是否存">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-计网复习之介质访问控制子层复习笔记" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            计网复习之介质访问控制子层复习笔记
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/01/03/计网复习之介质访问控制子层复习笔记/">
+            <time datetime="2017-01-03T13:29:08.000Z" itemprop="datePublished">2017-01-03</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/计算机网络/">计算机网络</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="介质访问控制子层"><a href="#介质访问控制子层" class="headerlink" title="介质访问控制子层"></a>介质访问控制子层</h1><p>传统信道分配FDM&amp;TDM的缺点是带宽利用率不高，并且存在高延迟<br>动态信道分配</p>
+<h2 id="多路访问协议"><a href="#多路访问协议" class="headerlink" title="多路访问协议"></a>多路访问协议</h2><p>纯ALOHA协议：当用户有数据时就传送，解决冲突的办法是，在一个站发送了一个帧过后，把该帧广播到所有其他站。不监听信道，所以冲突是很容易发生的。</p>
+<p>分槽ALOHA：将时间分成离散的时间间隔，这些时间间隔就为时间槽，每个时间槽对应一帧。<br>最佳的效率为1/e</p>
+<p>载波监听多路访问协议：站监听是否存在载波(即是否有传输)，并依据此进行相应的操作。</p>
+<p>1-坚持载波监听多路访问：站点在发送数据前监听信道，如果信道上有其他数据正在传输，则等待，直到信道变得空闲；然后发送该帧，如果发生冲突，则等待一个随机时间，在监听信道，重复上面的操作。<br>存在的问题：<br>（1）当等待发送的帧不为1时，若信道出现空闲，所有的帧将在同一时刻发送，必将导致冲突。<br>（2）信号的传播延迟也会带来冲突。如果一个站刚开始发送并且信号并没到达一个准备发送的站点，此时这个站点也将发送从而导致冲突。</p>
+<p>非坚持式CSMA：<br>和前面坚持式协议不同的是，同样该协议会监听信道，但是不会一直监听信道，也就是说，当信道忙时，其直接会等待一定的时间，在尝试监听信道，直到信道空闲，才发送该帧。<br>该算法很好的解决了冲突的问题，但也带来了更高的延迟。</p>
+<p>P-坚持式CSMA:适用于分槽的信道。当一个站准备好要发送数据时，其监听信道，如果信道是空闲的，则其按照概率p发送该帧，以1-p的概率讲该帧推迟到下一个时间槽发送。如果下一个时间槽也为空，则其同样以p概率发送这一帧，以1-p的概率延迟该帧到下一个时间槽，以此往复，直到这个帧被发送出去。如果发生冲突，则等待一个随机时间再进行尝试发送。</p>
+<p>带冲突检测的CSMA：<br>检测到冲突过后立即停止传输该帧，等待一段时间再尝试发送。这种方式可以有效的节省时间和带宽。<br>带冲突检测的CSMA会交替的出现传输期，竞争期和空闲期。</p>
+<p>检测冲突的最小时间是将信号从一个站点播到另一个站点所需要的时间t。<br>所以一个站点认为自己“抓住”了信道，最坏的情况下需要的时间是二倍于传送到另一个站点所需要的时间2t，当然这是最坏的情况。</p>
+<h2 id="无冲突的协议"><a href="#无冲突的协议" class="headerlink" title="无冲突的协议"></a>无冲突的协议</h2><p>上面带冲突检测的CSMA虽然如果一个站抓住了信道，冲突就不在发生。但是冲突还是会发生在竞争期中，特别是当延迟很大，线缆很长而帧特别短的情况下，冲突会浪费带宽，并且让一个帧的发送时间动荡不定，无法很好的适应实时流量。</p>
+<p>无冲突的协议在整个帧的发送过程中都不会产生冲突。</p>
+<ol>
+<li>位图协议。每个竞争周期都包含N个槽，若某个站要发送一个帧，则在相应的槽中插入一位来表明自己将要发送。当经过了所有的N个槽后，所有的站点都知道哪些站希望传递数据，这个时候就可以按照数字顺序开始发送了。传输数据之前需要广播自己传输意愿的的协议被称为预留协议。高序号站点平均只需要等待0.5N个槽时间，而低序号站需要等待的平均时间是1.5N个槽的时间。对于所有站而言，需要平均等待的时间为N个槽的时间。<br>在低负载的情况下，每一帧的额外开销为N位，数据长为d，则信道的利用率为d/(d+N).</li>
+<li>令牌环协议。如果一个站点有需要发送的队列，则其发送一帧，并把令牌传递给下一个站点，如果该站没有要发送的帧，则只是简单的传送一下令牌而已。这里的令牌指的是发送帧的权限。等待时间为令牌传递N-1次的时间和N-1个站点发送一个帧的时间。</li>
+<li>二进制倒计数。解决站点多的问题。这里每个站点以二进制串的形式广播自己的地址，从高位序开始，所有站的地址都有相同的长度，对于同一时刻，对发送进来的位进行布尔或。并且存在一个仲裁规则：bool或为为1时，舍掉为0的站点，bool或为0时，继续比较下一位。信道利用率为<br>d/(d+log2N)，经过优化甚至可以达到100%。</li>
+</ol>
+<h2 id="有限竞争协议"><a href="#有限竞争协议" class="headerlink" title="有限竞争协议"></a>有限竞争协议</h2><p>竞争的协议在负载低的情况下具有非常低的延迟，非竞争协议在负载高的情况下具备很好的信道利用率，因此有限竞争协议结合了这两种协议的优势，在低负载的情况下使用有竞争的协议，在高负载的情况下使用无竞争的协议。<br>有限竞争协议是这样做的：<br>将所有的站点划分成组，只有0号组才用时间去竞争0号槽，类似的只有n号组才能去竞争n号时间槽，若出现冲突，直接往后面推到下一个时间槽。<br>当负载很低时，每个时间槽的站点数就可以多一些，若负载很高的时候，每个时间槽的站点就需要低一点，甚至为了避免冲突只使用一个站一个组。</p>
+<h2 id="无线局域网协议"><a href="#无线局域网协议" class="headerlink" title="无线局域网协议"></a>无线局域网协议</h2><p>冲突发生在接收端而不是发送端，两种问题：隐藏终端问题和暴露终端问题(好好理解）。<br>这里有一个协议：冲突避免多路访问（MACA），其原理是这样的：如果一个站点想要给另一个站点发送帧，那么其先发送一个RTS帧，然后接收方再发送一个CTS帧作为应答，然后就可以发送了。如果一个其他站点听到了RTS帧，那么它一定离该站点很近，其必须保持沉默，等待足够长的时间使CTS返回给这个站点。如果一个站点收到了CTS，其必须保持沉默，知道该帧被顺利的发送(可以根据帧长来估计等待的时间)。</p>
+<h2 id="二进制指数后退的CSMA-CA"><a href="#二进制指数后退的CSMA-CA" class="headerlink" title="二进制指数后退的CSMA/CA"></a>二进制指数后退的CSMA/CA</h2><p>使用1-坚持CSMA算法，在发生冲突过后立即停止传输，并等待一定的时间尝试传输。如果再发生冲突，则随机等待的时间槽的最大值按指数级增长。<br>例如如果两个站点冲突一次，则选择随机等待0或者1个时间槽，若再次冲突，等待的时间槽为0，1，2，如果冲突n次，则随机等待的时间槽的为0-2^n -1之间的一个随机数。当达到1023的最大值的时候，便不再增加。<br>该算法可以动态的确定发送站的数量，如果随机数的最大值为1023，则冲突的可能性就很小了；如发生冲突，平均的等待时间将会是数百个时间槽，从而延迟时间特别大。这种算法只能保证两种情况：（1）在冲突只有少量发生的情况下，可以确保较低的延迟；（2）当许多站点发生冲突的时候，可以在一个合理的时间间隔解决冲突。</p>
+<h2 id="交换式以太网"><a href="#交换式以太网" class="headerlink" title="交换式以太网"></a>交换式以太网</h2><p>使用交换机来处理不断增长的负载。<br>交换机：把帧传输到该帧想去的端口。当交换机接收到来自某个站的帧，其检查该帧的以太网地址，确认该帧去的目的地端口。并且是全双工的，并不用担心任何的冲突，因为不会发生冲突。交换机可以同时发送多个帧(发往不同的端口），如果同时有多个帧需要经同一个端口发送出去，那么只需要交换机含有缓存。<br>交换机也能够更安全的发送，因为其不是以广播的形式发送出去的，它只会发给某一个特定的端口，经由该端口被发送出去。所以相比集线器，其更加安全。</p>
+<h2 id="千兆以太网"><a href="#千兆以太网" class="headerlink" title="千兆以太网"></a>千兆以太网</h2><p>设计目标：提升10倍的性能，并保持与现有以太网标准的兼容。<br>提供单播和广播的无确认数据报服务，采用48位的地址，保持相同的帧格式，包括最大最小帧的要求等。<br>为了达到距离经典以太网100倍的速度提升，在其他不变的情况下，最大的线缆长度下降了100倍，即为25米。考虑到25米在实际运用中的限制，这里使用了两种方法吧线缆长度深升到了200米。</p>
+<p>（1）载波扩充：让硬件在帧的后面加上一定的长度，将帧的长度扩展到512字节，再又硬件去除填充。这里存在一个问题，利用率不高(填充大多数是无用的)</p>
+<p>(2)帧突发：将多个帧连在一起，如果不满512字节再进行填充。这种方案是比较有效的(但前提是存在那么多帧)</p>
+<p>没有写入标准的还有巨形帧，可以达到9KB，但与较老的标准并不兼容。</p>
+<h2 id="以太网传输中的冲突和帧大小的关系"><a href="#以太网传输中的冲突和帧大小的关系" class="headerlink" title="以太网传输中的冲突和帧大小的关系"></a>以太网传输中的冲突和帧大小的关系</h2><p>以太网的最大传输长度为2.5km，信号在介质上传输的速度为2*10^8m/s<br>那么延迟为2500/v = 12.5us<br>最坏的情况下是若发送一个很小的帧，则检测冲突需要的时间为2t，25us。<br>在长的线缆上进行传输，需要经过4个中继器。因此传输的延迟最坏为50us，这里取到51.2us，在一个10Mbps的经典以太网上，其帧最小长度为512位=64B。这里的51.2us指的是传输间隙。<br>最小长度的定义：为了使发送方能够在一个帧的传输时间内检测到此帧是否在链路上发生冲突。<br>若帧小于了最小帧长，那么就无法检测是否发生了冲突了。</p>
+<h2 id="802-11"><a href="#802-11" class="headerlink" title="802.11"></a>802.11</h2><p>增加可靠性：（1）降低传输速率（2）减小帧的长度(拆分帧)<br>节省电源,<br>服务质量,对等流量传输</p>
+<h2 id="802-11帧结构"><a href="#802-11帧结构" class="headerlink" title="802.11帧结构"></a>802.11帧结构</h2><p>数据帧的格式：<br>帧控制字段(2字节，含有11个子字段)<br>持续时间(2字节)：告诉本帧和其确认帧会占据信道的时间，其他站点根据该值管理各自的NAV机制。<br>地址字段(3个，各6字节)：第一个接收方地址，第二个发送方地址，第三个指明远程端点。<br>序号字段(2字节)：帧的编号，用于重复字段的检测<br>数据字段：0-2312字节<br>校验字段：4字节</p>
+<p>和管理帧(数据字段不相同)以及控制帧略有不同</p>
+<h2 id="802-11服务"><a href="#802-11服务" class="headerlink" title="802.11服务"></a>802.11服务</h2><ol>
+<li>关联：把移动站点连接到AP上(我们常说的连接Wi-Fi)</li>
+<li>重新关联：允许移动站点改变它的首选AP(切换Wi-Fi)</li>
+<li>认证（WPA WPA2）</li>
+<li>QoS流量调度：给予视频和语音更高的优待</li>
+<li>发射功率限制</li>
+<li>动态频率选择</li>
+</ol>
+<h2 id="802-16"><a href="#802-16" class="headerlink" title="802.16"></a>802.16</h2><p>基站使用了更大的功率和更好的天线，传输距离至少是802.11答十倍以上，并提供了更多的差错处理。</p>
+<h2 id="数据链路层交换"><a href="#数据链路层交换" class="headerlink" title="数据链路层交换"></a>数据链路层交换</h2><p>网桥：连接多个局域网组成更大的局域网，实际上网桥就是以太网交换机。网桥工作在数据链路层，通过检查数据链路层的地址来转发帧。<br>路由器：检查数据包的地址，并且基于这些地址路由包，它只能按照预先设计好的协议工作。</p>
+<p>网桥的作用：（1）连接多个LAN，可构建更大的容量（2）增加了传输的可靠性(可以决定转发什么不转发什么)（3）完全透明，安装和使用简便。</p>
+<p>网桥是如何工作的呢？<br>它接收隶属于每个端口的站发送的帧，网桥必须选择丢掉或者转发一个帧，作出决定的是依据帧的目标地址。</p>
+<p>简单的方法是为每个网桥配备一个大的哈希表。该表列出每个可能的目标地址以及隶属的输出端口。</p>
+<p>当网桥初次被使用到网络中的时候，其哈希表是空的。因此为了构建这样一个哈希表，网桥将使用泛洪算法，其对于每个未知目标地址的入境帧，网桥将会把其输出到所有的出境端口，网桥将会学习每个目标地址在哪买。一旦知道了一个目标地址，下一次发送直接就被放到正确的端口上发送。</p>
+<p>网桥所用的算法是后向学习法。<br>当打开，关闭或移动网桥或机器的时候，网络的拓扑结构就会发生变化。为了记录这种动态的拓扑结构，一旦构造出一个哈希表项时，帧的到达时间也被记录在表项中。并且网桥会有一个进程扫描哈希表，清除那些时间值有几分钟的项(表示几分钟未使用)。这样的算法也意味着，如果一台计算机静止了几分钟，那么其再进行通信，帧仍然会被泛洪。</p>
+<p>下面是一个详细的流程：</p>
+<ol>
+<li>如果去往目标地址的端口和源端口相同，则丢弃该帧(不需要经过该网桥)。</li>
+<li>如果去往目标地址端口与源端口不同，则以目标端口发送该帧。</li>
+<li>如果目标端口未知，则使用泛洪算法。</li>
+</ol>
+<h2 id="生成树网桥"><a href="#生成树网桥" class="headerlink" title="生成树网桥"></a>生成树网桥</h2><p>解决冗余链路导致的无限循环。构建一颗生成树来解决这样的问题。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>中继器:物理层，用于处理自己所连线缆上的信号，一般用于增强信号。<br>集线器：集线器，将多个线路连接在一起，从任何线路发来的信号都将发送到其他所有线路上。如果两帧同时到达，那么将会发生冲突。<br>网关<br>网桥，交换机：数据链路层，多端口，用于连接过个局域网在一起。<br>路由器：网络层，当一个数据包进入路由器，帧头和帧尾被去掉，帧的有效载荷字段送到路由软件。路由软件根据帧的头信息来选择输出线路。这个地址指的是IP地址，而不是48位的IEEE802地址。</p>
+<p>网关：传输网关，将使用了两台不同传输协议的的计算机连接起来。<br>网关，应用网关，理解数据的格式和内容，并且根据需要将数据包重新进行格式化。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/" data-id="cjla85vzf002ne8udw88nhopk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/01/05/计算机网路复习笔记之网络层基础/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    计算机网路复习笔记之网络层基础
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2016/12/31/我的2016/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">我的2016</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 12px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/';
+        
+        this.page.identifier = '计网复习之介质访问控制子层复习笔记';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>词法作用域 | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="作用域模式有两种，一种是词法作用域，另一种是动态作用域，JavaScript采用的是词法作用域。  大部分的编译器会在编译阶段把程序进行词法化，也就是会对源代码中的字符进行解析，并且赋予词语语义。简单来讲，词法作用域就是词法阶段的作用域，词法作用域是由你在写代码时讲变量和块写在哪里决定的，当词法分析器在处理代码时会保持作用域不变。 考虑下面的代码：1234567891011var name =">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="词法作用域">
+<meta property="og:url" content="http://yoursite.com/2017/01/27/词法作用域/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="作用域模式有两种，一种是词法作用域，另一种是动态作用域，JavaScript采用的是词法作用域。  大部分的编译器会在编译阶段把程序进行词法化，也就是会对源代码中的字符进行解析，并且赋予词语语义。简单来讲，词法作用域就是词法阶段的作用域，词法作用域是由你在写代码时讲变量和块写在哪里决定的，当词法分析器在处理代码时会保持作用域不变。 考虑下面的代码：1234567891011var name =">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-01-27T14:11:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="词法作用域">
+<meta name="twitter:description" content="作用域模式有两种，一种是词法作用域，另一种是动态作用域，JavaScript采用的是词法作用域。  大部分的编译器会在编译阶段把程序进行词法化，也就是会对源代码中的字符进行解析，并且赋予词语语义。简单来讲，词法作用域就是词法阶段的作用域，词法作用域是由你在写代码时讲变量和块写在哪里决定的，当词法分析器在处理代码时会保持作用域不变。 考虑下面的代码：1234567891011var name =">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-词法作用域" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            词法作用域
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/01/27/词法作用域/">
+            <time datetime="2017-01-27T06:54:05.000Z" itemprop="datePublished">2017-01-27</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>作用域模式有两种，一种是词法作用域，另一种是动态作用域，JavaScript采用的是词法作用域。</p>
+</blockquote>
+<p>大部分的编译器会在编译阶段把程序进行词法化，也就是会对源代码中的字符进行解析，并且赋予词语语义。简单来讲，词法作用域就是词法阶段的作用域，词法作用域是由你在写代码时讲变量和块写在哪里决定的，当词法分析器在处理代码时会保持作用域不变。</p>
+<p>考虑下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showNameAPI</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> city = <span class="string">'Chongqing'</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">showCity</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> cid = <span class="string">'CN'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(city + cid);</span><br><span class="line">  &#125;</span><br><span class="line">  showCity();</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line">showNameAPI(name)</span><br></pre></td></tr></table></figure></p>
+<p>这个代码一共包含三个逐级嵌套的作用域，全局作用域中声明了变量name，全局函数showNameAPI,函数作用域中showNameAPI所创建的作用域，包含标识符city以及showCity，最后是showCity创建的作用域,包含了标识符cid。</p>
+<p>作用域查找会在找到第一个匹配的标识符时停止。这里的查找是由内而外的，并且在多级嵌套的作用域内可以定义同名的标识符，但是会产生覆盖。因为<strong>作用域查找的规则就是找到第一个匹配的标识符后停止</strong>。</p>
+<p>无论函数在哪里被调用，也无论其是怎么被调用的，其词法作用域只与其被声明的位置有关。</p>
+<h3 id="欺骗词法"><a href="#欺骗词法" class="headerlink" title="欺骗词法"></a>欺骗词法</h3><p>上面说到词法作用域是在是完全在书写代码是就已经决定，但是也可以通过下面的两种方式在运行时来改变词法作用域。</p>
+<p>当然，不出意外的，这两种方式会是不那么讨人喜欢的eval()和with。</p>
+<p>我们首先来回顾一下eval()，这个函数接收一个字符串作为参数，这个字符串好像是运行时写在这里的代码一样。这明显是一种词法欺骗，其假装是在书写期间就在那里，而在运行时修改词法作用域。但是引擎对此并不知情，所以其依旧照常按照词法作用域进行查找。<br>看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showName</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">eval</span>(str);</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line">showName(<span class="string">"var name = 'lindo'"</span>) <span class="comment">// lindo</span></span><br></pre></td></tr></table></figure></p>
+<p>eval(‘name=”lindo”‘)会被引擎误认为在书写时就在那里，由于执行了上面的语句，此时name的值已经被修改了，并且产生了覆盖，遮蔽了外部同名的变量name。</p>
+<p>在默认的情况下，如果eval中所执行代码中存在一个或者多个申明，其就会对eval()所处的作用域进行修改。无论何情况，eval(..) 都可以在运行期修改书写期的词法作用域。</p>
+<p>再来谈with关键字，我们都知道with关键字用于重复引用一个对象的多个属性的快捷方式，而不需要重复引用对象本身。<br>看下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  name: <span class="string">'limoer'</span>,</span><br><span class="line">  age: <span class="number">20</span>,</span><br><span class="line">  city: <span class="string">'Chongqing'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(obj.name)</span><br><span class="line"><span class="built_in">console</span>.log(obj.age)</span><br><span class="line"><span class="built_in">console</span>.log(obj.city)</span><br><span class="line"><span class="comment">// 重复</span></span><br><span class="line"><span class="keyword">with</span>(obj)&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">  <span class="built_in">console</span>.log(age);</span><br><span class="line">  <span class="built_in">console</span>.log(city);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的这段代码突出了with关键字优点，它可以简化我们的代码，但是我们这里谈的是with关键字的词法欺骗，看下面一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">info</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">with</span>(obj)&#123;</span><br><span class="line">    name = <span class="string">'lindo'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> p1 = &#123;</span><br><span class="line">  name: <span class="string">'limoer'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> p2 = &#123;</span><br><span class="line">  city: <span class="string">'Jinan'</span></span><br><span class="line">&#125;</span><br><span class="line">info(p1)</span><br><span class="line"><span class="built_in">console</span>.log(p1.name) <span class="comment">// 'lindo'</span></span><br><span class="line">info(p2)</span><br><span class="line"><span class="built_in">console</span>.log(p2.name) <span class="comment">// undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(name) <span class="comment">//lindo!</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的这个例子很好的展示了with关键字的词法欺骗，这里创建了两个对象p1和p2，并通过info函数执行with(obj){…}，这里进行了简单的LHS查找，并将新值赋给name属性。但是请注意，这里p2对象并不存在name属性，也不会创建name属性，所以p2.name为undefined；这里很好理解，但是为什么神奇的是竟然多出了一个全局变量name呢!？</p>
+<p>这里执行with(obj){…}的时候，执行的LHS查找，所以当查找不成功时自动隐式创建一个全局变量，如果这样考虑，那么出乎意料的name属性就不难理解了。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>JavaScript拥有的是词法作用域，所谓的词法作用域就是在进行词法分析时的作用域，也就是说，JS的作用域在代码一旦书写完成就能确定(靠书写位置来确定)。词法作用域的理解很简单，但是我们还是需要注意使用eval()和with语句带来的词法欺骗的原因。也许有人会说，在运行时修改词法作用域有利于实现复杂的功能，又利于扩展，何乐而不为呢？可我们在前面提到，在进行编译的时候，JS引擎会对代码进行优化，而这个优化则是根据代码的词法作用域，预先确定变量和函数的位置，才能在执行过程中快速找到标识符。而eval()和with的出现则有可能打破这样的格局，因为引擎在词法分析阶段并不能知道传入的代码到底是什么，会对词法作用域造成怎样的影响。所以，一切优化都是徒劳的，因为在运行时谁都不能确定此时此法作用域到底是怎么样的，所以JS引擎并不会进行优化，导致代码运行缓慢，性能并不好。所以，尽量不要使用它们。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="cjla85vzg002pe8udz31mnzbg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/01/27/词法作用域/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/01/27/词法作用域/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/01/28/JS作用域浅析/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    JS作用域浅析
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/01/27/理解作用域/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">理解作用域</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 12px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2017/01/27/词法作用域/';
+        
+        this.page.identifier = '词法作用域';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

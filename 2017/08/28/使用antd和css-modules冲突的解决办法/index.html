@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>使用antd和css-modules冲突的解决办法 | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="在暑假做项目实训的时候前端就使用到React构建并且使用了Ant Design作为组件库，当时就使用了extract-text-webpack-plugin把css单独抽离出来成为一个单独的css文件并引入，当时就遇到一个问题，当我使用css-loader来处理css时，并不能处理自定义的css，但是我把CSS直接写进组件中是可行的，由于当时项目比较小并且时间比较赶，就直接使用了这种方式，在开发">
+<meta name="keywords" content="React">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用antd和css-modules冲突的解决办法">
+<meta property="og:url" content="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="在暑假做项目实训的时候前端就使用到React构建并且使用了Ant Design作为组件库，当时就使用了extract-text-webpack-plugin把css单独抽离出来成为一个单独的css文件并引入，当时就遇到一个问题，当我使用css-loader来处理css时，并不能处理自定义的css，但是我把CSS直接写进组件中是可行的，由于当时项目比较小并且时间比较赶，就直接使用了这种方式，在开发">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-11-04T14:15:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用antd和css-modules冲突的解决办法">
+<meta name="twitter:description" content="在暑假做项目实训的时候前端就使用到React构建并且使用了Ant Design作为组件库，当时就使用了extract-text-webpack-plugin把css单独抽离出来成为一个单独的css文件并引入，当时就遇到一个问题，当我使用css-loader来处理css时，并不能处理自定义的css，但是我把CSS直接写进组件中是可行的，由于当时项目比较小并且时间比较赶，就直接使用了这种方式，在开发">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-使用antd和css-modules冲突的解决办法" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            使用antd和css-modules冲突的解决办法
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/08/28/使用antd和css-modules冲突的解决办法/">
+            <time datetime="2017-08-28T13:29:03.000Z" itemprop="datePublished">2017-08-28</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React/">React</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>在暑假做项目实训的时候前端就使用到React构建并且使用了<code>Ant Design</code>作为组件库，当时就使用了<code>extract-text-webpack-plugin</code>把css单独抽离出来成为一个单独的css文件并引入，当时就遇到一个问题，当我使用<code>css-loader</code>来处理css时，并不能处理自定义的css，但是我把CSS直接写进组件中是可行的，由于当时项目比较小并且时间比较赶，就直接使用了这种方式，在开发过程中也有苦说不清，但总算是完成了。</p>
+</blockquote>
+<blockquote>
+<p>最近想写一点东西，又用到<code>antd</code>了，当然是相同的问题，只不过时过境迁，我有足够多的时间来处理这个遗留下来的问题。可是即使有那么多的时间，可是还是踩坑无数，最终还是完成了。相信遇到这个问题的并不止我一个人，这里就先记录下来，希望能对你有所帮助。</p>
+</blockquote>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>经过查询和思考，解决这样的问题最好是单独处理<code>antd</code>CSS和自定义的CSS。好了问题解决办法已经很明显了，我们需要些两个不同的规则来出来css，就像这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">&#123;</span><br><span class="line">	test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	use: ExtractTextPlugin.extract(&#123;</span><br><span class="line">		use: <span class="string">'css-loader'</span></span><br><span class="line">	&#125;)</span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">	use: <span class="string">'css-loader'</span></span><br><span class="line">&#125;,</span><br><span class="line">...</span><br><span class="line">plugins: [</span><br><span class="line">	<span class="keyword">new</span> ExtractTextPlugin(<span class="string">'style.css'</span>)</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码我建立了两规则分别处理自定义css和antd 预定义css，我们可以正常的使用<code>import &#39;./style.css&#39;</code>的形式引入css，但是我们查看页面，并没有加载我们自定义的css。</p>
+<p>好吧，既然这样再试试<code>css-modules</code>的方式算了，我们把第二个规则改成下面这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">&#123;</span><br><span class="line">	test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">	use: [</span><br><span class="line">		loader:<span class="string">'css-loader'</span>,</span><br><span class="line">		options: &#123;</span><br><span class="line">			modules: <span class="literal">true</span>,</span><br><span class="line">			localIndentName: <span class="string">'[local]--[hash:base64:5]'</span></span><br><span class="line">		&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在我们可以通过<code>import style from &#39;./style.css&#39;</code>的形式引入自定义css，并且通过<code>style.className</code>的形式给元素设置类。这次倒好，直接build不成功了，我一气之下索性不搞了；为了继续捣鼓下去，我直接又把CSS写在组件中了，直到我要使用<code>react-transition-group</code>来做路由切换动画，不得不倒回来解决。这次比以往更加冷静，我仔细阅读了<code>extract-text-webpack-plugin</code>的readme过后，恍然大悟，原来我们可以在一个项目中使用多个<code>ExtractTextPlugin</code>实例来生成多个css文件！好了，这次还是通过两个规则处理css，并且构建两个css文件，一个是自定义的css，一个是antd css，问题迎刃而解，又可以开心的捣鼓了！</p>
+<p>好了，show you the code!:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ExtractTextPlugin = <span class="built_in">require</span>(<span class="string">'extract-text-webpack-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> extractANTDCSS = <span class="keyword">new</span> ExtractTextPlugin(<span class="string">'[name]-antd.css'</span>);</span><br><span class="line"><span class="keyword">const</span> extractNormalCSS = <span class="keyword">new</span> ExtractTextPlugin(<span class="string">'[name]-normal.css'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">	...</span><br><span class="line">	<span class="built_in">module</span>:&#123;</span><br><span class="line">		rules: [</span><br><span class="line">			&#123;</span><br><span class="line">				test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">				include: <span class="regexp">/node_modules/</span>,</span><br><span class="line">				loader: extractANTDCSS.extract(&#123;</span><br><span class="line">					fallback: <span class="string">'style-loader'</span>,</span><br><span class="line">					use: [&#123;</span><br><span class="line">						loader: <span class="string">'css-loader'</span>,</span><br><span class="line">						options: &#123;<span class="attr">modules</span>: <span class="literal">false</span>&#125;</span><br><span class="line">					&#125;]</span><br><span class="line">				&#125;)</span><br><span class="line">			&#125;,</span><br><span class="line">			&#123;</span><br><span class="line">				test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">				exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">				use: extractNormalCSS.extract(&#123;</span><br><span class="line">					fallback: <span class="string">'style-loader'</span>,</span><br><span class="line">					use: [&#123;</span><br><span class="line">						loader: <span class="string">'css-loader'</span>,</span><br><span class="line">						options: &#123;</span><br><span class="line">							modules: <span class="literal">true</span>,</span><br><span class="line">							localIndentName: <span class="string">'[local]--[hash:base64:5]'</span></span><br><span class="line">						&#125;</span><br><span class="line">					&#125;]</span><br><span class="line">				&#125;)</span><br><span class="line">			&#125;</span><br><span class="line">		]</span><br><span class="line">	&#125;,</span><br><span class="line">	plugins: [</span><br><span class="line">		extractANTDCSS,</span><br><span class="line">		extractNormalCSS,</span><br><span class="line">		...</span><br><span class="line">	]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上的两个loader会生成两个css文件，分别是<code>vendor-antd.css</code>和<code>main-normal.css</code>，我们只需要在正确的位置引入这两个css文件就好了！</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>我在前面提到我把CSS直接写在元素/组件的style标签中，其实这种方式实不可取的，它会让你在编码和代码review中苦不堪言，因为一旦项目变得很大，当你想修改某个样式的时候，花在定位CSS的时间是非常多的；并且，可读性和可复用性也会大打折扣；而且我们经常在写样式的过程中使用的各种选择器、伪类、伪元素都无法发挥其灵活的作用。所以，无论你是以何种方式写前端，请尽量不以这种方式写CSS。</p>
+<p>当然，我们也要从性能上去考虑。因为css是在页面解析正式前就加载好了的(写在header)里面，在我们再解析页面的时候，加载速度就会变得更快；再有，如果我们使用把CSS写在组件中后，无可避免的会产生更多的重绘和回流，这会严重影响渲染性能。比如我们使用JS修改我们在style属性中标明的样式，那么必然会触发一次repaint。</p>
+<p>好了，到此打住！如果你想学习reflow和repaint，点击<a href="http://blog.csdn.net/ClaireKe/article/details/51375622" target="_blank" rel="noopener">这里</a>，也许会帮助你！</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="cjla85vyl000ye8udh7oopc6k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/09/01/使用react-transition-group实现路由切换动画/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    使用react-transition-group实现路由切换动画
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/08/24/three-js/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Three.js</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 12px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/';
+        
+        this.page.identifier = '使用antd和css-modules冲突的解决办法';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
