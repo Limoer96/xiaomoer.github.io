@@ -4,6 +4,40 @@
 
     
   <url>
+    <loc>http://yoursite.com/2018/09/01/week-record-0901/</loc>
+    <lastmod>2018-09-01T03:20:01.394Z</lastmod>
+    <data>
+        <display>
+        <title>每周一记（8月的尾巴）</title>
+        <pubTime>2018-09-01T02:12:54.000Z</pubTime>
+        
+        <tag>周记</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://yoursite.com/2017/05/27/Demo-Canvas-with-React/</loc>
+    <lastmod>2018-09-01T02:06:50.372Z</lastmod>
+    <data>
+        <display>
+        <title>Demo--Canvas with React</title>
+        <pubTime>2017-05-27T12:34:19.000Z</pubTime>
+        
+        <tag>React</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://yoursite.com/2018/08/26/week-record-0826/</loc>
     <lastmod>2018-08-26T04:03:43.166Z</lastmod>
     <data>
@@ -246,23 +280,6 @@
         <display>
         <title>使用react-transition-group实现路由切换动画</title>
         <pubTime>2017-09-01T01:14:52.000Z</pubTime>
-        
-        <tag>React</tag>
-         
-         
-           
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://yoursite.com/2017/05/27/Demo-Canvas-with-React/</loc>
-    <lastmod>2017-08-24T07:42:48.000Z</lastmod>
-    <data>
-        <display>
-        <title>Demo--Canvas with React</title>
-        <pubTime>2017-05-27T12:34:19.000Z</pubTime>
         
         <tag>React</tag>
          
