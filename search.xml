@@ -4,6 +4,61 @@
   
     
     <entry>
+      <title><![CDATA[每周一记（9月来了）]]></title>
+      <url>http://yoursite.com/2018/09/08/week-record-0908/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>我真是一个坐不住的人。</p>
+</blockquote>
+<h3 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h3><blockquote>
+<p>我以前总以为在别人搭好的架子下写代码是体力活，而现在这个观念的的确确需要改变了。</p>
+</blockquote>
+<p>我的这周的前三天我都在开发新的报表，周四被安排了一天“轮休”仔仔细细检查了已经开发的报表，周五由于没有安排活所以还是开发报表。我一直以为开发报表是一件实打实的体力活，我们不需要知道报表/图表组件具体实现的方式，我们甚至不需要关心页面布局，因为用于布局容器组件都写好了，我只需要读懂把<code>Delphi</code>代码，然后把对应的数据传入到<code>props</code>中就可以了。这当然有难点，理解<code>Delphi</code>需要花上一些时间，细节也要想方设法去实现。可是当大多数报表实现十分类似，熟练过后基本没什么难度，那么这项任务也就对我来说就成了不折不扣的<em>体力活</em>了。</p>
+<p>真的是这样吗？</p>
+<p>刚开始开发的时候，其实犯了很多错，这些错误都来自对项目的不理解和粗心大意。甚至我在很长一段时间内并没有发掘，直到阴差阳错这些隐含着错误的报表被纳入到发布版本，测试检测出错误的那一刻。</p>
+<p>这中间还有一个小插曲，前面说到阴差阳错的报表就上线了，其实是因为配置文件被更改了。因为这个事情在晨会上我还和<code>leader</code>争了几句，当然到最后谁都没有再追究。把这件事讲给小伙伴，所有人都说我情商低，可我总是这样，我会忍气吞声，当然如果三番两次，总会忍不了，我是来写代码，可不是来背锅的。</p>
+<p>回到正题，修复了很早以前开发留下的<code>bug</code>外，在“轮休”那天，我好好检查了那些后来开发的报表，虽然没有了功能上的<code>bug</code>，但还是由于粗心大意，比如字段描述中的文字写错，数字格式化不正确等。好在这些报表都没上线，不然这个就真得我背锅了。</p>
+<p>周五开发了一个十分复杂的报表，它让我意识到，这不仅仅是一份体力活。我差不多花了5个小时来完成这张表，除了非常难懂<code>Delphi</code>代码外，限制条件也十分多，因为需要实现具体的功能，发现已经封装好的组件并不能满足需求的时候，又需要去沟通增加需求，并且在开发的过程中，因为实在架子下工作，反而为了实现某些功能，需要额外的想办法。</p>
+<p>好吧，说了这么多，我承认我现在做的工作不仅仅是体力活，当然就算是体力活，我也要把任务做到极致。</p>
+<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><blockquote>
+<p>这周大块大块空余的时间并不多，在闲散的时间里，我主要通过在<em>掘金</em>和<em>github</em>看文章来学习。</p>
+</blockquote>
+<h4 id="文件获取和上传"><a href="#文件获取和上传" class="headerlink" title="文件获取和上传"></a>文件获取和上传</h4><ol>
+<li>使用<code>input[type=&#39;file&#39;]</code>模拟点击上传</li>
+<li>使用拖动/放置事件来上传<code>drag/drop</code></li>
+<li>剪切板的粘贴事件</li>
+</ol>
+<h4 id="高阶函数-HOC"><a href="#高阶函数-HOC" class="headerlink" title="高阶函数(HOC)"></a>高阶函数(HOC)</h4><p>函数作为参数传入/作为返回值返回。</p>
+<ol>
+<li><code>AOP</code>面向切面编程。把与业务无关的模块抽离出来，然后动态织入到业务中去。</li>
+<li>柯里化(部分求值)。函数并不会立即求值，而是返回一个另一个函数，已经传入的参数活因为形成的闭包而得以保留。</li>
+<li>函数节流与分时函数。</li>
+<li>惰性加载函数。</li>
+</ol>
+<h4 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h4><ol>
+<li>有关于<code>getBoundingClientRect</code>的学习。</li>
+<li>哈希碰撞与生日攻击。</li>
+</ol>
+<h4 id="框架-库-工具"><a href="#框架-库-工具" class="headerlink" title="框架/库/工具"></a>框架/库/工具</h4><ol>
+<li><code>store.js</code> 多浏览器实现的本地存储库。</li>
+<li><code>pica</code> 一个很好用的图片压缩工具</li>
+<li><code>tween</code></li>
+<li><code>Vue.js</code> 基础知识重温</li>
+</ol>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>周五的<em>前端资格考试</em>已挂，期待下周补考。</p>
+<p>最近绝地暖暖开挂的人太多了，把把都有大哥，快要弃游了。</p>
+<p>最后：无糖全麦麦片真好吃🤮</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> 周记 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[每周一记（8月的尾巴）]]></title>
       <url>http://yoursite.com/2018/09/01/week-record-0901/</url>
       <content type="html"><![CDATA[<blockquote>
@@ -1755,15 +1810,15 @@
 <p>ReactDOM.render()可以渲染html标签，也可以渲染React组件，但是这里有一些命名上的规范</p>
 </blockquote>
 <p>html标签使用<em>首字母小写</em>的方式，但使用首字母大写也能够正常加载</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> renderDiv = &lt;div&gt;这是一个标签&lt;/div&gt;</span><br><span class="line">ReactDOM.render(renderDiv, <span class="built_in">document</span>.body)</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> renderDiv = <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span>这是一个标签<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">ReactDOM.render(renderDiv, <span class="built_in">document</span>.body)</span><br></pre></td></tr></table></figure>
 <p>React组件使用首字母大写的方式</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> RenderComp = React.createClass(&#123;</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span>: &lt;div&gt;这是一个组件&lt;/div&gt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(&lt;RenderComp /&gt;, document.body)</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> RenderComp = React.createClass(&#123;</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span>: <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span>这是一个组件<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">RenderComp</span> /&gt;</span>, document.body)</span></span><br></pre></td></tr></table></figure>
 <p>经过测试，发现如果使用首字母小写的方式，将不会正常渲染组件，也不会报错, 当然你也可以这样写:</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> RenderComp = React.createClass(&#123;</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span>: &lt;div&gt;这是一个组件&lt;/div&gt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> renderComp = &lt;RenderComp /&gt;</span><br><span class="line">ReactDOM.render(renderComp, document.body)</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> RenderComp = React.createClass(&#123;</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span>: <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span>这是一个组件<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> renderComp = <span class="xml"><span class="tag">&lt;<span class="name">RenderComp</span> /&gt;</span></span></span><br><span class="line"><span class="xml">ReactDOM.render(renderComp, document.body)</span></span><br></pre></td></tr></table></figure>
 <h2 id="js表达式"><a href="#js表达式" class="headerlink" title="js表达式"></a>js表达式</h2><blockquote>
 <p>当我们想要在React中使用js变量或者是表达式时候,使用{}来进行包裹，不能够出现””,否则会被当作字符串。</p>
 </blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> SampleComp = React.createClass(&#123;</span><br><span class="line">    getInitialState: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            iscls: <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            <span class="comment">// 表达式</span></span><br><span class="line">            &lt;div className=&#123;<span class="keyword">this</span>.state.iscls ? <span class="string">'cls'</span> : <span class="string">'no_cls'</span>&#125;&gt;</span><br><span class="line">            <span class="comment">// 变量</span></span><br><span class="line">            &lt;h2&gt;&#123;<span class="keyword">this</span>.props.msg&#125;&lt;<span class="regexp">/h2&gt;</span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(&lt;SampleComp msg='学习搬砖中...' /&gt;, document.body)</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> SampleComp = React.createClass(&#123;</span><br><span class="line">    getInitialState: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            iscls: <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            <span class="comment">// 表达式</span></span><br><span class="line">            &lt;div className=&#123;<span class="keyword">this</span>.state.iscls ? <span class="string">'cls'</span> : <span class="string">'no_cls'</span>&#125;&gt;</span><br><span class="line">            <span class="comment">// 变量</span></span><br><span class="line">            &lt;h2&gt;&#123;<span class="keyword">this</span>.props.msg&#125;&lt;<span class="regexp">/h2&gt;</span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">SampleComp</span> <span class="attr">msg</span>=<span class="string">'学习搬砖中...'</span> /&gt;</span>, document.body)</span></span><br></pre></td></tr></table></figure>
 <p>这里提示一下，在JSX中，标签的class和for属性分别使用className和htmlFor代替了</p>
 <h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><blockquote>
 <p>在给标签添加style属性的时候，应该这样写:</p>
@@ -1772,7 +1827,7 @@
 <blockquote>
 <p>也可以把要应用的样式赋值给一个变量，再使用变量</p>
 </blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> style = &#123;</span><br><span class="line">    color: red,</span><br><span class="line">    display: none</span><br><span class="line">&#125;;</span><br><span class="line">&lt;div style=&#123;style&#125;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> style = &#123;</span><br><span class="line">    color: red,</span><br><span class="line">    display: none</span><br><span class="line">&#125;;</span><br><span class="line">&lt;div style=&#123;style&#125;&gt;<span class="xml"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>HTML转义，为了防止XSS攻击，React默认是使用转义的,所以当你想使用一些富文本这里就必须注意<br>为了不让其转义，我们可以这样写：</p>
 </blockquote>
