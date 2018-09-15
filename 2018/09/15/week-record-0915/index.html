@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>在Express中使用Cookie | Limoer的记事小本</title>
+    <title>每周一记(发工资日) | Limoer的记事小本</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说cookie到底是什么。  cookieCookie是服务器保存在浏览器中的一段小(一般而言size&amp;lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信">
-<meta name="keywords" content="Node.js">
+    <meta name="description" content="上周说前段时间进行的的前端资格考试挂了，等待补考，其实不然，我莫名其妙的就过了。  工作之外昨天晚上和大学舍友聊天，聊到近况，发现大家都有落差但也随遇而安，无论是传说中的996还是节假日加班，抑或是我这种相对较为轻松的工作。现在大家都明白了，当初被听信企业画大饼，总觉得自己壮志未酬能够好好干一番，结果总结起来，就是我们太年轻。 我的作息时间一般为晚上12点睡觉，早上7点起，8点到公司，这样的话我">
+<meta name="keywords" content="周记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在Express中使用Cookie">
-<meta property="og:url" content="http://yoursite.com/2017/03/16/在express中使用cookie/index.html">
+<meta property="og:title" content="每周一记(发工资日)">
+<meta property="og:url" content="http://yoursite.com/2018/09/15/week-record-0915/index.html">
 <meta property="og:site_name" content="Limoer的记事小本">
-<meta property="og:description" content="文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说cookie到底是什么。  cookieCookie是服务器保存在浏览器中的一段小(一般而言size&amp;lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信">
+<meta property="og:description" content="上周说前段时间进行的的前端资格考试挂了，等待补考，其实不然，我莫名其妙的就过了。  工作之外昨天晚上和大学舍友聊天，聊到近况，发现大家都有落差但也随遇而安，无论是传说中的996还是节假日加班，抑或是我这种相对较为轻松的工作。现在大家都明白了，当初被听信企业画大饼，总觉得自己壮志未酬能够好好干一番，结果总结起来，就是我们太年轻。 我的作息时间一般为晚上12点睡觉，早上7点起，8点到公司，这样的话我">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-03-20T13:21:42.000Z">
+<meta property="og:updated_time" content="2018-09-15T06:04:21.899Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在Express中使用Cookie">
-<meta name="twitter:description" content="文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说cookie到底是什么。  cookieCookie是服务器保存在浏览器中的一段小(一般而言size&amp;lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信">
+<meta name="twitter:title" content="每周一记(发工资日)">
+<meta name="twitter:description" content="上周说前段时间进行的的前端资格考试挂了，等待补考，其实不然，我莫名其妙的就过了。  工作之外昨天晚上和大学舍友聊天，聊到近况，发现大家都有落差但也随遇而安，无论是传说中的996还是节假日加班，抑或是我这种相对较为轻松的工作。现在大家都明白了，当初被听信企业画大饼，总觉得自己壮志未酬能够好好干一番，结果总结起来，就是我们太年轻。 我的作息时间一般为晚上12点睡觉，早上7点起，8点到公司，这样的话我">
     
 
     
@@ -211,7 +211,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-在express中使用cookie" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-week-record-0915" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -219,7 +219,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            在Express中使用Cookie
+            每周一记(发工资日)
         </h1>
     
 
@@ -228,8 +228,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/03/16/在express中使用cookie/">
-            <time datetime="2017-03-16T08:11:42.000Z" itemprop="datePublished">2017-03-16</time>
+        <a href="/2018/09/15/week-record-0915/">
+            <time datetime="2018-09-15T03:09:56.000Z" itemprop="datePublished">2018-09-15</time>
         </a>
     </div>
 
@@ -238,7 +238,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Node-js/">Node.js</a>
+        <a class="tag-link" href="/tags/周记/">周记</a>
     </div>
 
                     </div>
@@ -250,22 +250,26 @@
         
             
             <blockquote>
-<p>文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说<code>cookie</code>到底是什么。</p>
+<p>上周说前段时间进行的的<code>前端资格考试</code>挂了，等待补考，其实不然，我莫名其妙的就过了。</p>
 </blockquote>
-<h3 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h3><p>Cookie是服务器保存在浏览器中的一段小(一般而言size&lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信息。</p>
-<p>在浏览器中我们只需要使用<code>document.cookie</code>来得到当前页面所属的cookie。请注意，返回的cookie是以字符串形式存在的，不同的key-value之间通过’;’来分割，所以如果你想对齐进行进一步操作，需要相应的处理。</p>
-<p>这里需要注意的是，<code>document.cookie</code>属性是可写的，这就意味着你可以手动添加cookie，使用<code>document.cookie=&quot;name=value&quot;</code>的形式。注意，这里是添加，而不产生覆盖。</p>
-<p>好了，关于cookie的属性的具体含义和用法，大家可以自行去了解。</p>
-<h3 id="我的问题"><a href="#我的问题" class="headerlink" title="我的问题"></a>我的问题</h3><p>我在使用服务器端使用cookie的时候出现了问题，出现这样问题的原因很简单，首先我对cookie存在错误的理解，请务必注意，cookie是服务器发送给客户端，而客户端在发起请求的时候携带cookie而已。在正确认识cookie之后，并且成功的将cookie发送到浏览器过后，问题又来了，我在请求的时候，cookie却不能发送到服务端。我使用的是下面一段代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'/login?'</span>+stringify_data, &#123;</span><br><span class="line">        method: <span class="string">'GET'</span></span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> res.json();</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(json.status);</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'oh ! error!'</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里我使用了fetch API，在能够正确的发送请求的情况下，服务器无法读取到相应的cookie信息，同样在chrome开发者工具中查看请求头也发现请求并没有携带cookie信息。我想着一定是fetch API的问题，所以我赶快写了一个使用Ajax的请求，很显然，能够正确的发起携带cookie的请求。好吧，写到现在，我想的确是fetch API的问题了，阅读文档发现fetch API发送的请求默认是不带cookie的，必须手动设置(无论是出于什么样的考虑，但还是觉得坑)！好吧，问题迎刃而解，我们只需要在fetch函数第二个参数设置<code>credentials: &#39;include&#39;</code>就可以发送cookie了/无奈！</p>
-<h3 id="在express中使用cookie"><a href="#在express中使用cookie" class="headerlink" title="在express中使用cookie"></a>在express中使用cookie</h3><p>在express中使用cookie是一件十分惬意的事情，因为如果你使用<code>cookie-parser</code>中间件的话，那么我们只需要使用<code>res.cookie(name, value[,options])</code>就可以设置cookie了，关于options相关的参数可以自行学习！</p>
-<p>如果想删除cookie，也很简单，使用<code>res.clearCookie(name)</code>就可以啦。</p>
-<p>当然如果想获取请求头发过来的cookie，我们只需要使用<code>req.cookies</code>就可以了，这里返回的是一个JS对象，我们直接可以使用<code>name</code>来读取值，从而做进一步的操作。</p>
-<p>在使用了<code>cookie-parser</code>中间件过后，在服务端操作cookie已经足够简单，并且<code>cookie-parser</code>不但提供了非签名使用的方式，还提供了签名的使用方式，具体使用是在使用中间件的时候添加一个secret，<code>app.use(cookieParser(&#39;secret&#39;))</code>即可，当然，在获取cookie的时候使用 <code>req.signedCookies</code>属性就好了。</p>
-<p>好了，如果你不想使用<code>cookie-parser</code>，我们也能够通过<code>req.headers.cookies</code>(感到罪恶所以不推荐/无奈)访问到cookie，如果想写cookie的话，使用<code>res.setHeader(name, value)</code>(再次感到罪恶)或者<code>res.writeHead(status[,options])</code>就可以了…</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>一般情况下，文章末尾，我总会写一点鸡汤/无奈，这次也不例外。距离写上一篇博客已经过了很久了，起初有两篇想写的文章，一篇是在RN中使用Navigator，另外一篇则是介绍我自己正在学习的几种分类算法。可是当创建好文件准备开工时，我因为写一篇文章可能需要2-3个小时(我速度慢)或者是因为真的动笔写的时候反而觉得没什么要说的就放弃了。然后一段时间过后，或许是因为忙，或许是因为懒，或许是因为浮躁，就是没有去实践，没有去巩固，而把一切都抛之脑后，然后把前面学习到的忘得一干二净！</p>
-<p>嗯，这的确的真实的！仅此而已！</p>
-<p>END</p>
+<h3 id="工作之外"><a href="#工作之外" class="headerlink" title="工作之外"></a>工作之外</h3><p>昨天晚上和大学舍友聊天，聊到近况，发现大家都有落差但也随遇而安，无论是传说中的<code>996</code>还是节假日加班，抑或是我这种相对较为轻松的工作。现在大家都明白了，当初被听信企业画大饼，总觉得自己壮志未酬能够好好干一番，结果总结起来，就是我们太年轻。</p>
+<p>我的作息时间一般为晚上12点睡觉，早上7点起，8点到公司，这样的话我就可以早点下班并且保持一个较高的所谓<em>战斗力</em>了。可是这个平衡还是被打破了，每天到了12点睡不着，早上还是7点起，睡眠时间不到7个小时，再配合上高强度的工作，担心身体真的吃不消。而这种担忧在昨天显现了，下午1点例常开发报表，开始头痛，我不得不停下来休息，喝喝水洗把脸什么的；到了三点半开完会，头痛反而加剧了，趴了好一阵，又去江边溜达了一圈，透透气，这才缓解，差不多到五点。前段时间看一个视频，程序员因为劳累倒在工作岗位上，我庆幸自己没事，但是为了健康着想，以后得早点睡了。</p>
+<h3 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h3><p>最近一段时间得任务都是开发报表，手头上报表大概有40张，按照每天开发3个得进度，得三周，并且每一张报表都不一样，遇到的问题也不一样，所以进度有可能被搁置。</p>
+<p>例如本周在开发过程中就遇到很多有意思的问题，具体的业务是我需要使用一个下拉选择框，每次选择后会请求不同的数据，问题就出在我根本不知道每个选择项具体的值是什么，因为我们能够获取信息的方式只有<code>Delphi</code>代码，而恰巧这份代码中所有涉及到的中文的地方都被编码过了，并且这种编码方式是公司独有的，且我暂时不能通过沟通的方式来解码，所以一切都得靠自己咯。编码方式看起来像<code>#23398#39#19876</code>这样，是不是很熟悉？如果稍微变化<code>&amp;#23398;&amp;#39;</code>现在知道了吧，所以这就是一种去掉了<code>&amp;</code>和<code>;</code>的<code>unicode</code>啊。那么这就很好解决了，写脚本转就可以了，至此，问题搞定。</p>
+<p>还有很有趣的事情，比如接口返回的数据有一个字段本该是<code>_mainColumn</code>却写成了<code>_mainColmn</code>,或者干脆在一个有四十多个字段的接口中使用了<code>columnX</code>的命名方式，这种毫无意义的字段名称，给到对我来说完全黑盒的接口，简直是灾难😂。</p>
+<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><p>这周仍然只有恨碎片化的时间来学习，并且随着内心变得浮躁，碎片化的时间也被消耗殆尽了。</p>
+<ol>
+<li>SPA性能优化。<code>tree shaking</code>打包时将无用的代码删除掉；代码分割，分离三方库等；动态导入（按需加载，预加载等）；利用缓存，打包成<code>runtimeChunk</code>等。</li>
+<li>TypeScript 学习。在TS官网上看了好几章文档，主要包括数据类型，类型断言，接口等。</li>
+<li>块级格式化上下文（BFC），老生常谈的问题了，看文章温习温习。</li>
+</ol>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li>安利一款游戏：《NBA2K OL2》,可以看作《2K17》的阉割版，目前能玩的模式只有王朝和街头，对于我这种不花钱也不是很想变得很强的玩家，偶尔玩玩还是不错的。</li>
+<li>一款叫做<em>PDFelement6 Pro</em>的软件，也许是我用过能够看PDF和编辑PDF最好的一款了，当然，这不是免费的，当然在天朝想免费还是能够办到。</li>
+<li>都2018了<code>JetBrains</code>全家桶仍然可以通过修改系统时间的方式无限期使用，所以我想学<code>Fluter</code>，求打醒，小程序还没眉目呢！</li>
+</ol>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>上午说发工资了，怎么也得请吃顿好的吧。好，肯德基怎么样？好啊，请。帮我叫外卖吧，外面太热了，不想出去。怎么可能，已经点好了，出去取吧。晕。穿好鞋，飞奔。走到一半，电话响起。您好，你的外卖到了，门口拿一下。飞奔回去，衣服湿透了。</p>
+<p>吃着三十多一顿的午餐，真香。</p>
 
         
         </div>
@@ -276,7 +280,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjm312bte001w2kudsvgs7zcr" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjm312bso000x2kudz9t6bk1v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -344,7 +348,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/03/16/在express中使用cookie/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/03/16/在express中使用cookie/">评论</a>
+        <a href="http://yoursite.com/2018/09/15/week-record-0915/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/09/15/week-record-0915/">评论</a>
     
 
         </footer>
@@ -353,19 +357,10 @@
         
 <nav id="article-nav">
     
-        <a href="/2017/04/17/回忆录/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    你
-                
-            </div>
-        </a>
     
-    
-        <a href="/2017/02/28/兑水的心灵鸡汤/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2018/09/08/week-record-0908/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">兑水的心灵鸡汤</div>
+            <div class="article-nav-title">每周一记（9月来了）</div>
         </a>
     
 </nav>
@@ -452,9 +447,9 @@
     <script>
     var disqus_config = function () {
         
-            this.page.url = 'http://yoursite.com/2017/03/16/在express中使用cookie/';
+            this.page.url = 'http://yoursite.com/2018/09/15/week-record-0915/';
         
-        this.page.identifier = '在express中使用cookie';
+        this.page.identifier = 'week-record-0915';
     };
     (function() { 
         var d = document, s = d.createElement('script');  

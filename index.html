@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                47
+                48
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,153 @@
 
             
             <section id="main">
+    <article id="post-week-record-0915" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/09/15/week-record-0915/">每周一记(发工资日)</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/09/15/week-record-0915/">
+            <time datetime="2018-09-15T03:09:56.000Z" itemprop="datePublished">2018-09-15</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/周记/">周记</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>上周说前段时间进行的的<code>前端资格考试</code>挂了，等待补考，其实不然，我莫名其妙的就过了。</p>
+</blockquote>
+<h3 id="工作之外"><a href="#工作之外" class="headerlink" title="工作之外"></a>工作之外</h3><p>昨天晚上和大学舍友聊天，聊到近况，发现大家都有落差但也随遇而安，无论是传说中的<code>996</code>还是节假日加班，抑或是我这种相对较为轻松的工作。现在大家都明白了，当初被听信企业画大饼，总觉得自己壮志未酬能够好好干一番，结果总结起来，就是我们太年轻。</p>
+<p>我的作息时间一般为晚上12点睡觉，早上7点起，8点到公司，这样的话我就可以早点下班并且保持一个较高的所谓<em>战斗力</em>了。可是这个平衡还是被打破了，每天到了12点睡不着，早上还是7点起，睡眠时间不到7个小时，再配合上高强度的工作，担心身体真的吃不消。而这种担忧在昨天显现了，下午1点例常开发报表，开始头痛，我不得不停下来休息，喝喝水洗把脸什么的；到了三点半开完会，头痛反而加剧了，趴了好一阵，又去江边溜达了一圈，透透气，这才缓解，差不多到五点。前段时间看一个视频，程序员因为劳累倒在工作岗位上，我庆幸自己没事，但是为了健康着想，以后得早点睡了。</p>
+<h3 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h3><p>最近一段时间得任务都是开发报表，手头上报表大概有40张，按照每天开发3个得进度，得三周，并且每一张报表都不一样，遇到的问题也不一样，所以进度有可能被搁置。</p>
+<p>例如本周在开发过程中就遇到很多有意思的问题，具体的业务是我需要使用一个下拉选择框，每次选择后会请求不同的数据，问题就出在我根本不知道每个选择项具体的值是什么，因为我们能够获取信息的方式只有<code>Delphi</code>代码，而恰巧这份代码中所有涉及到的中文的地方都被编码过了，并且这种编码方式是公司独有的，且我暂时不能通过沟通的方式来解码，所以一切都得靠自己咯。编码方式看起来像<code>#23398#39#19876</code>这样，是不是很熟悉？如果稍微变化<code>&amp;#23398;&amp;#39;</code>现在知道了吧，所以这就是一种去掉了<code>&amp;</code>和<code>;</code>的<code>unicode</code>啊。那么这就很好解决了，写脚本转就可以了，至此，问题搞定。</p>
+<p>还有很有趣的事情，比如接口返回的数据有一个字段本该是<code>_mainColumn</code>却写成了<code>_mainColmn</code>,或者干脆在一个有四十多个字段的接口中使用了<code>columnX</code>的命名方式，这种毫无意义的字段名称，给到对我来说完全黑盒的接口，简直是灾难😂。</p>
+<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><p>这周仍然只有恨碎片化的时间来学习，并且随着内心变得浮躁，碎片化的时间也被消耗殆尽了。</p>
+<ol>
+<li>SPA性能优化。<code>tree shaking</code>打包时将无用的代码删除掉；代码分割，分离三方库等；动态导入（按需加载，预加载等）；利用缓存，打包成<code>runtimeChunk</code>等。</li>
+<li>TypeScript 学习。在TS官网上看了好几章文档，主要包括数据类型，类型断言，接口等。</li>
+<li>块级格式化上下文（BFC），老生常谈的问题了，看文章温习温习。</li>
+</ol>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li>安利一款游戏：《NBA2K OL2》,可以看作《2K17》的阉割版，目前能玩的模式只有王朝和街头，对于我这种不花钱也不是很想变得很强的玩家，偶尔玩玩还是不错的。</li>
+<li>一款叫做<em>PDFelement6 Pro</em>的软件，也许是我用过能够看PDF和编辑PDF最好的一款了，当然，这不是免费的，当然在天朝想免费还是能够办到。</li>
+<li>都2018了<code>JetBrains</code>全家桶仍然可以通过修改系统时间的方式无限期使用，所以我想学<code>Fluter</code>，求打醒，小程序还没眉目呢！</li>
+</ol>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>上午说发工资了，怎么也得请吃顿好的吧。好，肯德基怎么样？好啊，请。帮我叫外卖吧，外面太热了，不想出去。怎么可能，已经点好了，出去取吧。晕。穿好鞋，飞奔。走到一半，电话响起。您好，你的外卖到了，门口拿一下。飞奔回去，衣服湿透了。</p>
+<p>吃着三十多一顿的午餐，真香。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjm312bso000x2kudz9t6bk1v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2018/09/15/week-record-0915/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/09/15/week-record-0915/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-week-record-0908" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -296,7 +443,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjlsv9zyk000h3sud5g2zosel" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjm312bsw00152kudlrw0ly5f" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -454,7 +601,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjlsv9zyh000d3sudpebrc2qm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjm312bsr000z2kudwm242qgu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -606,7 +753,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjlsv9zyg000c3sud1e9tffhz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjm312bro000i2kudauxyfwtb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -750,7 +897,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjlsv9zzn002e3sudvgm9mlea" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjm312btc001s2kudkrvm07fv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -916,7 +1063,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjlsv9zzt002n3suda1vutoad" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjm312buk002x2kudg8qdl9es" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1065,7 +1212,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/06/30/尾巴/" data-id="cjlsv9zzd001v3sudwiceqr4t" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/06/30/尾巴/" data-id="cjm312bti00252kud7rw5k8x5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1204,7 +1351,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/05/01/Hello-Goodbye-Hello/" data-id="cjlsv9zxu00013sudsc357ud4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/05/01/Hello-Goodbye-Hello/" data-id="cjm312br600022kud2zttgcys" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1360,7 +1507,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="cjlsv9zz6001h3sudz9zomx5k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="cjm312bt7001j2kud6gwgnrva" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1512,7 +1659,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/02/24/最近这段时间/" data-id="cjlsv9zzk002a3sud9u8jisnx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/02/24/最近这段时间/" data-id="cjm312btm002b2kudtlvx11mx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1590,151 +1737,6 @@
 
 
 
-    <article id="post-SQL参数化查询" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/10/23/SQL参数化查询/">SQL参数化查询</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/10/23/SQL参数化查询/">
-            <time datetime="2017-10-23T02:08:27.000Z" itemprop="datePublished">2017-10-23</time>
-        </a>
-    </div>
-
-
-                        
-                        
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>SQL注入想必是每个人都听过，其原理和XSS攻击很相似，都是把用户的输入当做程序去执行。防御办法也很类似，就是对用户的输入进行转义，但是同样转义十分麻烦，因为SQL注入攻击的方式和变种实在太多，转义需要考虑到的情况也复杂多变；而另外一种方式就是使用参数化查询–Prepared Statements。</p>
-</blockquote>
-<h3 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h3><p>在先介绍参数化查询的时候我们先复习一下SQL注入，上面提到其原理是把用户的输入当做了SQL语句<code>程序</code>的一部分去执行，因为我们经常使用字符串拼接来构建SQL语句。</p>
-<p>在这里开始演示一下(使用MySQL):</p>
-<p>在我的数据库中我数据库中我建立了一个名为urls的表，其结构和数据如下：</p>
-<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; desc urls;</span><br><span class="line">+-------------+------------------+------+-----+-------------------+----------------+</span><br><span class="line">|<span class="string"> Field       </span>|<span class="string"> Type             </span>|<span class="string"> Null </span>|<span class="string"> Key </span>|<span class="string"> Default           </span>|<span class="string"> Extra          </span>|</span><br><span class="line">+-------------+------------------+------+-----+-------------------+----------------+</span><br><span class="line">|<span class="string"> id          </span>|<span class="string"> int(11) unsigned </span>|<span class="string"> NO   </span>|<span class="string"> PRI </span>|<span class="string"> NULL              </span>|<span class="string"> auto_increment </span>|</span><br><span class="line">|<span class="string"> url         </span>|<span class="string"> varchar(255)     </span>|<span class="string"> NO   </span>|<span class="string">     </span>|<span class="string">                   </span>|<span class="string">                </span>|</span><br><span class="line">|<span class="string"> insert_time </span>|<span class="string"> timestamp        </span>|<span class="string"> NO   </span>|<span class="string">     </span>|<span class="string"> CURRENT_TIMESTAMP </span>|<span class="string">                </span>|</span><br><span class="line">|<span class="string"> tid         </span>|<span class="string"> bigint(20)       </span>|<span class="string"> YES  </span>|<span class="string">     </span>|<span class="string"> NULL              </span>|<span class="string">                </span>|</span><br><span class="line">+-------------+------------------+------+-----+-------------------+----------------+</span><br><span class="line">mysql&gt; select <span class="symbol">*</span> from urls;</span><br><span class="line">+----+-----------------------+---------------------+------+</span><br><span class="line">|<span class="string"> id </span>|<span class="string"> url                   </span>|<span class="string"> insert_time         </span>|<span class="string"> tid  </span>|</span><br><span class="line">+----+-----------------------+---------------------+------+</span><br><span class="line">|<span class="string">  1 </span>|<span class="string"> http://www.limoer.cc  </span>|<span class="string"> 0000-00-00 00:00:00 </span>|<span class="string"> NULL </span>|</span><br><span class="line">|<span class="string">  2 </span>|<span class="string"> http://baidu.com/news </span>|<span class="string"> 0000-00-00 00:00:00 </span>|<span class="string"> NULL </span>|</span><br><span class="line">|<span class="string">  3 </span>|<span class="string"> http://do.io          </span>|<span class="string"> 0000-00-00 00:00:00 </span>|<span class="string"> NULL </span>|</span><br><span class="line">|<span class="string">  5 </span>|<span class="string"> http://github.iod     </span>|<span class="string"> 0000-00-00 00:00:00 </span>|<span class="string"> NULL </span>|</span><br><span class="line">+----+-----------------------+---------------------+------+</span><br></pre></td></tr></table></figure>
-<p>该表有4字段并且有4条记录，现在我们如果想要查询id=1的那条记录，应该这样写:<code>select * from urls where id=1</code>。执行该条语句，正确返回结果，现在我们修改一下这条语句，改成：<code>select * from urls where id=1 and 1=1</code>,执行这条语句，同样没问题，返回结果正常；我们接下来再把<code>and</code> 改成 <code>or</code>再执行，结果出乎我们的意料，我们把所有的记录都查询了出来，<code>id=1</code>的限定条件失效了。至于如何导致其失效，是因为<code>or</code>后面的条件1=1是恒等的，所以前面的限定条件已经不重要了，<code>and</code>也是如此，我们想要获取正确的结果，那么<code>and</code>后面的限定条件必须要正确才可以。</p>
-<p>说到这里，其实我们就已经进行了一次SQL注入的攻击，并且窃取了数据库的所有记录(更严重的删库、窃取管理员密码也很easy)！</p>
-<p>其实不光是上面演示到的使用<code>and or</code>来进行SQL注入，还有很多神奇的SQL语法让SQL注入有了可乘之机，例如我们常用的<code>union</code>等等。</p>
-<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>如果我们把上面情景放在实际开发过程中，我们可能现在有一个输入框，用户可以输入任意一个数据来查看某条记录，<br>服务端的SQL语句也许是这样的：<code>select * from urls where id=${userInput}</code>。如果某个淘气的用户不遵守约定输入了非数字，例如<code>10 or 1=1</code>，SQL语句拼接过后就成了这样:<code>select * from urls where id=10 or 1=1</code>，表中的信息一次被完全暴露！</p>
-<p>针对上面的情况，我最想想到的不是转义输入也不是使用参数化查询，而是针对本问题，我们直接对其进行输入验证即可，既然其必须限定用户输入数字，那么在进行SQL拼接之前，对用户输入进行验证即可！</p>
-<p>例如，在Node.js环境下，我们可以使用<code>parseInt(userInput)</code>就可以完成对用户输入进行强制性的验证。</p>
-<p>第二种也就是最常用的解决办法就是转义，和防御XSS攻击一样，我们需要构建用于转义的函数，对用户的输入进行转义，还是上面的那个例子：<br><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> urls <span class="keyword">where</span> <span class="symbol">`id`</span>= $&#123;id&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>如果用户输入<code>1 or 1=1</code>，那么毫无疑问将会导致一次非常严重的SQL注入攻击，现在假设我们已经写好了我们的转义函数escape，我们只需要在进行字符串拼接之前，做一次转义即可。 例如对于用户的输入<code>1 or 1=1</code>经过转义后变成了<code>&#39;1 or 1=1&#39;</code>，经过SQL拼接过后则变成了:<br><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> urls <span class="keyword">where</span> <span class="symbol">`id`</span>=<span class="string">'1 or 1=1'</span>;</span><br></pre></td></tr></table></figure></p>
-<p>不出意外，我们得到了正确的结果。</p>
-<p>关于转义函数escape如何实现，这里就不不再多说，很多数据库的驱动工具都带有相应的工具函数，我们在实际开发过程中一定要注意对用户的输入进行转义，来避免SQL注入攻击；当然，如果你使用参数化查询的话，就完全没有必要了。</p>
-<h3 id="参数化查询"><a href="#参数化查询" class="headerlink" title="参数化查询"></a>参数化查询</h3><p>最开始提到参数化查询的时候，我提到了<code>Prepared Statements</code>也就是预处理语句，其实我们可以把参数化查询理解为预处理，我们把完整的一次SQL查询分成两部分，第一步是预先查询，第二步使用参数得到结果。具体该怎么理解呢，还是接着上面的那个例子，现在我们使用参数化查询执行<code>select * from urls where id=1</code>。其分为两步，第一步执行<code>select * from urls where id=?</code>，注意这里的<code>?</code>，其实代表了未来将要传入的参数；第二步，传入用户的输入作为具体的id值，并且输出结果。这里要注意，因为执行完第一步的时候期待第二步传入的是一个用户的id(这里必须是数字)，这时候用户传入的非法输入就不会生效，这也就从根本上杜绝了了SQL注入攻击。</p>
-<p>好了，参数化查询(预处理)可以完全避免SQL注入，其还有其他的优点例如更加可读(相比于字符串拼接)，多次查询性能会有提升(因为会对预处理语句进行缓存再利用)等。</p>
-<p>说了这么多，那么如何使用参数化查询呢？很简单，使用一个支持该特性的数据库连接工具就可以了，比如我们下面要演示的Node环境下MySQL的参数化查询。</p>
-<h3 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h3><p>我们在Node环境下进行演示，首先通过<code>npm install mysql2</code>命令安装数据库连接工具，这里是<code>mysql2</code>,能够支持参数化查询。</p>
-<p>如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> mysql2 = <span class="built_in">require</span>(<span class="string">'mysql2'</span>);</span><br><span class="line"><span class="keyword">const</span> conn = mysql2.createConnection(&#123;</span><br><span class="line">	host: <span class="string">'localhost'</span>,</span><br><span class="line">	user: <span class="string">'admin'</span>,</span><br><span class="line">	password: <span class="string">'123'</span>,</span><br><span class="line">	database: <span class="string">'news'</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 不使用任何防护手段(将导致SQL注入攻击)</span></span><br><span class="line"><span class="keyword">const</span> userInput = <span class="string">'1 or 1=1'</span>;</span><br><span class="line">conn.query(</span><br><span class="line">	<span class="string">`select * from urls where id=<span class="subst">$&#123;userInput&#125;</span>`</span>,</span><br><span class="line">	(err, result) =&gt; &#123;</span><br><span class="line">		<span class="built_in">console</span>.log(result);</span><br><span class="line">	&#125;</span><br><span class="line">);</span><br><span class="line"><span class="comment">// 使用转义(这里默认进行了转义)</span></span><br><span class="line">conn.query(</span><br><span class="line">	<span class="string">'select * from urls where `id`=?'</span>,</span><br><span class="line">	[<span class="string">'1 or 1=1'</span>], </span><br><span class="line">	(err, result) =&gt; &#123;</span><br><span class="line">		<span class="built_in">console</span>.log(result);</span><br><span class="line">	&#125;</span><br><span class="line">);</span><br><span class="line"><span class="comment">// 使用参数化查询</span></span><br><span class="line">conn.execute(</span><br><span class="line">	<span class="string">'select * from urls where `id`=?'</span>, </span><br><span class="line">	[<span class="string">'1 or 1=1'</span>], </span><br><span class="line">	(err, result, fields) =&gt; &#123;</span><br><span class="line">		<span class="built_in">console</span>.log(result);</span><br><span class="line">	&#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>关于SQL注入和参数化查询就介绍到这里，如果你觉得参数化查询两步走我说得并不明确，你可以使用抓包工具来加深理解；还有最后的Demo，其实query和execute的区别就是一个支持了参数化查询而另外一个不支持；如果你运行Demo，仔细看，区别就藏在里面(Tips：B &amp; T)；最后，请总是使用参数化查询！</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="cjlsv9zyc00083sudn8yvjxtu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/10/23/SQL参数化查询/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/10/23/SQL参数化查询/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
@@ -1749,7 +1751,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1758,7 +1760,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 

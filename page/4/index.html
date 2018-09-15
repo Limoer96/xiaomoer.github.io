@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                47
+                48
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,150 @@
 
             
             <section id="main">
+    <article id="post-词法作用域" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/01/27/词法作用域/">词法作用域</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/01/27/词法作用域/">
+            <time datetime="2017-01-27T06:54:05.000Z" itemprop="datePublished">2017-01-27</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>作用域模式有两种，一种是词法作用域，另一种是动态作用域，JavaScript采用的是词法作用域。</p>
+</blockquote>
+<p>大部分的编译器会在编译阶段把程序进行词法化，也就是会对源代码中的字符进行解析，并且赋予词语语义。简单来讲，词法作用域就是词法阶段的作用域，词法作用域是由你在写代码时讲变量和块写在哪里决定的，当词法分析器在处理代码时会保持作用域不变。</p>
+<p>考虑下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showNameAPI</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> city = <span class="string">'Chongqing'</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">showCity</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> cid = <span class="string">'CN'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(city + cid);</span><br><span class="line">  &#125;</span><br><span class="line">  showCity();</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line">showNameAPI(name)</span><br></pre></td></tr></table></figure></p>
+<p>这个代码一共包含三个逐级嵌套的作用域，全局作用域中声明了变量name，全局函数showNameAPI,函数作用域中showNameAPI所创建的作用域，包含标识符city以及showCity，最后是showCity创建的作用域,包含了标识符cid。</p>
+<p>作用域查找会在找到第一个匹配的标识符时停止。这里的查找是由内而外的，并且在多级嵌套的作用域内可以定义同名的标识符，但是会产生覆盖。因为<strong>作用域查找的规则就是找到第一个匹配的标识符后停止</strong>。</p>
+<p>无论函数在哪里被调用，也无论其是怎么被调用的，其词法作用域只与其被声明的位置有关。</p>
+<h3 id="欺骗词法"><a href="#欺骗词法" class="headerlink" title="欺骗词法"></a>欺骗词法</h3><p>上面说到词法作用域是在是完全在书写代码是就已经决定，但是也可以通过下面的两种方式在运行时来改变词法作用域。</p>
+<p>当然，不出意外的，这两种方式会是不那么讨人喜欢的eval()和with。</p>
+<p>我们首先来回顾一下eval()，这个函数接收一个字符串作为参数，这个字符串好像是运行时写在这里的代码一样。这明显是一种词法欺骗，其假装是在书写期间就在那里，而在运行时修改词法作用域。但是引擎对此并不知情，所以其依旧照常按照词法作用域进行查找。<br>看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showName</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">eval</span>(str);</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line">showName(<span class="string">"var name = 'lindo'"</span>) <span class="comment">// lindo</span></span><br></pre></td></tr></table></figure></p>
+<p>eval(‘name=”lindo”‘)会被引擎误认为在书写时就在那里，由于执行了上面的语句，此时name的值已经被修改了，并且产生了覆盖，遮蔽了外部同名的变量name。</p>
+<p>在默认的情况下，如果eval中所执行代码中存在一个或者多个申明，其就会对eval()所处的作用域进行修改。无论何情况，eval(..) 都可以在运行期修改书写期的词法作用域。</p>
+<p>再来谈with关键字，我们都知道with关键字用于重复引用一个对象的多个属性的快捷方式，而不需要重复引用对象本身。<br>看下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  name: <span class="string">'limoer'</span>,</span><br><span class="line">  age: <span class="number">20</span>,</span><br><span class="line">  city: <span class="string">'Chongqing'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(obj.name)</span><br><span class="line"><span class="built_in">console</span>.log(obj.age)</span><br><span class="line"><span class="built_in">console</span>.log(obj.city)</span><br><span class="line"><span class="comment">// 重复</span></span><br><span class="line"><span class="keyword">with</span>(obj)&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">  <span class="built_in">console</span>.log(age);</span><br><span class="line">  <span class="built_in">console</span>.log(city);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的这段代码突出了with关键字优点，它可以简化我们的代码，但是我们这里谈的是with关键字的词法欺骗，看下面一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">info</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">with</span>(obj)&#123;</span><br><span class="line">    name = <span class="string">'lindo'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> p1 = &#123;</span><br><span class="line">  name: <span class="string">'limoer'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> p2 = &#123;</span><br><span class="line">  city: <span class="string">'Jinan'</span></span><br><span class="line">&#125;</span><br><span class="line">info(p1)</span><br><span class="line"><span class="built_in">console</span>.log(p1.name) <span class="comment">// 'lindo'</span></span><br><span class="line">info(p2)</span><br><span class="line"><span class="built_in">console</span>.log(p2.name) <span class="comment">// undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(name) <span class="comment">//lindo!</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的这个例子很好的展示了with关键字的词法欺骗，这里创建了两个对象p1和p2，并通过info函数执行with(obj){…}，这里进行了简单的LHS查找，并将新值赋给name属性。但是请注意，这里p2对象并不存在name属性，也不会创建name属性，所以p2.name为undefined；这里很好理解，但是为什么神奇的是竟然多出了一个全局变量name呢!？</p>
+<p>这里执行with(obj){…}的时候，执行的LHS查找，所以当查找不成功时自动隐式创建一个全局变量，如果这样考虑，那么出乎意料的name属性就不难理解了。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>JavaScript拥有的是词法作用域，所谓的词法作用域就是在进行词法分析时的作用域，也就是说，JS的作用域在代码一旦书写完成就能确定(靠书写位置来确定)。词法作用域的理解很简单，但是我们还是需要注意使用eval()和with语句带来的词法欺骗的原因。也许有人会说，在运行时修改词法作用域有利于实现复杂的功能，又利于扩展，何乐而不为呢？可我们在前面提到，在进行编译的时候，JS引擎会对代码进行优化，而这个优化则是根据代码的词法作用域，预先确定变量和函数的位置，才能在执行过程中快速找到标识符。而eval()和with的出现则有可能打破这样的格局，因为引擎在词法分析阶段并不能知道传入的代码到底是什么，会对词法作用域造成怎样的影响。所以，一切优化都是徒劳的，因为在运行时谁都不能确定此时此法作用域到底是怎么样的，所以JS引擎并不会进行优化，导致代码运行缓慢，性能并不好。所以，尽量不要使用它们。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="cjm312btu002q2kud4ib9nibf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/01/27/词法作用域/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/01/27/词法作用域/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-理解作用域" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -276,7 +420,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/27/理解作用域/" data-id="cjlsv9zzm002c3sud40v4sei3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/27/理解作用域/" data-id="cjm312btq002i2kud8r3a3tml" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -415,7 +559,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/26/我们的世界/" data-id="cjlsv9zzg00213sud093s0jbx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/26/我们的世界/" data-id="cjm312btk00272kudjymb214s" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -559,7 +703,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/11/给自己立个寒假计划吧/" data-id="cjlsv9zzp002h3sud14jquimq" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/11/给自己立个寒假计划吧/" data-id="cjm312btr002k2kudvqkg1o2p" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -757,7 +901,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/05/计算机网路复习笔记之网络层基础/" data-id="cjlsv9zzu002p3sudb2gso0rq" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/05/计算机网路复习笔记之网络层基础/" data-id="cjm312btt002o2kudcy49ziq7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -935,7 +1079,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/" data-id="cjlsva000002u3sudg1uxpc9a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/" data-id="cjm312bv200312kudulu13ngm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1085,7 +1229,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/12/31/我的2016/" data-id="cjlsv9zze001x3sudccqovyqm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/12/31/我的2016/" data-id="cjm312bth00232kudk1di0q3u" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1224,7 +1368,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/12/12/React全家桶学习资源汇总/" data-id="cjlsv9zyp000q3sudqydemzuk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/12/12/React全家桶学习资源汇总/" data-id="cjm312brq000l2kud3cfjrv1o" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1364,7 +1508,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/" data-id="cjlsv9zyx00133sudr2uzcbgm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/" data-id="cjm312bta001o2kudu46jflb2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1499,7 +1643,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/15/使用ES6语法写React/" data-id="cjlsv9zyo000o3sudbf8k83v4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/15/使用ES6语法写React/" data-id="cjm312bsu00132kudfjmkl6z7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1577,142 +1721,6 @@
 
 
 
-    <article id="post-JS定时器知多少" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/11/06/JS定时器知多少/">JS定时器知多少</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/11/06/JS定时器知多少/">
-            <time datetime="2016-11-06T11:36:11.000Z" itemprop="datePublished">2016-11-06</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>在JavaScript中，定时器是一个经常被误用且不被大家所熟识的特性。但在构建应用时其却非常有用。<br>定时器提供了一种让一段代码在一定的时间之后运行的能力。由于JS的单线程特性，其同一时间只能执行一处代码，而定时器跳出了这一性质，以其特有的方式来执行代码。</p>
-<p>在浏览器环境当中，window对象下有两组方法，setTimeOut()/clearTimeOut()以及setInterval()/clearInterval()分别用于设置定时器让其在一段时间后执行/让其停止和每隔一段时间就会执行一次/清除该定时器。<br>比如下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do somethign</span></span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br><span class="line">setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do this code every 1s</span></span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
-<p>上面的代码分别创建了一个一次执行定时器和循环执行的定时器，每隔一秒钟，function就会被执行一遍</p>
-<p>咋一看，setInterval就像周期性执行setTimeout一样，但是他们有很多不同之处。<br>举个栗子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span> <span class="title">repect</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	setTimeOut(repect, <span class="number">100</span>);</span><br><span class="line">&#125;, <span class="number">100</span>);</span><br><span class="line">setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do some thing</span></span><br><span class="line">&#125;, <span class="number">100</span>)</span><br></pre></td></tr></table></figure></p>
-<p>上面两段代码的功能几乎是一样的，但是实际上却不是。setTimeOut()代码中执行前一个回调结束后100毫秒甚至更多，才会执行下一个回调<br>而setInterval()不一样，每隔100毫秒就会尝试执行，不会受到前面回调的影响。那为什么执行一个setTimeOut()执行回调的时间会更长呢？因为js单线程的特性，当计时时间到，回调函数会被放入执行队列排队，并且执行回调是需要时间的，所以执行时间只会大于设置的时间。setInterval()也一样，但有一点，由于其不关注前一个回调执行的情况，如果一直被延迟，那么setInterval()在可用后会无延迟执行。</p>
-<p>好吧，写个栗子证明一下上面的结论：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="built_in">console</span>.time(<span class="string">'测试setTimeOut执行的时间'</span>)</span><br><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.timeEnd(<span class="string">'测试setTimeOut执行的时间'</span>);</span><br><span class="line">&#125;,<span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
-<blockquote>
-<p>执行结果为：<br>测试setTimeOut执行的时间: 1004.673ms</p>
-</blockquote>
-<p>关于setInterval()的演示和清除定时器的演示这里就不做了。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2016/11/06/JS定时器知多少/" data-id="cjlsv9zy900043sudh1v3zd2q" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2016/11/06/JS定时器知多少/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/11/06/JS定时器知多少/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/">下一页 &raquo;</a>
     </nav>
@@ -1727,7 +1735,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1736,7 +1744,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
