@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                48
+                49
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,147 @@
 
             
             <section id="main">
+    <article id="post-初识-requestAnimationFrame" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/12/初识-requestAnimationFrame/">初识 requestAnimationFrame</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/12/初识-requestAnimationFrame/">
+            <time datetime="2017-05-12T10:22:39.000Z" itemprop="datePublished">2017-05-12</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>事情的起因是这样的，前段时间面试的时候面试官问我会canvas不，作为一名未来的前端猿，我只有过一点了解，后来居然收到了offer，当然在闲暇之余是要学习一下canvas，并且在学习过程中首次接触到了本文的主角<code>requestAnimationFrame</code>。</p>
+</blockquote>
+<h3 id="web中实现动画"><a href="#web中实现动画" class="headerlink" title="web中实现动画"></a>web中实现动画</h3><p>老实说，如果有人问我如何在web开发中实现动画，我第一时间想到的就是使用定时器<code>setTimeout()</code>或者<code>setTimeInterval()</code>来实现。其实实现的方式远远不止这一种，在CSS3的时代，我们实现动画有了更多的选择，比如使用关键帧动画，使用<code>transition</code>，我们也可以在<code>canvas</code>上绘图来实现动画；当然，还有<code>requestAnimationFrame</code>。</p>
+<p>使用<code>setTimeout()/setInterval()</code>实现的方式很简单，我前面有一篇文章就简要介绍了JS中的定时器。使用这种方式实现动画其实是有其性能瓶颈的，例如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">animation</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// do something</span></span><br><span class="line">    setTimeout(animation, <span class="number">1000</span>/<span class="number">60</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面我们以60帧/秒的速度执行动画，但是如果浏览器不是60帧/秒，就会掉帧；并且由于JS单线程的特点，所有不能保证每一次执行回调都是<code>1000/60</code>毫秒；还有，当窗口处于非激活状态的时候，它同样可能会执行。</p>
+<p>其实很好理解，作为定时器，<code>setTimeout/setInterval</code>并不是专门做动画的，存在各种各样的问题也是很好接受的，但是当我们认识到这种实现动画的方式的各种缺点时，我们也许会考虑另一种动画的实现方式，而<code>requestAnimationFrame</code>是一种更好的方案。</p>
+<h3 id="初识-requestAnimationFrame"><a href="#初识-requestAnimationFrame" class="headerlink" title="初识 requestAnimationFrame"></a>初识 requestAnimationFrame</h3><blockquote>
+<p>当我们执行window.requestAnimationFrame(callback)的时候，浏览器会在下次重绘的时候执行回调函数，它会告诉浏览器马上就要执行动画了，而callback则是用于更新动画。</p>
+</blockquote>
+<p><code>requestAnimationFrame</code>使用起来很简单，通过递归不断来执行回调来更新画面从而让画面动起来，我们甚至不需为其指定动画执行的时间和帧率。其优点是：1）从名字上就可以看出这是一个专门用于实现动画的API，优化是自然少不了的；2）其如果处于非激活状态，会自动暂停执行，有效节省了CPU资源。</p>
+<h3 id="小实例"><a href="#小实例" class="headerlink" title="小实例"></a>小实例</h3><p>我们在做动画的时候，有时希望背景移动起来，结合目前正在学习的canvas，我们可以很轻易的做到这点.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> j = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">let</span> image = <span class="built_in">document</span>.querySelectorAll(<span class="string">'img'</span>)[<span class="number">0</span>];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">moveBackground</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height);</span><br><span class="line">  ctx.translate(<span class="number">10</span>, <span class="number">0</span>);</span><br><span class="line">  ctx.drawImage(image, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">  j++;</span><br><span class="line">  <span class="keyword">if</span>(j &lt; <span class="number">20</span>)&#123;</span><br><span class="line">    requestAnimationFrame(moveBackground);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> moveBtn  = <span class="built_in">document</span>.getElementById(<span class="string">'move'</span>);</span><br><span class="line">moveBtn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;</span><br><span class="line">  e.preventDefault();</span><br><span class="line">  requestAnimationFrame(moveBackground);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面我们点击button的时候，开始执行动画，通过不断的坐标变换和清除重绘，达到背景图片向右移的效果。</p>
+<p>最后，请注意，不是所有浏览器都支持该方法，所以你可能需要一个polyfill，关于如何实现这个polyfill，网络上的资源比较多了，这里就不在赘述。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="cjmgavldw001gpwudquhay67p" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-实用的JavaScript技巧、经验总结" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -289,7 +430,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="cjm312btf001y2kud48ddf9fh" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="cjmgavle3001tpwudyl32uo2w" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -487,7 +628,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/04/17/回忆录/" data-id="cjm312bts002m2kudu6cz1ysu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/04/17/回忆录/" data-id="cjmgavlei002lpwudwyy8t8s4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -630,7 +771,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjm312bte001w2kudsvgs7zcr" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjmgavle4001vpwudkgbcnrv0" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -778,7 +919,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/" data-id="cjm312bsy00192kud0xfga9qj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/" data-id="cjmgavldr0018pwuddvqdvnt2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -930,7 +1071,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="cjm312br100012kud3fdqdevj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="cjmgavlca0001pwudpxz8qt5i" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1074,7 +1215,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="cjm312btp002g2kud5ke5e96n" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="cjmgavleg002hpwud3n1lcu5k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1232,7 +1373,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="cjm312brc00062kudisuqyf6m" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="cjmgavldq0015pwuda6l0btfx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1378,7 +1519,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="cjm312brj000e2kudogfvs2tn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="cjmgavldb000jpwudmyfaezbo" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1524,7 +1665,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="cjm312btl00292kudw15udwld" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="cjmgavleb0028pwudedhlilhg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1602,148 +1743,6 @@
 
 
 
-    <article id="post-JS作用域浅析" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/01/28/JS作用域浅析/">JS作用域浅析</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/01/28/JS作用域浅析/">
-            <time datetime="2017-01-28T12:43:19.000Z" itemprop="datePublished">2017-01-28</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>我们都知道，JS的作用域其实包含了一系列的<strong>气泡</strong>，这些<strong>气泡</strong>包含了标识符(函数和变量)的定义,而这些气泡相互嵌套并且整齐排列。而在JavaScript中，这种气泡指的是<strong>函数作用域</strong>和<strong>块级作用域</strong>。</p>
-</blockquote>
-<h3 id="函数作用域"><a href="#函数作用域" class="headerlink" title="函数作用域"></a>函数作用域</h3><p>函数作用域是JS中最基本也是最常见的一种作用域。所谓函数作用域，指的是在函数声明的过程中产生的一个“气泡”，这个“气泡”可以包含标识符。</p>
-<p>来看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> b = <span class="number">2</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 失败</span></span><br><span class="line"><span class="built_in">console</span>.log(b); <span class="comment">// 失败</span></span><br><span class="line">bar(); <span class="comment">//失败</span></span><br></pre></td></tr></table></figure></p>
-<p>在上面的这段代码中，函数foo所形成的作用域包含了标识符变量<em>a</em>以及函数<em>bar</em>,而函数<em>bar</em>所形成的作用域包含了变量<em>b</em>。当然，全局作用域中也包含标识符<em>函数foo</em>。</p>
-<p>当然，就像上面程序的运行结果一样，直接访问变量a，b，函数bar都将失败。因为在函数作用域中，其声明的变量和函数中能在其内部(包含嵌套的作用域)使用。</p>
-<p>由于函数作用域的特性，将会带来很多优点，譬如函数作用域可以隐藏函数内部的实现(非常重要)，也可以避免变量在声明过程中产生的冲突以及覆盖。</p>
-<h3 id="块级作用域"><a href="#块级作用域" class="headerlink" title="块级作用域"></a>块级作用域</h3><p>有Java学习经验的童鞋对<em>块级作用域可谓是了解</em>，然而在JS中，块级作用域可不是那么常见(至少是在ES6出现以前)。</p>
-<p>在let和const关键字出现以前，如果想找到块作用域的影子，那么只有with和try…catch语句了。</p>
-<p>with关键字是JS块作用域的一个典型，在该作用域的范围内声明的变量都只在with语句块中有效。</p>
-<p>而块作用域的另一个应用则是在try…catch中，相信即使对JS不够了解的童鞋都知道异常处理，对于JS中的try…catch语句，在catch块中将会产生一个err对象，而这一个对象只能在catch块中才能使用。看下面一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showName</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  showName()</span><br><span class="line">&#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(e);</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'end'</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(e);</span><br></pre></td></tr></table></figure></p>
-<p>上面的这个例子showName函数内部试图打印一个并不存在的变量name，这里将使用一个RHS查找，并且在失败后抛出一个引用错误，我们可以在catch捕获到这个错误对象，但是我们没法在全局作用域上使用这个错误对象。</p>
-<p>好了，除了这两个使用<em>块作用域</em>的典型，在ES6标准中，还新增了let和const关键字来实现块作用域。这里简单介绍一下，对ES6感兴趣的的童鞋们可以点<a href="http://es6.ruanyifeng.com/" target="_blank" rel="noopener">这里</a>来进一步了解ES6。</p>
-<p>let和const都是有别于var的另外两种声明方式，let用于声明变量，该变量将会被绑定在{…}中，也就是说使用let声明的变量具有块级作用域。使用let声明的变量不但具有块级作用域，同时变量也不会提升。而const则用于声明常量，同样具有块级作用域，并且也不存在提升。let可以很好的用于循环，防止变量对于环境的污染。</p>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>函数是JS中最常见的作用域，声明在函数内部的变量和函数将会被很好的隐藏起来，这是一种良好的设计原则。而在ES6中，块级作用域再次被人们所日常使用。块作用域到底是不是函数作用域的替代方案，我认为到目前为止，不是！我们应该自己选择使用何种作用域，如何结合使用这两种作用域，来创造更加可读和健壮的程序。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="cjm312bra00042kud6ccucy04" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/01/28/JS作用域浅析/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/01/28/JS作用域浅析/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
@@ -1758,7 +1757,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1767,7 +1766,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -1776,7 +1775,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 15px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16.67px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 12px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 16px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 16px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 14px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 14px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 12px;">计算机网络</a>
         </div>
     </div>
 
