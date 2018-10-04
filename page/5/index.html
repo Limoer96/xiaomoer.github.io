@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                50
+                49
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,146 +207,6 @@
 
             
             <section id="main">
-    <article id="post-使用webpack-npm进行React开发" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/11/19/使用webpack-npm进行React开发/">使用webpack+npm进行React开发</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/11/19/使用webpack-npm进行React开发/">
-            <time datetime="2016-11-19T08:17:52.000Z" itemprop="datePublished">2016-11-19</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/React/">React</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>这一期的知识我早就想写了，因为在学习React之初，心里面就有很多疑问，当然其中一个就是：我能不能不把所有的Component写在一个文件中，当然后面没有关注这样的问题，直到前些日子学习Flux才重视起来，恰逢周六，在这里写一篇，关于如何使用webpack+npm进行React开发。</p>
-<h2 id="webpack–脚手架工具而已"><a href="#webpack–脚手架工具而已" class="headerlink" title="webpack–脚手架工具而已"></a>webpack–脚手架工具而已</h2><p>在这里我并不打算详细介绍webpack如何使用，webpack只是一个前端脚手架工具而已，在进行React开发的时候，我们只是使用babel转换ES6的代码而已，但是webpack也是一个好用而简单的打包工具，想了解更多关于webpack的知识，点击<a href="http://webpackdoc.com/index.html" target="_blank" rel="noopener">这里</a>。<br>好吧，正式开始吧！<br>首先我们需要安装node 和 npm, 因为webpack也是依赖node的，安装好node和npm后我们就可以开始安装webpack了，首先安装webpack：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g webpack</span><br></pre></td></tr></table></figure></p>
-<p>当然这里你也可以不全局安装，使用<code>npm init</code>初始化一个package.json文件，使用<code>npm install --save webpack</code>安装。</p>
-<p>这里我将会跳过使用命令进行打包，直接进到使用配置管理文件就好了，如果想更深层次的了解webpack，点击上面的介绍咯(真的很详细)。</p>
-<p>首先介绍一下这个配置文件，默认命名为webpack.config.js，其是一个node的文件，就像如下的这个样子。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">	</span><br><span class="line">	<span class="built_in">module</span>.exports = &#123;</span><br><span class="line">		entry: <span class="string">'./base.jsx'</span>,</span><br><span class="line">    output: &#123;</span><br><span class="line">        filename: <span class="string">'./output.js'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="built_in">module</span>: &#123;</span><br><span class="line">    	loaders:[</span><br><span class="line">    		&#123;</span><br><span class="line">            test: <span class="regexp">/\.jsx?$/</span>,</span><br><span class="line">            exclude: <span class="regexp">/(node_modules|bower_components)/</span>,</span><br><span class="line">            loader: <span class="string">'babel'</span>,</span><br><span class="line">            query: &#123;</span><br><span class="line">                presets: [<span class="string">'es2015'</span>,<span class="string">'react'</span>]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    	]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>好吧，介绍一下上面的这个文件到底描述了些什么，首先我们输出了一个配置对象，<code>entry</code>定义了要引入的文件，当然如果需要引入多个文件的话可以使用一个数组。<code>output</code>顾名思义定义要输出的文件名，这里可以把它理解为打包好存放的文件。<br>最后，下面的这个<code>module</code>属性用于定义加载器，比如我们需要使用babel来吧jsx转为普通的js代码，test属性表示给所有匹配的jsx执行解析，<br>exclude表示将会不解析node模块和通过bower安装的模块。loader表示使用解析工具，query则表示的扩展参数，这里表示应用es6和react的解析规则。<br>好了，对示例文件的简单介绍就告一段路，当然还有一个属性plugins，用于使用插件，有关插件的使用请移至官方文档。</p>
-<h2 id="搭建react的开发环境"><a href="#搭建react的开发环境" class="headerlink" title="搭建react的开发环境"></a>搭建react的开发环境</h2><p>细心的童鞋可以发现了，上面我演示的配置文件就是一个用于开发react的基本配置文件。好吧，直接开始，首先安装react，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install --save react</span><br><span class="line">npm install --save react-dom</span><br></pre></td></tr></table></figure></p>
-<p>接着安装babel用于解析jsx和es6，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install --save babel-loader</span><br></pre></td></tr></table></figure></p>
-<p>最后安装一些解析规则<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install babel-plugin-transform-es2015-arrow-functions --save-dev</span><br><span class="line">npm install babel-preset-es2015 --save-dev</span><br><span class="line">npm install babel-preset-react</span><br></pre></td></tr></table></figure></p>
-<p>到这里，我们就安装完了开发react所需要的模块了，好吧，直接进入最后一步，在这里我将写一个和小很小的例子</p>
-<h2 id="一个栗子"><a href="#一个栗子" class="headerlink" title="一个栗子"></a>一个栗子</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;render&#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InputComp</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span></span>&#123;</span><br><span class="line">	<span class="keyword">constructor</span>(props)&#123;</span><br><span class="line">		<span class="keyword">super</span>(props);</span><br><span class="line">		<span class="keyword">this</span>.handleChange = <span class="keyword">this</span>.handleChange.bind(<span class="keyword">this</span>);</span><br><span class="line">		<span class="keyword">this</span>.state = &#123;</span><br><span class="line">			value: <span class="string">''</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	handleChange(e)&#123;</span><br><span class="line">		<span class="keyword">var</span> newvalue = e.target.value.trim();</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;<span class="attr">value</span>: newvalue&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;input ref=<span class="string">"name"</span> type=<span class="string">"text"</span> defaultValue=&#123;<span class="keyword">this</span>.props.tag&#125; onChange=&#123;<span class="keyword">this</span>.handleChange&#125;/&gt;</span><br><span class="line">				&lt;p&gt;&#123;<span class="keyword">this</span>.state.value&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">InputComp.propTypes = &#123;</span><br><span class="line">	tag: React.PropTypes.string.isRequired</span><br><span class="line">&#125;</span><br><span class="line">InputComp.defaultProps = &#123;</span><br><span class="line">	tag: <span class="string">'输入点什么东西吧！'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> tag = <span class="string">'请输入'</span>;</span><br><span class="line">render(<span class="xml"><span class="tag">&lt;<span class="name">InputComp</span> /&gt;</span>,document.getElementById('app'));</span></span><br></pre></td></tr></table></figure>
-<p>上面的小例子来源于react首页上面的一个例子，这里使用react的写法，对es6不是很了解的童鞋可以点<a href="http://es6.ruanyifeng.com/" target="_blank" rel="noopener">这里</a>,关于适用ES5开发react和使用es6开发有什么区别，可以看我的上一篇博客，这里就不做过多的介绍，<br>接下来，使用webpack进行打包就好了，使用上面举例的config文件，运行命令<code>webpack</code>就可以了，然后将输出文件引入到html文件中就可以看到效果了，当然如果你不想每一次修改都运行一遍命令的话那就使用监听更新模式，运行<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">webpack --progress --watch</span><br></pre></td></tr></table></figure></p>
-<p>当你修改完文件后，其会监听到文件的改变而做出增量的修改打包（当然第一次还是得手动打包）</p>
-<h2 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h2><p>写到这里，这篇文章就算完了，当你一步步完成上面的步骤，你就搭建了一个十分简陋的React开发环境，这里所说的的是简陋，我并没有加载对css文件的打包，这里大家可以根据自己的需求添加不同的loader来完成。作为一个React的初学者，感觉React这一个体系是十分庞大的，庞大到学习React一个多月仍然觉得力不从心，作为一个大三孩纸，每天被上不完的专业课实验课所压着，抽出来学习的时间并不多，再有自身比较懒惰所以…<br>好吧，不多说了，好好努力吧，毕竟路都是自己选的。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/" data-id="cjmr84v7a001i1sudkgd9bi8k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <article id="post-使用ES6语法写React" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -404,7 +264,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/15/使用ES6语法写React/" data-id="cjmr84v6q000v1sudci8r6ync" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/15/使用ES6语法写React/" data-id="cjmu33z7x000x6cudjlx1b1t4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -540,7 +400,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/06/JS定时器知多少/" data-id="cjmr84v6700061sudmbmc75k1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/06/JS定时器知多少/" data-id="cjmu33z7600046cudw4a2k1x8" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -678,7 +538,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/23/写在去星期一之前/" data-id="cjmr84v78001g1sudi4wnkr7v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/23/写在去星期一之前/" data-id="cjmu33z87001g6cud85a3ndlx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -826,7 +686,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/21/浅谈JS闭包/" data-id="cjmr84v7t002f1sud73qhmru1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/21/浅谈JS闭包/" data-id="cjmu33z8p002c6cud2bs79jse" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -990,7 +850,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/13/踩过React表单的坑后有感/" data-id="cjmr84v8500331sud88heti47" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/13/踩过React表单的坑后有感/" data-id="cjmu33z90002x6cudwbk3ps0f" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1148,7 +1008,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/12/在React中使用mixin/" data-id="cjmr84v7h001u1sudu7xgigha" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/12/在React中使用mixin/" data-id="cjmu33z8d001p6cudbb70aa66" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1311,7 +1171,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/11/React学习之JSX/" data-id="cjmr84v6600051sud1jzzvszf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/11/React学习之JSX/" data-id="cjmu33z7a000a6cudmm0sqdfq" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1469,7 +1329,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/10/写在正式学习React之前/" data-id="cjmr84v7b001k1sudjl9prk2d" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/10/写在正式学习React之前/" data-id="cjmu33z88001i6cudgxfp06hm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1605,7 +1465,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/10/依偎/" data-id="cjmr84v6u00141sudqm6akvsx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/10/依偎/" data-id="cjmu33z85001b6cudvcaxzsce" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1697,7 +1557,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1706,7 +1566,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
