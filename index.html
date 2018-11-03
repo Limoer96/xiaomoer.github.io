@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                50
+                51
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,157 @@
 
             
             <section id="main">
+    <article id="post-week-record-1103" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/11/03/week-record-1103/">每周一记（十一月）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/11/03/week-record-1103/">
+            <time datetime="2018-11-03T11:12:10.000Z" itemprop="datePublished">2018-11-03</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/周记/">周记</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="先说重点"><a href="#先说重点" class="headerlink" title="先说重点"></a>先说重点</h3><blockquote>
+<p>差不多一个小时以前， <em>IG</em> <code>3-0</code>零封 <em>FNC</em>拿到了 <em>LPL</em>赛区的第一个世界冠军。我目睹了这一切，也曾今是一个<code>英雄联盟</code>玩家。还记得第一次弟弟带着我玩这款游戏，我抽到了一个<code>8</code>折优惠，花了<code>36</code>买了我的第一个英雄–<em>金克斯</em>，后来，买了第一款新年限定皮肤–<code>羊年限定金克斯</code>；也买过<code>源计划--艾希</code>。记得大学的第一个暑假高中同学小聚，网吧开黑玩一整夜也不会觉得累。记得最孤独无助的<code>2015</code>年，一个人在宿舍打出排位<code>36</code>连胜。记得几个月以前，快要离开大学之前，和同学们开黑的那段时光。老实说，当我忘记了出门要买装备，总是忘记交闪现，也经常线上漏刀的时候，<code>英雄联盟</code>早已不属于我了。可我总是会在忙得不可开交的一天后，打开直播看上两局；也全程关注了<code>S8</code>世界总决赛；也会打开网易云音乐，单曲循环<em>RISE</em>。到现在，我明白了，我还是喜欢<em>英雄联盟</em>这款游戏，即便我不怎么会亲自去玩了。</p>
+</blockquote>
+<p>我一直喜欢玩游戏，从最开始的<em>穿越火线</em>，再到陪伴了整个高三的<em>NBA 2KOL</em>，到<em>英雄联盟</em>，在到如今的<em>绝地求生</em>。因为只有在玩游戏的时候，才是那个没有任何防备的自我。</p>
+<h3 id="工作-amp-学习"><a href="#工作-amp-学习" class="headerlink" title="工作&amp;学习"></a>工作&amp;学习</h3><p>为什么要把工作和学习放到一起来说呢？因为这一周真的很闲，临近项目结项，我最主要的工作，除了处理<code>BUG</code>，大把大把的时间就拿来学习了。</p>
+<p>当然还是先将工作。我们的项目遇到了一个<code>BUG</code>，我们有一个嵌套层级很深的菜单，需要实现几个需求：</p>
+<ol>
+<li>当用户切换主菜单的时候自动滚动到顶部。</li>
+<li>当弹出板块树或者是进行滚动的时候，始终保持用户选择的菜单项在可视区域内。</li>
+<li>当用户刷新整个页面的时候，能够准确还原到上一次用户选择的菜单项中。</li>
+</ol>
+<p>我们最初并没有将<code>Menu</code>写成一个单独的组件，而是把它放在了<code>DataReport</code>中，并且只是用了<code>scrollIntoViewIfNeeded</code>来让选中的菜单项滚动到可视区域，因为在切换菜单是默认会选中顶部第一项的，所以不需要加任何代码就可以实现滚动到顶部这个功能。</p>
+<p>理论上是这样的，并且我们也是这样做的。可我们发现了，如果我们切换菜单的时候，如果默认选中的不是报表，那么就没办法滚动到顶部。而且一旦刷新页面，用户当前的状态也就丢失了。</p>
+<p>我第一想法是把<code>Menu</code>作为一个组件独立出来，这个我们可以更好的在组件内部实现逻辑。当切换菜单的时候，我使用了<code>scrollTop=0</code>这种方式来滚动到顶部。并且为了能够在刷新后记住用户状态，我需要反向遍历菜单树，并与当前路由进行对比，确认用户当前打开的菜单项位于的层级，从而控制其祖先菜单的打开和关闭。至此，问题解决了。</p>
+<p>可是，在和<code>boss</code>沟通的时候，他第一时间判断我这样做是不正确的，并且现场撸了一个版本出来，且不讨论是否能用，但是太多的<code>if else</code>条件判断，反而让<code>DataReport</code>变得无比臃肿，再加上到下班时间并且我们在他身后看他写代码很久了，我一时口嗨就说了句<em>写得乱七八糟的</em>，这惹怒了我的<code>boss</code>，我也当场为我的不理智做出了道歉。<br>通过这件事可以看出来我的情商还要加强。</p>
+<p>虽然最后还是采用了我的方案。</p>
+<p>再讲讲学习。</p>
+<p>在掘金上看了很多文章，都是零散的，比如说<em>时间循环</em>， <em>Shadow-Dom&amp;Custom-Element</em>，还是<em>CSS mask&amp;clip</em>或是<code>markdown2html</code>，通过这些零散的知识点学习，我觉得我对前端的理解又有了更多的理解。在大方向上的学习上，主要是<code>TypeScript</code>，<code>Echarts自定义系列</code>，以及读源码。</p>
+<p>特别是读源码，真的让我收获颇多。最近在看<code>Wind Design</code>的很多组件的源码，大体上是老版本的<code>Ant Design</code>的源码。很早就接触并使用到了<code>Antd</code>组件库，比如经常使用的<code>Form</code>组件却不知道是如何实现的。</p>
+<p>我之前也按照自己的想法，封装了一个组件。可当读完源码后发现，真的是自己水平太低，很多问题都没有考虑到。并且作为源码，自己的代码也不够规范。</p>
+<p>当然，从下周开始，我不会像现在一样闲了，但源码我还是会一直读下去。如果有时间的话，我会考虑记录记录写成博客什么的？</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><blockquote>
+<p>上周末我把和上司闹不愉快的事情告诉了家人，而一到周一下班，妈妈就打来电话，问我的情况，生怕我和上司的关系存在问题什么的。说实话，我很感动，我给她说啊，都是技术上的事，不会带入平时工作的，并且我在意识到自己的错误的时候，也立马进行了道歉，况且我的上司也是一个很nice的人，这样他们终于不用担心了。其实就是这样，最关心我们的，非家人莫属。所以啊，都那么大的人了，做事情一定要考虑更多，让他们和关心你的人，少为你操心。</p>
+</blockquote>
+<p><em>IG</em>都夺冠了，那我也要戒掉自己的某个陋/懒习了，所以在最后立一个只有一个人知道的<code>FLAG</code>。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2018/11/03/week-record-1103/" data-id="cjo1ey5rh0010hgudmxe5tptx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2018/11/03/week-record-1103/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/11/03/week-record-1103/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-week-record-1014" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -282,7 +433,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/10/15/week-record-1014/" data-id="cjnaauf8a000vzsud77gyqg4h" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/10/15/week-record-1014/" data-id="cjo1ey5rg000yhgud2hw2bkcf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -430,7 +581,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/10/02/week-record-1002/" data-id="cjnaauf89000uzsudacy75art" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/10/02/week-record-1002/" data-id="cjo1ey5rd000shgudsvs6rwrs" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -561,7 +712,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/22/week-record-0922/" data-id="cjnaauf89000szsudvuudrwnp" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/22/week-record-0922/" data-id="cjo1ey5re000uhgudcpamy6tn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -708,7 +859,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjnaauf8e000zzsud45ipsdmt" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjo1ey5rk0018hgudzvaehi1g" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -875,7 +1026,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjnaauf9p0024zsud6hc2jnct" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjo1ey5ri0014hgudbolb21id" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1033,7 +1184,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjnaauf88000qzsudv89z0xqr" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjo1ey5ra000ohguds5vnlkbt" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1185,7 +1336,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjnaauf8j0016zsud01ztdzcd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjo1ey5rh0012hgudhnsf7z8m" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1329,7 +1480,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjnaaufa3002hzsudzo6kr0mh" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjo1ey5sg0036hgud9xglciix" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1495,7 +1646,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjnaaufad002yzsudz9byenb9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjo1ey5sb002uhgudlaab0e9h" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1573,157 +1724,8 @@
 
 
 
-    <article id="post-尾巴" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/06/30/尾巴/">尾巴</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/06/30/尾巴/">
-            <time datetime="2018-06-30T06:37:02.000Z" itemprop="datePublished">2018-06-30</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>这是故事的结局，我把它叫做尾巴。</p>
-</blockquote>
-<h3 id="是尾巴但也有开头"><a href="#是尾巴但也有开头" class="headerlink" title="是尾巴但也有开头"></a>是尾巴但也有开头</h3><p>尾巴起源于我一个不敢想但是蓄谋已久的想法。22岁，我大学毕业，来到了梦想中的城市，找了一份自认为还不错的工作，然后开始奋斗。这几乎是每个大学毕业生的剧本，我也不例外。22岁总会带来点什么，或是我们应该下意识改变些什么。而22岁的我，决定付诸行动，虽然已经蓄谋很久了。</p>
-<p>见老朋友啊。</p>
-<p>这就是尾巴，但尾巴也有开头。</p>
-<h3 id="旅程"><a href="#旅程" class="headerlink" title="旅程"></a>旅程</h3><p>毫不夸张的讲，这是一趟漫长的旅程。即使我生活的地点一直向南在变化，就算我们可以选择的交通工具既方便又快捷，虽说没有千里之隔，但就像是回趟家一样。漫长，但充满期待。</p>
-<p>路途开始那天就下起了雨，虽说都快七月了，但是上海就像梅雨天一样，几乎每天都会下会儿小雨，或者是太阳雨。傍晚时分，刚坐上火车，雨又开始沥沥淅淅下起来了，我把脸贴在玻璃上，甚至可以感受到火车车轮与钢轨摩擦发出的吱吱声，随着火车越开越快，这种感觉就越发强烈，直到到了忍耐的极限。在火车上的六个小时不长，但却够拿来回忆很多年的故事呢！好在六个小时不长，不然陷入回忆这种事就要发生在我身上了。可又为何会这样，也许是因为除了回忆，什么都不剩下了。</p>
-<p>晚上10点，顺利到达目的地，一走出火车站，潮湿的热空气像我袭来，就像在冬季里吸入冷空气一样，吸入这样的空气也会让人顿时提起神来，它仿佛在告诉，你活着。是啊，活着真好！</p>
-<p>第二天，很早就起，赶上清晨的前几班公交，离目的地还有很远，换乘，再步行，差不多两小时才到。穿过菜市场，湿漉漉的街道和发出的鱼腥味让我想起了和妈妈为数不多买菜的情景。眼前是一个有点年头的小区，旁边有高架桥，不远处还在绿化施工，这虽然是一片住宅，的的确确和D描述的一样，吵死了！</p>
-<p>我环顾四周，茫然写在脸上。我开始打电话，又等了几分钟，一个阿姨向我走来，我认出来了，她是来接我的，旁边还跟着一个小女孩。我赶忙上去打招呼，阿姨看见我也很开心，好久没见到这样的笑容挂在一个中年妇女脸上了，上一个还是半年前的寒假，那个人是我妈。</p>
-<p>就这样，我上了楼，一口气爬了六层，到了她家。房子从外面看真不怎么样，但走进真觉得精致啊，客厅厨房都挺宽敞的，这点和我合租的房子真是天壤之别。阿姨问我吃早餐了没，我碍于情面不好说自己饥肠辘辘，上一顿还是在昨天下午吃的，就说自己吃了，阿姨也没多问。</p>
-<p>我坐在客厅的沙发上，环顾四周，却没有发现记忆里的东西，心里不禁失落，四年的时间里，也许什么都在发生改变。我和阿姨坐下来聊天，她以为我是D的高中同学，我说不是呢，我是D最好的朋友也是D小学同学，在远在千里的家乡，小学三年级的时候，我们还做过半年多同桌呢！阿姨的震惊完全写在脸上，又有谁能想到，眼前的这个人，竟然是D的小学同学！说道这里，毕竟是同乡人，我们用家乡的方言开始交流。我给阿姨讲我和D的故事，记忆深刻的。这样的桥段在我的脑海里不知过了几遍，语言斟酌了多少次，却没想到，直到真的要说出去的时候，是如此的困难。</p>
-<p>好在时间冲淡了这一切，我们都没有太动情。阿姨带我去看了D的房间，这间房子我还是很熟悉的，虽然房间的主人不在了，陈设也变了，但是透过那窗台，望过去就是外面齐平的高架桥。D曾告诉过我，当她无聊的时候，还可以数过往车辆，数到自己不无聊为止。</p>
-<p>我问阿姨有没有老照片。</p>
-<p>她拿出了一本相册，整整满满的一个相册都贴满了，有多年的老照片，有全家福，还有很多有关D的照片。阿姨在和我一起翻看这些照片，去给我讲有关D的故事。</p>
-<p>至始至终我脸上都没有表现出悲伤，直到离开。我谢绝了留下来吃中午饭的好意，阿姨也陪着我下楼，在最后的时间里，我给阿姨说，如果D没离开，可能我们早就见面了。</p>
-<p>阿姨叫我以后多来家做客，可是就像是四年前那样，我又有什么理由再来这座城市呢！经过那条菜市场街，我拐了好几道弯，终于走出了小区。一路上，我在想，真的走出来了吧，不然小萝莉都快3岁了！我很欣慰，前所未有的释然。</p>
-<h3 id="是尾巴但终究还是结局了"><a href="#是尾巴但终究还是结局了" class="headerlink" title="是尾巴但终究还是结局了"></a>是尾巴但终究还是结局了</h3><p>回到新的大本营，迫不及待的开始写这个结局。今天下了好久的雨，肯定积了好多水坑，我打开窗呼吸着还算清爽的空气，听到蛙鸣，一切都是那么安静。我想，是时候让故事告一段落了。</p>
-<p>我的这22年来，对我影响最大的三个女性是妈妈，老姐和D。妈妈在我童年的那段时间教会了我太多，善恶美丑，做人准则；有一个姐姐真的很棒，总会收到各种各样的礼物，在最无法沟通的时候，同龄人的姐姐却可以懂我；D，我们在小学就已经相识，到了高中，如果不是有D，恐怕我已经荒废那段最宝贵的时光，然后浑浑噩噩过着日子。</p>
-<p>我走不出D离开给我带来的阴影，看似只有在电视剧上才会发生的剧情，发生在了我头上，并且没有一个好的结局。</p>
-<p>五年可以忘掉什么？那些看似很有用的高中知识点，我忘了；不常用的邮箱密码，也搞忘了；可是，D的离开，快五年了，我以为我忘记了，可是一旦记起，唯独耿耿于怀。</p>
-<p>这一次，我依然没法忘记这一切，毕竟真实存在过，亲生经历过；正是因为忘不掉，才证明我们真正的活着啊，并且要好好活着。我没法忘掉这一切，但我看开了，这就是结局。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2018/06/30/尾巴/" data-id="cjnaauf9u0026zsudp91yytxo" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2018/06/30/尾巴/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/06/30/尾巴/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
-        <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+        <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
 </section>
             
@@ -1736,7 +1738,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1745,7 +1747,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
