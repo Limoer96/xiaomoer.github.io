@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                51
+                52
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,164 @@
 
             
             <section id="main">
+    <article id="post-Prototype" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/03/Prototype/">Prototype</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/03/Prototype/">
+            <time datetime="2017-02-03T13:30:39.000Z" itemprop="datePublished">2017-02-03</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>JS为了模拟面向对象“类”的实现，为了模拟类的复制行为，可能会使用一种叫做“混入”的方法，当然，这种方法和我们今天要说的<em>原型</em>并没有多大的关系。使用<em>mixin</em>的方式来模拟“类”的实现不常见，当然为了模拟”类“所付出的代价也会让我们得不偿失，JS中不并存在”类”，而是存在一种叫做<em>原型</em>的东西，请容我细细说来。</p>
+</blockquote>
+<h3 id="Prototype"><a href="#Prototype" class="headerlink" title="Prototype"></a>Prototype</h3><p>我们直接来讲文章的主角<em>Prototype</em>，其实JavaScript中每个对象都有一个叫做[[prototype]]的属性，这个属性就是对其他对象的一个引用。基本上所有的对象在初始化时[[prototype]]都会被赋予一个值，关于这个值是什么以及如何访问这个[[prototype]]属性，我会在后面提到。</p>
+<p>还是先看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> obj2 = <span class="built_in">Object</span>.create(obj)</span><br><span class="line"><span class="built_in">console</span>.log(obj2.a); <span class="comment">//1</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的代码我们创建了一个对象obj，其包含一个属性a，我使用Object.create(obj)创建了一个新的对象，并把该对象的[[prototype]]属性赋值为obj，最后我们打印obj2中并没有显式声明的变量a，令人惊奇的是，我们成功的访问到了变量a，并且该变量的值为[[prototype]]属性引用对象obj的属性a的值！</p>
+<p>我想解释下为什么要对这段代码写这么详细的解释，因为对于大多数接触过JS的童鞋而言，原型已经是见怪不怪了，可是当初我学习JS的时候，脑子里完全没有原型的概念，直到有一天我慢慢开始懂得原型，那个时刻，我的心情就像现在写这段解释的时候这么激动!</p>
+<p>看完上面这段代码和冗长的解释，即使不了解JS的童鞋也对原型有了一定的认识。在这里我想再说一下，[[prototype]]到底有什么用，其实很简单，当我们试图引用某个对象的时候，在底层其实调用的是一个GET方法，而这个方法首先会查找对象本身存在这个属性与否，如果不存在则通过[[prototype]]访问其原型对象，如果还是不存在的话，则访问原型的原型对象(别忘了原型对象也是普通对象)，知道找到或者达到尽头(Object.prototype)。这个道理很简单，如果你使用for…in循环遍历一个数组的话，也许你得到的结果除了数组成员，还包含一些其它成员(不信你试试看)，这些成员就来自原型对象，并且是<em>可枚举</em>的，而对于in关键字，也会查找原型链上面属性。</p>
+<h3 id="类"><a href="#类" class="headerlink" title="类"></a>类</h3><p>在说类的时候，也许更恰当的是给类打上一个引号，因为JS中根本就不存在”类”，JavaScript中只存在对象，我们不使用“类”创建对象，更多时候我们直接创建对象。可有些时候，我们使用<em>new</em>关键字来初始化一个对象，我们甚至在ES6后开始使用class，extend等属于类的关键字，这貌似和我前面说的矛盾了…<br>接着看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">A</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(A.prototype);<span class="comment">// &#123;&#125;</span></span><br><span class="line"><span class="keyword">var</span> a = <span class="keyword">new</span> A();</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> a); <span class="comment">// object</span></span><br></pre></td></tr></table></figure></p>
+<p>我们创建了一个函数A，并且这个函数有一个属性prototype，如果没记错的话，这是本篇文章第一次访问原型，然后我们使用<em>new</em>初始化了一个对象，有传统面向对象语言基础的同学就知道，这简直像极了“类”！我再次强调，JS中不存在类，而且此<em>new</em>非彼<em>new</em>，这里函数A在<em>new</em>关键字的作用下，新建了一个空白对象，并让其prototype指向的对象赋值给新建对象a的[[prototype]]属性(关联)，当然这里面还会做一些其它的工作，不过大体上就这样了，很简单吧！</p>
+<p>在JavaScript中，并不存在类的复制，我们不能创建一个类的多个实例，只能创建过个对象，只不过通过<em>new</em>这种方式创建的对象，其内部的[[prototype]]属性关联到同一个对象，这里所说的关联是建立一个联系，并不存在复制。</p>
+<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><p>既然不存在类了，这构造函数听着也很别扭，我们暂且给它打个引号吧。上面我们在说“类”的时候，我们就用到了”构造函数”，函数A就是所谓的“构造函数”，其本质上就是一普通函数，是JS的一等公民，要说真要有什么区别，函数名首字母大写算吗？也许是吧。</p>
+<p>再来写一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">B</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="built_in">console</span>.log(B.prototype);</span><br><span class="line"><span class="built_in">console</span>.log(B.prototype.constructor === B);</span><br><span class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> B();</span><br><span class="line"><span class="built_in">console</span>.log(b.constructor === B);</span><br></pre></td></tr></table></figure></p>
+<p>我感觉我放了一个大招，突然让自己迷惑起来，这里我要说明的是，B.prototype和对象b有一个叫做constructor的属性，并且默认指向函数B。这个属性的名字会让我们对JS的误解加深，四级没过的都知道，constructor翻译过来可叫做“构造器”啊，那么既然B.prototype.constructor指向了B，我们还有什么理由不说B不是“构造函数”？讲到这里，我很无奈…</p>
+<p>其实呢，JS中根本不存在什么“构造函数”，其就是普普通通的函数，只不过一旦加上new关键字，这个函数调用再也不是普通的函数调用，我们把它叫做“构造函数调用”。</p>
+<p>这里不想再说下去了，写个复杂点的例子先：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, city</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.name = name;</span><br><span class="line">  <span class="keyword">this</span>.city = city;</span><br><span class="line">&#125;</span><br><span class="line">Student.prototype.showInfo = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`name: <span class="subst">$&#123;<span class="keyword">this</span>.name&#125;</span>, from: <span class="subst">$&#123;<span class="keyword">this</span>.city&#125;</span>`</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> stu = <span class="keyword">new</span> Student(<span class="string">'limoer'</span>, <span class="string">'Chongqing'</span>);</span><br><span class="line">stu.showInfo(); <span class="comment">// name: limoer, from: Chongqing</span></span><br></pre></td></tr></table></figure></p>
+<p>这里有两个值得注意的地方，每个通过”构造函数调用”而生成的对象都存在两个属性name和city；我们给Student.prototype上添加了一个“方法”，这样所有的新建对象都<strong><em>关联</em></strong>了这个对象，可以引用这个“方法”，关于<em>this</em>的使用，这里就不在提了。</p>
+<p>在说了这么多过后，我想把“构造函数”称为“关联函数”，因为所谓的“构造函数”其实并不存在，或者说是，我们并不知道一个函数在创建好后是否是“构造函数”，而如果我们把它叫做“关联函数”，因为它本质上做的工作包含了建立对象和其原型对象的关联，当然，这个叫法是不恰当的。</p>
+<p>再来看看constructor属性，一般情况下，任何一个普通对象都存在一个constructor属性，其实这个属性并不是其本身就有，而是当引用该属性的时候，其可以在该对象的原型链中找到。现在我急切的想写一个例子来表明一个问题：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">C</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">C.prototype = &#123;&#125;</span><br><span class="line"><span class="keyword">var</span> c = <span class="keyword">new</span> C();</span><br><span class="line"><span class="built_in">console</span>.log(c.constructor === C); <span class="comment">// false</span></span><br></pre></td></tr></table></figure></p>
+<p>我不啰嗦了直接看问题，这里对象c的constructor属性竟然指向的不是创建它的那个函数C，这也侧面印证了我上面说的话，通过构造函数调用创建的对象不直接持有属性constructor而是从其原型链中“继承”而来，所以当我们想写一段包含继承的代码时，如果还想用constructor属性，需要做必要的修正。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Main</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Sub</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  Main.call(<span class="keyword">this</span>)</span><br><span class="line">&#125;</span><br><span class="line">Sub.prototype = <span class="built_in">Object</span>.create(Main);</span><br><span class="line">Sub.prototype.constructor = Sub;</span><br></pre></td></tr></table></figure></p>
+<p>在结束“构造函数”讨论的时候，提醒一句，尽量不要使用constructor属性，要问原因？我想我已经不那么直观的在前面说出来了。</p>
+<h3 id="如何关联"><a href="#如何关联" class="headerlink" title="如何关联"></a>如何关联</h3><p>我在上面提到把“构造函数”叫做“关联函数”，这虽然是不恰当的，但也不是一无是处，因为使用<em>new</em>关键字的“构造函数调用”，其在创建一个对象过后，也把该对象的[[prototype]]属性关联到该函数的prototype上。当然，如何关联不止这一种方法，这里介绍一种使用更为普遍的方法，Object.create(proto)。</p>
+<p>还是例子为先吧：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  info: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'info'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> obj1 = <span class="built_in">Object</span>.create(obj)</span><br><span class="line">obj1.info(); <span class="comment">// info</span></span><br></pre></td></tr></table></figure></p>
+<p>这里我们使用字面量的直接形式创建了一个对象obj，该对象包含一个方法<em>info</em>，然后使用Object.create()创建了一个新的对象，并且该对象内部的[[prototype]]属性指向obj，概括点来说，该方法创建了一个对象，并把其关联到指定的对象。</p>
+<p>Object.create()是ES5才引进的，在这里我实现一个polyfill代码作为本篇的结束：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(!<span class="built_in">Object</span>.create)&#123;</span><br><span class="line">  <span class="built_in">Object</span>.create = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">Foo</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">    Foo.prototype = obj;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Foo();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当然，这个版本的polyfill代码无法做到更复杂的功能，而Object.create第二个参数可以指定要添加到新建属性的属性名、值等。</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>我们如果要访问一个并不存在的属性，在内部将会使用[[GET]]方法，并且查找该对象[[prototype]]所关联的对象，该关联实际上定义了一条“原型链”，在查找属性的时候会遍历整个“原型链”。</p>
+<p>关联两个对象的最常用的两种方法是：（1）使用new关键字进行“构造函数调用”，创建一个新对象并进行关联；(2)使用Object.create()，创建新的对象，并时期和传入对象关联。</p>
+<p>最后再次强调，JavaScript并不存在类，所有继承的实现完全是基于原型链，不存在复制。</p>
+<blockquote>
+<p>注：到底前面所说的原型链的尽头到底在哪里呢？答案是Object.prototype，对于一般的原型链而言，其最终都指向了Object.prototype，这个对象包含了许多对象通用的方法，例如obj.toString()&amp;obj.valueOf()等。</p>
+</blockquote>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="cjp6mdjr4000ve8udo1we14nd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/02/03/Prototype/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/03/Prototype/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-this" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -275,7 +433,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="cjo1ey5r9000nhgudysgomdig" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="cjp6mdjqz000qe8udxi0vddhu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -421,7 +579,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="cjo1ey5s4002ehgudlin1ebby" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="cjp6mdjry002be8udbg4y8l6c" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -563,7 +721,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="cjo1ey5nq0002hgudiqp498bp" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="cjp6mdjpw0002e8udfnt9ofzm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -707,7 +865,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="cjo1ey5sc002whgudejblwq27" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="cjp6mdjsa002ve8udsenqjfkn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -854,7 +1012,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/27/理解作用域/" data-id="cjo1ey5s8002ohgudow7u9hh4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/27/理解作用域/" data-id="cjp6mdjs3002ie8ud45a8q1r4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -993,7 +1151,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/26/我们的世界/" data-id="cjo1ey5s7002lhgud09flkyef" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/26/我们的世界/" data-id="cjp6mdjrw0026e8ud05xr4442" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1137,7 +1295,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/11/给自己立个寒假计划吧/" data-id="cjo1ey5s9002qhgud648ssrph" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/11/给自己立个寒假计划吧/" data-id="cjp6mdjs8002re8ud2v2u0hle" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1335,7 +1493,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/05/计算机网路复习笔记之网络层基础/" data-id="cjo1ey5sd002zhgudxv36qyn8" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/05/计算机网路复习笔记之网络层基础/" data-id="cjp6mdjse0032e8uduwedoss2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1513,7 +1671,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/" data-id="cjo1ey5sf0033hgud3jeoenmx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/" data-id="cjp6mdjtd0038e8udpmqdru89" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1591,156 +1749,6 @@
 
 
 
-    <article id="post-我的2016" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/12/31/我的2016/">我的2016</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/12/31/我的2016/">
-            <time datetime="2016-12-31T15:33:49.000Z" itemprop="datePublished">2016-12-31</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/晨记/">晨记</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p><img src="https://d13yacurqjgara.cloudfront.net/users/952958/screenshots/3186188/2017.png" alt="2017"><br>图片来自<a href="https://dribbble.com/shots/3186188-Happy-New-Year" target="_blank" rel="noopener">https://dribbble.com/shots/3186188-Happy-New-Year</a></p>
-<h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><blockquote>
-<p>最近发现有好多童鞋都在回顾自己的2016，好吧，我也顺应一次潮流，来写写我的2016年。</p>
-</blockquote>
-<p>2016年的最后一天，也就是今天。我是这样过的：<br>睡到10点起，<br>  看了一场NBA，<br>    中午开始写一个实验到下午饭点，没写出来，<br>      晚上6点到9点，图书馆自习，复习了<strong>计网</strong>第一章,<br>        回来看直播，同时玩炉石到11点，<br>          跑去其它宿舍唠嗑，11点半，<br>            开始写软文，现在<br>              …<br>在一天的最后十几分钟里，回想一下，上面描述的总总已经成了我2016最后一个月的常态，并且持续时间超过了21天，已经从入门到精通…<br>更可恨的是，最后一个月诸事不顺！不但挂了科，还…嗯..好像就挂了科，还开到了橙卡，成功脱非。<br>我严肃的说，这真是我真实的写照…哈哈！😂</p>
-<blockquote>
-<p>写了一通废话，还是进入正题吧。先总结一下，2016过的不能再平凡了，成绩还是老样子不上不下，编程技术有所进展，选定目标专注前端，大部分的时间过的还算充实。好了，写完了，这就是我的2016，我希望我的2017能够找一份实习工作，顺利补完所有没修的课，然后2018顺利毕业。对，听着就很实在对不对。<br>。</p>
-</blockquote>
-<p>可是<br>…<br>…<br>…<br>…<br>…<br>…<br>…<br>…</p>
-<hr>
-
-<p>如果有一个比惨大会的话，我一定会拿冠军的😢</p>
-<h2 id="负气"><a href="#负气" class="headerlink" title="负气"></a>负气</h2><blockquote>
-<p>我负气不是说我过得不好，而是有那么些不甘心</p>
-</blockquote>
-<p>任何人心有不甘，那么他一定是自卑了。而我的自卑完完全全是看到旁边有那么多优秀的人，无论是在西电还是在山大。没人会承认比别人差，我也是这样，所以我觉得自卑也好，负气也罢，一定程度上让我能够平静下来，去追寻自己想要的东西。2017，仍然是我负气的一年。</p>
-<h2 id="离开"><a href="#离开" class="headerlink" title="离开"></a>离开</h2><blockquote>
-<p>我特别不想回望过去，因为一定有离别</p>
-</blockquote>
-<p>2016年7月，我离开了呆了十个月的西安和呆了一学年的西电，在我的印象里，我对西安和西电抱怨了不下十次，最开始我甚至不想待在这里，到最后我离开也是头也不回。可是，我是真的喜欢那里，我临走之前，有过这样的想法，我一定要考研来这里，然而时过境迁，我已没了要去考研的念头；我喜欢在那里生活，喜欢它给我提供的前所未有的学习生活体验，虽然我说过我不认识这个学校99%的人，但是我认识的那1%都是那么可爱，他们会过来和你聊过去，会叫你参加集体活动，会鼓励你登上舞台，虽然有意见不合，可也会和你合作…<br>还记得最后匆匆忙忙离开的那天，在等车的时候，我偷偷拍了两张在北门的照片，藏起来，后来回到家翻出来看泪水花了一脸，我真是舍不得离开。<br>在这里我结识了我最好的朋友杨&amp;张,加入了小团体，真正的编程入门，甚至篮球水平都有不错的长进。<br>我喜欢深夜11点的时候回宿舍，因为那一段路太长了，长得你可以一个人昂着头哼着歌，思考着人生，嗯！那是最美妙的20分钟。</p>
-<h2 id="再出发"><a href="#再出发" class="headerlink" title="再出发"></a>再出发</h2><blockquote>
-<p>我对未来充满了期待，所以我提前来了</p>
-</blockquote>
-<p>2016下半年是我过得最充实的半年，内心从来没有这么平静过，我把精力更多的放在了学习技术上面，我带上耳机，感觉与世隔绝，我追随心所向，开始慢慢摸索。我的2017，注定也会在摸索中慢慢度过，我喜欢这样的生活。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2016/12/31/我的2016/" data-id="cjo1ey5s20028hgudgd4yf9yt" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2016/12/31/我的2016/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/12/31/我的2016/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/5/">下一页 &raquo;</a>
     </nav>
@@ -1755,7 +1763,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
