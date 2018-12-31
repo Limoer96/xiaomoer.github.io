@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                52
+                53
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,146 @@
 
             
             <section id="main">
+    <article id="post-three-js" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/08/24/three-js/">Three.js</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/08/24/three-js/">
+            <time datetime="2017-08-24T07:44:03.000Z" itemprop="datePublished">2017-08-24</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>最近貌似Node又有了新的fork ayo.js(怎么读！哎呦？)，加之前端一不留神就出框架的节奏，在2016年就开始用Next(wtf！你能看出来其是一个前端框架？)来命名，以后恐怕就得future.js、plus.js的节奏…贵圈真乱啊！</p>
+<p>当然当然，这和我们今天的主角three.js并没有太大的关系，比起这些看了名字不知所云的xxx.js，Three.js这个就和明显了，其是一个3d JavaScript库，更准确的说是用JavaScript编写的WebGL三方库，那么什么是WebGL呢？这个我不解释，有兴趣的小伙伴可以去探索。</p>
+<p>作为我最想学却一直学不会的技术之一，WebGL的确对于大部分的前端猿们来说有些复杂和繁琐了，早些时候我花了大量的时间去啃API，学习如何使用，可到目前脑子还是一团乱麻。既然这样的话，我们得另辟蹊径，不能因为有困难就放弃学习不是！所以我了解到了Three.js，其化繁为简，做同样的事，其只需要少于<code>1/5</code>的代码量就可以完成，并且API也十分通俗易懂，学习难度降低了不少，可以让我们关注使用WebGL创造而不是痛苦的学习和编码。</p>
+<p>如果你还不理解WebGL是什么，这是官方文档上的原话：</p>
+<blockquote>
+<p>WebGL (Web Graphics Library) is a JavaScript API for rendering interactive 3D and 2D graphics within any compatible web browser without the use of plug-ins. WebGL does so by introducing an API that closely conforms to OpenGL ES 2.0 that can be used in HTML5 canvas elements.</p>
+</blockquote>
+<p>如果你对Three.js比较有兴趣的话可以直接进去<a href="https://threejs.org/" target="_blank" rel="noopener">官网</a>，其中首页展示了很多<code>featured projects</code>，个人比较喜欢这个<a href="https://paperplanes.world/" target="_blank" rel="noopener">Paper Planes</a>。</p>
+<p>你也可以去<a href="https://github.com/mrdoob/three.js/" target="_blank" rel="noopener">gayhub</a>把Three.js代码download下来，里面有很多很多(大约几百个例子)可供学习，当然如果你想学习Three.js，来<a href="https://pan.baidu.com/s/1nvQJsUX" target="_blank" rel="noopener">百度云</a>下载，这是目前少有的全方面介绍Three.js的书籍。</p>
+<p>好了，差不多介绍完该跑了。但是我好想发现了我竟然连副标题都没取，好吧，还是再多讲一会儿，为了彰显Three.js的简单易用的特性，我讲决定再写一个全面但是简单的例子，并且配上必要的讲解。</p>
+<h4 id="例子？不存在的！"><a href="#例子？不存在的！" class="headerlink" title="例子？不存在的！"></a>例子？不存在的！</h4><p>这是一个很小的例子，它将会展示Three.js使用流程，并且是经过测试没有错误(也许有！)，请放心食用。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf8"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">title</span>&gt;</span>使用Three.js<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'./three.js'</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"three-container"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">'text/javascript'</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">			<span class="comment">// three.js中有几个非常重要的知识点，为了构成一个3D程序，我们至少需要以下几部分。</span></span></span><br><span class="line"><span class="javascript">			<span class="comment">// 1. Scene 场景，用于承载一些必要元素</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> scene = <span class="keyword">new</span> THREE.Scene();</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 2. Camera 相机(此相机非你想的那个相机哦！)</span></span></span><br><span class="line"><span class="javascript">			<span class="comment">// Three.js中提供了两种相机，透视相机和正交相机，这里使用的是透视相机(类似于人眼看到的)</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> camera = <span class="keyword">new</span> THREE.PerspectiveCamera(<span class="number">60</span>, <span class="built_in">window</span>.innerWidth/<span class="built_in">window</span>.innerWidth, <span class="number">1</span>, <span class="number">1000</span>);</span></span><br><span class="line"><span class="undefined">			camera.position.set(-20, 40, 20);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 3. renderer 渲染器， 也可以在canvas中渲染，但是复杂场景可能有性能问题</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> renderer = <span class="keyword">new</span> THREE.WebGLRenderer();</span></span><br><span class="line"><span class="undefined">			renderer.setClearColor(0x708090);</span></span><br><span class="line"><span class="javascript">			renderer.setSize(<span class="built_in">window</span>.innerWidth, <span class="built_in">window</span>.innerHeight);</span></span><br><span class="line"><span class="javascript">			renderer.shadowMapEnabled = <span class="literal">true</span>;</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 4. 物体</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> cubegeo = <span class="keyword">new</span> THREE.CubeGeometry(<span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 5. 材质 用于物体表面，不同材质包含不同特性，可设置颜色等。</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> material = <span class="keyword">new</span> THREE.MeshLambertMaterial(&#123;</span></span><br><span class="line"><span class="undefined">				color: 0xffffff</span></span><br><span class="line"><span class="undefined">			&#125;);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 组合物体与材质成为一个网格</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> cube = <span class="keyword">new</span> THREE.Mesh(cubegeo, material);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 设置物体能够产生光源阴影</span></span></span><br><span class="line"><span class="javascript">			cube.castShadow = <span class="literal">true</span>;</span></span><br><span class="line"><span class="undefined">			scene.add(cube);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 6. 光源 Three.js中存在多种光源</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> light = <span class="keyword">new</span> THREE.SpotLight(<span class="number">0xfffff</span>);</span></span><br><span class="line"><span class="undefined">			light.position.set(-30, 40, -20);</span></span><br><span class="line"><span class="javascript">			light.castShadow = <span class="literal">true</span>;</span></span><br><span class="line"><span class="undefined">			scene.add(light);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 设置相机看向场景远点(空间坐标系原点)</span></span></span><br><span class="line"><span class="undefined">			camera.lookAt(scene.position);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 添加到HTML中</span></span></span><br><span class="line"><span class="javascript">			<span class="built_in">document</span>.getElementById(<span class="string">'three-container'</span>).appendChild(renderer.domElement);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 为了更加直观，这里设置一下空间坐标系</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> axes = <span class="keyword">new</span> THREE.AxisHelper(<span class="number">30</span>);</span></span><br><span class="line"><span class="undefined">			scene.add(axes);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 动起来吧！添加动画</span></span></span><br><span class="line"><span class="javascript">			<span class="function"><span class="keyword">function</span> <span class="title">animation</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">				<span class="comment">// 比如移动转动方块， 这里设置在x、y轴转动平面</span></span></span><br><span class="line"><span class="undefined">				cube.rotation.x += 0.1;</span></span><br><span class="line"><span class="undefined">				cube.rotation.y += 0.1;</span></span><br><span class="line"><span class="undefined">				requestAnimationFrame(animation);</span></span><br><span class="line"><span class="undefined">				renderer.render(scene, camera);</span></span><br><span class="line"><span class="undefined">			&#125;</span></span><br><span class="line"><span class="undefined">			requestAnimationFrame(animation);</span></span><br><span class="line"><span class="undefined">		</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h4><p>即使是这样一个简单的例子，我如今也没有办法在不参考官方文档的情况下一口气写下来，原因无非在于，虽然其简化了开发，但是概念还是偏多并且需要记住每个API也是在有难度。</p>
+<p>但是，如果我们能够十分清楚的理解制作3D应用的流程，至少是使用Three.js的流程，按照流程十分有条理的写下去，代码总归是十分清晰的。</p>
+<p><code>time waiting for no one</code>，这是我最近在看《穿越时空的少女》看到的。对啊，时间不等人，珍惜好为说不多的’自由’而’枯燥’的时间吧！</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="cjqc4a40b000imsudxrgvadpg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/08/24/three-js/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/08/24/three-js/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-从decorator到Mobx" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -310,7 +450,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="cjp6mdjrh001fe8udp06yibx1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="cjqc4a40m0013msud0inta1ku" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -462,7 +602,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="cjp6mdjrn001pe8ud6pvxhzns" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="cjqc4a41o002gmsudndd6y2w3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -599,7 +739,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/07/25/孩子/" data-id="cjp6mdjrx0029e8udawieqngk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/07/25/孩子/" data-id="cjqc4a41h0026msud531k1wnk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -784,7 +924,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="cjp6mdjql000de8udcg42badz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="cjqc4a3zv0002msudwgrra45c" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -925,7 +1065,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="cjp6mdjro001re8udv20wjglz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="cjqc4a411001rmsudix54sm9a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1085,7 +1225,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="cjp6mdjrs001ze8udug37ud95" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="cjqc4a41j0028msudfvtb9nku" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1228,7 +1368,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjp6mdjrr001xe8udx99rnfme" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjqc4a413001vmsudw94acjb7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1349,10 +1489,10 @@
 <p>总结下来，我熬的心灵鸡汤大概有这样的特点：写自己的故事，还算完美的结局，极高的迷惑性，不认真看或者不了解我的人根本意识不到他们已经喝了我的鸡汤。</p>
 <p>丑小鸭都能变成白天鹅，所以一切都会变好的。可实际上，丑小鸭之所以能够成为白天鹅，并不仅仅是因为它努力，勤奋，而是他的父母本身就是白天鹅。</p>
 <p>爱笑的女孩子运气都不会太差。可实际上，如果一个女孩运气一直不好，她怎么可能笑得出来？</p>
-<p>刚刚看完自己三年前的一篇鸡汤文，讲述的是一个不起眼的男孩的成长历程。这个故事就像丑小鸭的故事那样，那个男孩通过不懈的努力最终成为佼佼者。当然那个男孩就是我自己，而真实情况却是，整个高中三年，我因上课期间逃到校外上网不下10次，每个星期天唯一的半天假期我都在网吧度过；由于我对手机的痴狂，我甚至一个月会换好几个手机，所以绞尽脑汁想尽各种办法向并不富裕的家庭索要金钱；我足球水平也没有那么好，也没有过刻骨铭心的所谓的“爱情”。而至于我最终为什么能够考上大学，这个我真的不知道，也许我真有过刻苦和努力的那段时光吧。</p>
+<p>刚刚看完自己三年前的一篇鸡汤文，讲述的是一个不起眼的男孩的成长历程。这个故事就像丑小鸭的故事那样，那个男孩通过不懈的努力最终成为佼佼者。当然那个男孩不是我自己，而我的真实情况却是，整个高中三年，我因上课期间逃到校外上网不下10次，每个星期天唯一的半天假期我大都在网吧度过；由于我对手机的痴狂，我甚至一个月会换好几个手机；篮球水平也没有那么好。而至于我最终为什么能够考上大学，这个我真的不知道，也许我真有过刻苦和努力的那段时光吧。</p>
 <p>我开始揣摩我当时的心理，可是依然没有任何头绪。我猜，我写文章的时候从来没想过让别人看见，我在给自己炖鸡汤，然后自己大口大口的喝下去。当刚刚喝完的时候可能我很解气，顿时觉得神清气爽有精神，可一段时间过后，我又感到烦躁无比，因为我又要面对摆在眼前那么真切的问题，我最终从自己幻想的那个世界中爬出来，面对强烈的反差，消极和怠慢丛生，然后开始耽误，一天，一周，一年，一辈子…</p>
 <p>我继续看文章，有几篇是在我在外校做交流生的时候写的。不知道能不能算鸡汤文吧，但至少还是有一股鸡汤味。然后我又发现了一个共性，所有的文章都是我在遇到问题踌躇满怀的时候写的，比如刚来到陌生校园而找不到上课教室过后，和室友闹了小矛盾过后，离别的时候。这又能说明什么问题呢？当我开始把心中所有的烦躁和愤怒写出来过后，我的确好了很多，因为在构思一篇文章的时候，我出奇的冷静。当文章写完，消极和愤怒开始消退，短时间内信心爆棚，此时鸡汤的功效正在起作用；一段时间过后，我又开始烦躁，负能量急速增长，我想，我似乎得了鸡汤依赖症。所以不断的熬鸡汤，不断的喝自己熬的鸡汤，已经成为了我的常态。</p>
-<p>做菜是我为数不过get到的技能，所以文章的最后讲讲我认为的好的熬鸡汤的方式。</p>
+<p>做菜也许是我为数不过get到的技能，所以文章的最后讲讲我认为的好的熬鸡汤的方式。</p>
 <p>材料：4-6个月母鸡，腌制萝卜整只多只，当归若干，枸杞少量，鲜竹笋数只，姜蒜，料酒，食盐若干。<br>步骤：</p>
 <ol>
 <li>在剔除多余的胸脯肉和鸡腿肉过后，切成小块洗净；</li>
@@ -1376,7 +1516,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/" data-id="cjp6mdjrq001ve8udcxbsxzbk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/" data-id="cjqc4a40q0019msudf7g2fuzj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1528,7 +1668,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="cjp6mdjqg0008e8udfacwo32v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="cjqc4a404000amsuds922726w" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1606,150 +1746,6 @@
 
 
 
-    <article id="post-生成器" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/11/生成器/">生成器</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/11/生成器/">
-            <time datetime="2017-02-11T04:10:07.000Z" itemprop="datePublished">2017-02-11</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>大家对于<em>异步</em>这个词想必都不陌生，看到异步我可能最先想到的就是使用回调，再者我会使用Promise，可是使用回调处理异步控制流是有缺陷的：第一，基于回调的异步方式实在不适合大脑对于任务的思考(这点我深有体会)；第二，存在控制反转的问题。而Promise链提供了我们以顺序的方式处理和表达异步流。而这篇文章的主角生成器(generator)也是一种顺序和看似同步的处理异步的方式，并且它比Promise更加优秀。</p>
-</blockquote>
-<h3 id="有关函数"><a href="#有关函数" class="headerlink" title="有关函数"></a>有关函数</h3><p>不知道大家有没有这样思考过，一个函数一旦执行，其是否能够中断，我也没有仔细想这个问题，并且当看到这个问题，我会经验判断函数在执行过程中不会中断。到底是否中断，我们先写一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  bar();</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">&#125;</span><br><span class="line">foo(); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
-<p>运行上面这个例子，最终的结果是3，这就意味着，当函数执行完a++后，函数foo从表面上来看被中断了，然后执行了bar函数，最后执行权交给foo，函数返回已经被修改的变量a的值。虽然通过上面的小例子，并且因为JS单线程的特性，我们似乎能够肯定JS是抢占式的，但实际情况是JS并不是抢占式的，虽然函数bar的执行打断了函数foo的执行，但这其实是一种“关联”(参考原型继承)。</p>
-<h3 id="初识生成器"><a href="#初识生成器" class="headerlink" title="初识生成器"></a>初识生成器</h3><p>现在让我们来认识生成器表达式，<br>同样是上面的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;   </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> iter = foo();</span><br><span class="line">iter.next();</span><br><span class="line">bar();</span><br><span class="line">iter.next(); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
-<p>分析一下：<br>首先我们创建了一个生成器foo(注意*)，该函数里面多了一个yield，有过python经验的大概知道这是干什么的。然后创建了一个函数bar；再来看执行，这里var iter = foo()并没有执行生成器foo，而是构建了一个迭代器，然后使用next方法启动了迭代器foo，并且在碰到yield停止执行，此时已经执行了x++，然后执行函数bar，执行完后，x经过两轮自增，此时x的值为3；最后我们调用next方法，从上一次中断处继续执行，并且没有碰到yield表达式，一直执行到函数结束，打印变量x的值为3。</p>
-<p>现在我们来回答什么是生成器，其是一个特殊的函数，在函数声明的时候函数名前面包含一个”*“，并且能够多次启动和暂停。好了，我认为仅此而已。</p>
-<h3 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h3><p>为了把生成器运用到异步流程控制中，我们还需要更深层次的了解生成器。</p>
-<h4 id="生成器仍然是一种函数"><a href="#生成器仍然是一种函数" class="headerlink" title="生成器仍然是一种函数"></a>生成器仍然是一种函数</h4><p>既然说生成器其本质上还是一种函数，所以其仍然具备函数最基本的特性，能够传递参数，也能返回值。我们不妨写一个例子测试一下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">test</span>(<span class="params">a, b</span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span>;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = test(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">it.next();</span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure></p>
-<p>其实生成器和普通函数的一个很大区别是在运行期间，它不会直接运行，而是创建了一个迭代器，然后每调用迭代器的next方法，便向下执行直到到碰到yield或者执行完成暂停。而我们注意到调用next方法返回的其实是一个对象，其包含一个value属性，如果生成器返回值的话，那么该属性的值就为生成器返回的值。总的来说，生成器的运行到目前为止完全是依托迭代器。</p>
-<p>好了，继续。</p>
-<p>继续来看例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params">a, b</span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span> a;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line"><span class="keyword">var</span> mid = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(mid.value); <span class="comment">// 2</span></span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.next); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure></p>
-<p>这个例子想表达的就是对于生成器而言，yield表达式总会返回一个值，而我们可以通过迭代器next方法生成的对象来得到。</p>
-<p>继续来看一个更复杂的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params">a</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> b = a + (<span class="keyword">yield</span> <span class="string">'ok return!'</span>);</span><br><span class="line">  <span class="keyword">return</span> b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// ok return!</span></span><br><span class="line">res = it.next(<span class="number">2</span>);</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
-<p>这个例子向我们展示了生成器是如何双向传递消息的，yield表达式可以发出消息响应next(…)的调用，而next(…)可以向暂停的yield表达式发送值。</p>
-<h4 id="多个迭代器"><a href="#多个迭代器" class="headerlink" title="多个迭代器"></a>多个迭代器</h4><p>一个生成器的多个实例可以并发执行，并且可以彼此交互。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">gen</span>(<span class="params">a</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> b = a + (<span class="keyword">yield</span>)</span><br><span class="line">  <span class="keyword">return</span> b</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it1 = gen(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">var</span> it2 = gen(<span class="number">2</span>);</span><br><span class="line">it1.next();</span><br><span class="line"><span class="keyword">var</span> res = it1.next(<span class="number">3</span>).value;</span><br><span class="line">it2.next();</span><br><span class="line"><span class="built_in">console</span>.log(it2.next(res).value); <span class="comment">// 6</span></span><br></pre></td></tr></table></figure></p>
-<p>这个例子想说明的是一个生成器的多个实例可以并发执行，并且是互不干扰的。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="cjp6mdjs5002me8udfg19bsja" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/02/11/生成器/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/11/生成器/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
@@ -1764,7 +1760,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1773,7 +1769,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
