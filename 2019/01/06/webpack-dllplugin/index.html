@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>使用Webpack DllPlugin | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="DllPlugin 简易使用指南 创建webpack.dll.config.js 用于对特定的模块打包成dll webpack --config webpack.dll.config.js 生成dll以及其描述文件 在webpack.common.config.js中使用DllReferencePlugin引入打包好的dll文件。 打包。此时遇到相应的模块时直接引入而不会重新打包。  创建webp">
+<meta name="keywords" content="Webpack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Webpack DllPlugin">
+<meta property="og:url" content="http://yoursite.com/2019/01/06/webpack-dllplugin/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="DllPlugin 简易使用指南 创建webpack.dll.config.js 用于对特定的模块打包成dll webpack --config webpack.dll.config.js 生成dll以及其描述文件 在webpack.common.config.js中使用DllReferencePlugin引入打包好的dll文件。 打包。此时遇到相应的模块时直接引入而不会重新打包。  创建webp">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-06T12:04:20.947Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Webpack DllPlugin">
+<meta name="twitter:description" content="DllPlugin 简易使用指南 创建webpack.dll.config.js 用于对特定的模块打包成dll webpack --config webpack.dll.config.js 生成dll以及其描述文件 在webpack.common.config.js中使用DllReferencePlugin引入打包好的dll文件。 打包。此时遇到相应的模块时直接引入而不会重新打包。  创建webp">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                54
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                12
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-webpack-dllplugin" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            使用Webpack DllPlugin
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/01/06/webpack-dllplugin/">
+            <time datetime="2019-01-06T11:52:32.000Z" itemprop="datePublished">2019-01-06</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Webpack/">Webpack</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="DllPlugin-简易使用指南"><a href="#DllPlugin-简易使用指南" class="headerlink" title="DllPlugin 简易使用指南"></a>DllPlugin 简易使用指南</h2><ol>
+<li>创建<code>webpack.dll.config.js</code> 用于对特定的模块打包成dll</li>
+<li><code>webpack --config webpack.dll.config.js</code> 生成dll以及其描述文件</li>
+<li>在<code>webpack.common.config.js</code>中使用DllReferencePlugin引入打包好的dll文件。</li>
+<li>打包。此时遇到相应的模块时直接引入而不会重新打包。</li>
+</ol>
+<h3 id="创建webpack-dll-config-js"><a href="#创建webpack-dll-config-js" class="headerlink" title="创建webpack.dll.config.js"></a>创建<code>webpack.dll.config.js</code></h3><blockquote>
+<p>这里以分别打包<code>moment</code>和<code>lodash</code>为例</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: &#123;</span><br><span class="line">    lodash: [<span class="string">'lodash'</span>],</span><br><span class="line">    moment: [<span class="string">'moment'</span>],</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// webpack.dll.config.js</span></span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> config = <span class="built_in">require</span>(<span class="string">'./config'</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: config.entry,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'/static/dll'</span>),</span><br><span class="line">    filename: <span class="string">'[name].dll.js'</span>,</span><br><span class="line">    library: <span class="string">'[name]_library'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.DllPlugin(&#123;</span><br><span class="line">      path: path.join(__dirname, <span class="string">'/static/dll'</span>, <span class="string">'[name]-manifest.json'</span>),</span><br><span class="line">      name: <span class="string">'[name]_library'</span>,</span><br><span class="line">      context: __dirname,</span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>解释：</p>
+<ol>
+<li>推荐把入口配置信息写在单独文件中，易于维护。</li>
+<li>DllPlugin类接受一个配置对象，该对象有三个属性：<code>context</code>(绝对路径), manifest文件中请求上下文；<code>name</code>,暴露的dll函数名；<code>path</code>：manifest文件存放的位置(绝对路径)。</li>
+</ol>
+<h3 id="使用DllReferencePlugin"><a href="#使用DllReferencePlugin" class="headerlink" title="使用DllReferencePlugin"></a>使用DllReferencePlugin</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// webpack.common.config.js</span></span><br><span class="line"><span class="keyword">const</span> config = <span class="built_in">require</span>(<span class="string">'./config'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  ... <span class="comment">// 省略其它配置</span></span><br><span class="line">  plugins: [</span><br><span class="line">    ...Object.keys(dllConfig.entry).map(<span class="function">(<span class="params">name</span>) =&gt;</span> <span class="keyword">new</span> <span class="keyword">new</span> webpack.DllReferencePlugin(&#123;</span><br><span class="line">      context: __dirname,</span><br><span class="line">      manifest: <span class="built_in">require</span>(<span class="string">`./static/dll/<span class="subst">$&#123;name&#125;</span>-manifest.json`</span>),</span><br><span class="line">    &#125;))</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>DllReferencePlugin 接受一个对象用于初始化</p>
+</blockquote>
+<ol>
+<li>context: manifest的上下文(绝对路径)，需和DllPlugin中的context一致</li>
+<li>manifest: manifest文件，使用require引入或指定绝对路径</li>
+</ol>
+<p>可选参数：</p>
+<ol>
+<li>content：模块id的映射，默认为 manifest.content</li>
+<li>name: dll文件的名称，默认为 manifest.name</li>
+<li>scope: dll 内容前缀</li>
+<li>sourceType: dll如何暴露的？amd commonjs2 …</li>
+</ol>
+<p>scope: ‘abc’， 则该dll中的xyz文件可以通过require(‘abc/xyz’)来引用<br>例如在一个dll中打包了<code>lodash</code>和<code>axios</code>两个库，并且指定了<code>{scope: &#39;lib&#39;}</code>，则在需要使用axios的时候使用<code>require(&#39;lib/axios&#39;)</code>即可。</p>
+<h3 id="测试1：把echarts，windui，react及其周边分别抽取成dll文件。"><a href="#测试1：把echarts，windui，react及其周边分别抽取成dll文件。" class="headerlink" title="测试1：把echarts，windui，react及其周边分别抽取成dll文件。"></a>测试1：把<code>echarts</code>，<code>windui</code>，<code>react</code>及其周边分别抽取成dll文件。</h3><p>抽取的dll文件大小分别为：753KB 1603KB，385KB。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">构建方式</th>
+<th style="text-align:right">平均构建时间</th>
+<th style="text-align:right">包大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">普通</td>
+<td style="text-align:right">97s</td>
+<td style="text-align:right">4.1MB</td>
+</tr>
+<tr>
+<td style="text-align:left">使用Dll</td>
+<td style="text-align:right">71s</td>
+<td style="text-align:right">2.6MB</td>
+</tr>
+<tr>
+<td style="text-align:left">dll文件</td>
+<td style="text-align:right">24s</td>
+<td style="text-align:right">2.7MB</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>经过对比发现，由于无法使用按需加载，所以整个<code>windui</code>打包的大小差不多为1.6MB，而普通的打包方式<code>windui</code>的大小仅为365KB。</p>
+</blockquote>
+<blockquote>
+<p>在使用<code>windui</code>链接库后生成的打包，发现vendors模块中仍然含有<code>windui</code>，大小为<code>330KB</code>，仅<code>windui</code>中的<code>node_modules</code>文件夹下的<code>rc-trigger</code>和<code>rc-dropdown</code>被重用，因此这里可能重复打包了。</p>
+</blockquote>
+<blockquote>
+<p><code>windui</code>中依赖的<code>rc-*</code>部分模块仍然被打包。</p>
+</blockquote>
+<h3 id="方式二-仅对react相关模块和echarts进行打包"><a href="#方式二-仅对react相关模块和echarts进行打包" class="headerlink" title="方式二 仅对react相关模块和echarts进行打包"></a>方式二 仅对<code>react</code>相关模块和<code>echarts</code>进行打包</h3><p>抽取的两个dll文件的大小为393KB 769KB</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">构建方式</th>
+<th style="text-align:right">平均构建时间</th>
+<th style="text-align:right">包大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">普通</td>
+<td style="text-align:right">97s</td>
+<td style="text-align:right">4.1MB</td>
+</tr>
+<tr>
+<td style="text-align:left">使用DLL</td>
+<td style="text-align:right">77s</td>
+<td style="text-align:right">3.08MB</td>
+</tr>
+<tr>
+<td style="text-align:left">dll</td>
+<td style="text-align:right">11s</td>
+<td style="text-align:right">1.16MB</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>windui</code>的大小基本不变，而<code>windui</code>依赖的<code>rc-*</code>系列组件基本没被打包。</p>
+</blockquote>
+<blockquote>
+<p><code>vendors</code>模块从<em>0.61MB</em>到<em>1.67MB</em></p>
+</blockquote>
+<h3 id="使用html-webpack-include-assets-plugin-把dll注入到index-html"><a href="#使用html-webpack-include-assets-plugin-把dll注入到index-html" class="headerlink" title="使用html-webpack-include-assets-plugin 把dll注入到index.html"></a>使用<code>html-webpack-include-assets-plugin</code> 把dll注入到<code>index.html</code></h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> HtmlWebpackIncludeAssetsPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-include-assets-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> dllIntoHtml = <span class="keyword">new</span> HtmlWebpackIncludeAssetsPlugin(&#123;</span><br><span class="line">  assets: [<span class="string">'./static/dll/echarts.dll.js'</span>, <span class="string">'./static/dll/react.dll.js'</span>], <span class="comment">// 需要注入的dll文件路径</span></span><br><span class="line">  append: <span class="literal">false</span>, <span class="comment">// 是否尾注入？push ： unshift</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>因为先构建dll，再进行项目构建，在项目构建过程中会删除整个build目录，所以在构建完后再把<em>dll文件夹</em>拷贝进<em>build/static/</em>。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li><p><code>windui</code>进行dll打包后会因为无法按需加载而导致总大小偏高(且可能会产生冗余)；而不进行的话，包的总大小基本不变。</p>
+</li>
+<li><p>初始时需要加载的chunk从3个变为6个/5个</p>
+</li>
+</ol>
+<h3 id="升级到webpack4-x"><a href="#升级到webpack4-x" class="headerlink" title="升级到webpack4.x"></a>升级到webpack4.x</h3><p>升级到webpak4.x后无论是<code>dll</code>还是最终生成块，都有小幅度的下降。与此同时，构建总时间(dll构建时间+项目build时间)略微减小。</p>
+<h3 id="关于使用已存在的模块直接作为dll文件引入的可能性"><a href="#关于使用已存在的模块直接作为dll文件引入的可能性" class="headerlink" title="关于使用已存在的模块直接作为dll文件引入的可能性"></a>关于使用已存在的模块直接作为dll文件引入的可能性</h3><ol>
+<li>目前无相关方面的实践。</li>
+<li>DllPlugin抽取特定的模块构建dll文件后会生成一个<code>manifest</code>文件。该存储了各个模块的和公共模块的对应关系。<br>该文件会对已经打包成dll的模块中的文件进行描述，会给每个文件指定id，并且该<code>json</code>文件中的<code>name</code>属性对应dll的<code>library</code>。</li>
+<li>在进行项目构建的时候，如需要打包某个模块，会在<code>manifest</code>文件中查找，如果该模块已经存在于dll中，依据manifest中的信息进行链接即可，不必重新打包。</li>
+</ol>
+<p>构建的dll块和使用<code>splitChunk</code>或者直接使用babel打包出来的块不一致。其依赖构建dll时指定的<code>library</code>等，而manifest文件也是和该块一一对应的。所以从理论上，使用其它方式提供dll文件由于构建方式和无法提供<code>manifest</code>文件，在构建过程中并不能被重用。</p>
+<p>PS: 本片文章来自于我在团队内部分享的笔记，任何关于<code>webpack-dll-plugin</code>的理解和使用方式请在该插件的<a href="https://webpack.js.org/plugins/dll-plugin/" target="_blank" rel="noopener">Webpack介绍页查看</a>。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="cjqkunkzv000k9wuduscdsyam" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/01/06/webpack-dllplugin/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/01/06/webpack-dllplugin/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/12/31/this-year/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">我的这一年</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 10px;">Webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2019/01/06/webpack-dllplugin/';
+        
+        this.page.identifier = 'webpack-dllplugin';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

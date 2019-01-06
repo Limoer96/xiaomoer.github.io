@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                53
+                54
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                11
+                12
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,204 @@
 
             
             <section id="main">
+    <article id="post-计算机网路复习笔记之网络层基础" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/01/05/计算机网路复习笔记之网络层基础/">计算机网路复习笔记之网络层基础</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/01/05/计算机网路复习笔记之网络层基础/">
+            <time datetime="2017-01-04T16:15:19.000Z" itemprop="datePublished">2017-01-05</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/计算机网络/">计算机网络</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="网络层基础"><a href="#网络层基础" class="headerlink" title="网络层基础"></a>网络层基础</h2><p>网络层关注的是如何将源端数据送到另一方，为了将数据送到另一方，可能会经过很多跳中间路由器。网络层处理的是端到端的数据。<br>为了达到这样的目的，网络层必须知道网络的拓扑结构。并从中选取适当的路径传输；此外，网络层还得仔细选择路由器，避免线路拥塞和路由器负载过重，而其他路由器则很清闲。<br>当源端数据和接收端数据来自不同网络时，需要网络层来解决。</p>
+<h3 id="1-网络层的设计问题"><a href="#1-网络层的设计问题" class="headerlink" title="1.网络层的设计问题"></a>1.网络层的设计问题</h3><p>5.1存储数据包与网络交换<br>如果一台主机需要发送一个数据包，它将数据包传递给就近的路由器，路由器可能在它自己所在的LLAN上，也可能在通往IPS的点到点的链路上；<br>在数据包到达路由器后，路由器的链路层对其进行校验和验证后，它首先会被存储在路由器上；接着沿路径被转发到下一个路由器，直至达到目标主机。<br>这是一种存储-转发数据报交换的模式。</p>
+<h3 id="2-无连接服务的实现"><a href="#2-无连接服务的实现" class="headerlink" title="2.无连接服务的实现"></a>2.无连接服务的实现</h3><p>无连接的服务：所有数据包将会被独立的注入到网络中，并且每个包独立路由，不需要任何的提前设置。这里我们把数据包也称为数据报，对应的网络被称为数据报网络。<br>有连接的服务：在发送数据包之前，需要建立一条源路由器到目标路由器的路径，我们把这个连接称为<strong>虚电路</strong>。其类似于电话系统中建立的物理电路，该网路也被称为虚电路网络。</p>
+<p>每个路由器将含有一个路由表，它指明了每一个可能的地址应该将数据包送到哪里去。每个表项由两部分组成，目标地址和通往目标地址所使用的出境线路。<br>每个路由表是可变的，管理这些路由表并作出路由选择的算法是路由算法。<br>IP协议是Internet的基础，它是无连接协议的范例。每个数据包携带一个IP地址，路由器根据IP地址来单独的转发每一个包。</p>
+<h3 id="3-有连接的服务"><a href="#3-有连接的服务" class="headerlink" title="3.有连接的服务"></a>3.有连接的服务</h3><p>有连接的服务需要一个虚电路，为了避免数据包选择一条新的路径。需要使用路由表记录下来已经确认的路径，当连接被释放，虚电路消失。在面向连接的服务中，每个数据包都带有一个标识符，指明它属于哪一条虚电路。</p>
+<p>这里的路由表是这样的，对于某个路由器而言，其包含了入境和出境两个逻辑列，每个列含有两行，分别指定了路由器和标识符。这里的出境标识符是可变的(为了解决某些冲突需要改变一下标识符)。这个改变出境标识符和的过程也被称为<strong>标签交换</strong>。</p>
+<h3 id="4-简单的比较"><a href="#4-简单的比较" class="headerlink" title="4.简单的比较"></a>4.简单的比较</h3><p>使用虚电路需要有一个花费时间并且耗费资源的建立过程，之后处理数据包非常容易；在数据报网络中，不需要建立连接，但路由器需要一个更复杂的查找过程。对于数据报网络而言，需要使用更长的目标地址，因此如果在数据量很小的情况下，目标地址承担了巨大的开销，宽带资源被浪费。<br>在控制拥塞方面虚电路表现得更好，因为在建立连接时，资源可以提前预留。最后是事务处理和健壮性，虚电路网络并不能够表现得很好，因为其需要花费大量的时间用于建立和清除虚电路并且一旦发生宕机，虚电路终端，所有的数据都会受到影响。</p>
+<h2 id="路由算法-⭐️"><a href="#路由算法-⭐️" class="headerlink" title="路由算法(⭐️)"></a>路由算法(⭐️)</h2><p>路由算法属于网络层软件的一部分：其负责确认一个入境数据包应该被发送到哪一条输出线路上。如果网路选择了数据报，那么路由器需要对每一个到达的数据包重新选择路径，因为自上次选择了过后，可能最优路径已经发生改变；对于使用虚电路时，只有在新建一条虚电路时，才需要路由决策，这种情形被称为<strong>回话路由</strong>。 </p>
+<p>我们可以把一个路由器内部想象成为有两个进程，一个用于接收数据包，检查数据包并且<strong>转发</strong>，一个则用于更新路由表。</p>
+<p>路由算法需要含有的特性：正确性，简单性，鲁棒性，稳定性，公平性和有效性。</p>
+<p>路由算法分类：</p>
+<ol>
+<li><p>非自适应算法：不会对当前进行测量，或者估算流量和拓扑结构来调整路由决策，相反所有路由都是在离线条件下计算好，并在网络启动时下载到路由器中，这个过程也被称为静态路由。该算法只适用于对路由选择已经很清楚的情况。</p>
+</li>
+<li><p>自适应算法：改变路由决策以便反应出拓扑结构的变化，通常也反映出流量的变化。<br>这些<strong>动态路由</strong>算法在各个方面也有表现不同，获取信息的来源不同，改变路径时间的不同，对路由的优化度量不同等。</p>
+</li>
+</ol>
+<h3 id="优化原则"><a href="#优化原则" class="headerlink" title="优化原则"></a>优化原则</h3><p>最优路径的一般陈述：如果路由器J在路由器I到K的最优路径上，那么从J到K的最优路径仍然遵循同样的路由。</p>
+<p>汇集树：作为最优化原则的一个直接结果，从<strong>所有的源</strong>到一个指定目标的最优路径的集合构成的一颗<strong>以目标节点为根</strong>的树。<br>汇集树不一定是唯一的。<br>汇集树<strong>不含有环</strong>，因此在指定的跳数内一定可以完成对数据包的传递。<br>每一个路由器都有一颗汇集树，根节点就是该路由节点。</p>
+<h3 id="具体的路由算法"><a href="#具体的路由算法" class="headerlink" title="具体的路由算法"></a>具体的路由算法</h3><h4 id="最短路径算法"><a href="#最短路径算法" class="headerlink" title="最短路径算法"></a>最短路径算法</h4><p>构建一张网络图，图中的每个节点代表一个路由器，每条边代表一段通信线路。为了选择一对给定路由器的路由，算法只需要在图中找到他们的最短路径。<br>采用Dijkstra算法（这里的思想完全一致）。</p>
+<h4 id="泛洪算法"><a href="#泛洪算法" class="headerlink" title="泛洪算法"></a>泛洪算法</h4><p>路由器将数据包发送给到达线路之外的所有出境线路。<br>分析：这样的做法会导致大量的冗余数据包，并且如果不加限制的话，将产生无数个重复的包。<br>限制的做法有：</p>
+<p>(1) 在每个包头加上一个跳计数器，每经过一个路由器，跳数减一，跳数为0时，丢弃掉该包。理想情况下，计数器的大小是源端到目的端跳长度；最坏的情况是整个网络的最长路径。</p>
+<p>(2) 追踪已经泛洪过的数据包，避免第二次发送它们。每个源路由器在接收数据包时给数据包添加上一个序号，每个路由器为源路由器建立一个表，其中包含了这些已经泛洪过的数据包的序号，如果某个数据包的序号在这张表中，则不再泛洪该包。<br>(3)为了防止这张表无限膨胀，每个表使用一个计数器k作为参数。它表示直到k的所有序号都已经观察到了。当一个数据包入境时，很容易检测该包是否被泛洪过，只需要比较和k的大小，如果泛洪过，丢弃该包。</p>
+<p>泛洪算法对于广播是一种有效的手段，但是对于其他用途而言不切实际。泛洪算法的鲁棒性非常好，如路由器损坏导致拓扑结构发生变化，仍然能够起比较好的作用。</p>
+<h4 id="距离矢量算法⭐️"><a href="#距离矢量算法⭐️" class="headerlink" title="距离矢量算法⭐️"></a>距离矢量算法⭐️</h4><p>每个路由器维护一张表，表中列出了当前已知到每个目标的最佳距离以及所使用的链路。这些表通过邻居之间相互交换信息而被不断更新，最终每个路由器都了解到达每个路由器的最佳链路。</p>
+<p>路由器维护的表一共有两项，第一项是目的路由，第二项是到其的最优路径的跳数(也可以是一个综合计算的数值)。通过邻居分享的路由表可以计算出新的信息，如果有最佳路径，就更新该路由器的路由表。<br>注：感觉这里是绝对的重点，一定要掌握如何计算和更新路由表。</p>
+<p>距离矢量算法会产生一个无穷计算的问题，关于什么是无穷计算，这里需要看书。<br>距离矢量算法的另一大缺点就是：当网络拓扑结构发生变化时，路由算法需要太长的时间才能收敛到稳定的状态(无穷计数问题引起)</p>
+<h4 id="链路状态路由算法⭐️"><a href="#链路状态路由算法⭐️" class="headerlink" title="链路状态路由算法⭐️"></a>链路状态路由算法⭐️</h4><p>步骤：</p>
+<ol>
+<li>发现其邻居节点，并掌握它们的网络地址</li>
+<li>设置到每个邻居节点的长度值(或者说是成本度量值)</li>
+<li>构造一个包，包含上述信息</li>
+<li>将这个包发送给所有其他路由器，并且接受来自其他路由器的包</li>
+<li>计算出到每个其它路由器的最佳路径</li>
+</ol>
+<p>对于发现邻居，其实是很好理解的，每个路由器在启动过后都发送一个特殊的HELLO数据包，其邻居接到过后就会返回一个应答，包含了自己的网络地址等信息。</p>
+<p>链路成本的计算：一种常用的选择是成本与链路带宽成反比。或者使用延迟估算来作为成本计算的方式。</p>
+<p>构造链路状态包：<br>包含了以下内容：发送方的标志，序号，年龄(后面介绍)，邻居和其成本的二元组。</p>
+<p>构建链路状态包的时期为：周期性的构建或者当网络拓扑结构发生变化了进行构建。</p>
+<p>对于发送包和接收包，这里使用的是泛洪算法，age字段的作用是防止数据包无限的生存下去，递减到0时则丢弃该包（这里不是到达一个路由器age-1）而是每过一个时间减一，比如说一秒。</p>
+<p>计算新路由：使用的是Dijkstra算法计算。</p>
+<p>链路状态路由算法相比距离矢量算法需要更多的内存和计算，对于一个具有n个路由器的网络，每个路由含有k个邻居，则用于存储输入数据的内存与kn成正比，并且计算时长的增长快过kn，在大型网络中运行这个算法仍然是个问题。不过在实际过程中，由于其并没有慢收敛的问题，因此工作的还不错。</p>
+<h4 id="层次路由"><a href="#层次路由" class="headerlink" title="层次路由"></a>层次路由</h4><p>对于规模特别大的网络，可以把网络分成区域，对于区域内部仍然构建详细的路由，对于区域外部，只构建层次的路由表项，不关心内部。这样可以减小一个路由器维护的路由表的大小。</p>
+<h4 id="广播路由"><a href="#广播路由" class="headerlink" title="广播路由"></a>广播路由</h4><p>使用泛洪算法，使用逆向路径转发的思想构建一颗汇集树。<br>生成树：网络的一个子集，包含所有路由器并且不含环路。汇集树属于生成树的一种。</p>
+<h4 id="组播路由"><a href="#组播路由" class="headerlink" title="组播路由"></a>组播路由</h4><p>为了防止给不是该组成员发送，在采用广播的思想上，需要对生成的汇聚树进行剪枝。通过把不是改组成员去掉，可以构建组播树。</p>
+<p>如果使用的是链路状态路由算法，每个路由器知道完整的拓扑结构，并且知道每个路由器是属于哪个组的情况下，可以使用最简单的组播算法。每个路由器针对组内每个发送者构建一颗它自己修剪后的组播树。具体的做法是首先构建一颗简单的汇聚树，然后再把不是该组的链路去掉即可。</p>
+<h3 id="拥塞控制算法⭐️"><a href="#拥塞控制算法⭐️" class="headerlink" title="拥塞控制算法⭐️"></a>拥塞控制算法⭐️</h3><p>拥塞：网络中存在太多的数据包导致数据包被延迟和丢失，从而降低了传输性能。</p>
+<p>拥塞控制和流量控制</p>
+<p>拥塞控制的途径：简单来说需要增加资源和减小负载。在时间尺度上，要么事先避免拥塞，要么在发生拥塞过后迅速做出反应。</p>
+<p>基本方法是建立一个与流量匹配的良好网络；<br>根据流量模式制定路由（改变最短路径权重等）；<br>如果无法增加容量，那么可做的就是降低负载了。例如对于有连接的服务，如果此时负载很大，应该拒绝建立虚电路的请求，这样的控制也被称为准入控制。</p>
+<h4 id="流量感知路由"><a href="#流量感知路由" class="headerlink" title="流量感知路由"></a>流量感知路由</h4><p>把链路权重设置成为一个带宽，延迟，负载，排队延迟的多方面函数，在其他条件都相同的情况下，最小权重的路径更青睐那些轻负载的路径。</p>
+<p>早期的流量感知路由存在一个问题，把负载考虑进链路权重过后，如果某一条链路非常拥挤而另外一条很空闲，那么下一时刻负载将会转移到这条链路，但是下一时刻有回到原先的链路，从而导致网络抖动。解决办法是不考虑负载，只考虑带宽和传输延迟，这样的问题就不会发生。</p>
+<h4 id="准入控制"><a href="#准入控制" class="headerlink" title="准入控制"></a>准入控制</h4><p>这是一种用于虚电路网络，防止出现拥塞的技术。其基本思想很简单：除非网络可以携带额外的流量而不会变得拥塞，否则不再建立新的虚电路。准入控制可以和流量感知路由结合，在建立虚电路的过程中，避开负载高的线路。</p>
+<h4 id="流量调节"><a href="#流量调节" class="headerlink" title="流量调节"></a>流量调节</h4><p>必须要解决的两个问题：</p>
+<p>（1）路由器必须确定何时快要接近拥塞(链路利用率，丢包数和排队包数)，每个路由器连续监测它正在使用的资源<br><br>（2）路由器必须及时把信息反馈给造成拥塞的发送方 <br><br>对于信息的反馈,这里有下面几种方法：</p>
+<ol>
+<li>抑制包，路由器随机选择一个被拥塞的数据包，给数据包的源主机发送一个抑制包。同时打上标记，以防在发送的图中产生更多的抑制包。</li>
+<li>显式拥塞通知，基本原理如下，路由器给每个转发的数据包打上标记，表明目前该链路正经历着拥塞，当包到达接收方时，接收方在回复应答包的时候会携带流量调节的信息，从而告诉发送方控制发送的速度。</li>
+<li>逐跳后压，存在一种这样的情况，当发送方速率很快的时候，即使抑制包发送出去后，在到达发送方之前，仍然会注入大量的数据导致网络更加拥挤，所以这里可以这样：让抑制包抑制它经过的每一跳，这样的话，短时间内抑制效果将会生效，来达到快速缓解负载很大的链路段的压力。</li>
+</ol>
+<h4 id="负载脱落"><a href="#负载脱落" class="headerlink" title="负载脱落"></a>负载脱落</h4><p>当流量感知路由，准入控制和流量调节都没办法消除拥塞是，路由器可以使用负载脱落来消除拥塞。其思想很简单，当路由器快要被淹没时，直接丢弃掉这些数据包。<br>这里有一个问题，丢弃什么包呢？当然是丢弃掉不那么重要的包，这里的选择是这样的，发送方在发送包之前就给每一个包打上标签，表明这个包有多么重要，这样在丢包的时候可以参考这个标签，丢弃掉不那么重要的包。</p>
+<p>随机早期检测算法（RED ⭐️）：为了确定何时丢包，路由器要维护一个运行队列长度的平均值，在这个值超过某个阈值时，该链路就被认为即将拥塞，因此路由器丢弃一小部分的包（随机）来避免拥塞。<br>这里使用随机丢包的好处是可以更高概率的丢掉速率很快的发送方的包，因此发送方不得不重传这些被丢掉的包，而上层协议也会建议该发送方放慢速度，来达到避免拥塞的效果。</p>
+<h3 id="服务质量"><a href="#服务质量" class="headerlink" title="服务质量"></a>服务质量</h3><p>有些应用对于网络的需求特别大，并不满足于网络的“尽力而为“，这个时候网络需要提供良好的服务质量来达到要求。</p>
+<p>最简单的方式就是<strong>过度配置</strong>：建设有足够网络容量的网络，可以满足任何的流量需求。这不是可笑的想法，因为电话系统就是一个很好的例子。</p>
+<p>确保服务质量必须解决下面的四个问题：<br><br>（1）应用程序需要网络什么样的质量？<br><br>（2）如何规范进入网络的流量？ <br><br>（3）为了保障性能如何在路由器预留资源？ <br><br>（4）网络能否安全的接受更多的流量？<br></p>
+<h4 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h4><p>流：从源端发送到一个接收方的所有数据包被称为一个流。对于每个流的需求可以以下面四个参数来衡量：带宽，延迟，抖动，丢失。不同的应用这四个方面的要求不同。</p>
+<h4 id="流量整形"><a href="#流量整形" class="headerlink" title="流量整形"></a>流量整形</h4><h5 id="漏桶算法和令牌桶流量"><a href="#漏桶算法和令牌桶流量" class="headerlink" title="漏桶算法和令牌桶流量"></a>漏桶算法和令牌桶流量</h5><p>想象一个漏桶，无论倒入水的速率有多大，只要漏桶还有水，其速率恒定；如果没有水，速率为0；如果超出漏桶容量，额外进入桶的水都会通过桶侧分流，最终流失掉。</p>
+<p>概念上，每个主机连接到网络接口中含有一个漏桶，为了向网络层发送数据包，必须往网络中注入更多的水。如果漏桶满了来了一个数据包，该数据包必须排队等待漏桶空出来时再接纳，或者直接被丢弃。</p>
+<p>令牌桶：把网络接口想象成为一个漏桶，正在往里灌水，速率为R，桶容量为B。现在，为了发送一个数据包，我们必须能够从桶内掏出水或者令牌。桶内只可以累积固定数量的令牌，如果桶是空的，那么必须等到累积到一定的令牌才能发送一个数据包。</p>
+<h5 id="包调度"><a href="#包调度" class="headerlink" title="包调度"></a>包调度</h5><p>定义：在同一个流之间以及在竞争流之间分配路由器资源的算法成为包调度算法。<br>不同的流可以预约潜在的资源有以下三种：带宽，缓冲区，CPU周期。<br>包调度算法负责分配带宽和其他路由器资源，具体的做法是确定下一次把缓冲区中的哪些数据发送到输出线路。最简单的方式是先进先出FIFO。<br>FIFO路由器在队列满时通常丢弃新到的数据包，由于新到的数据包会排在末尾，因此这种行为也被称作<strong>尾丢包</strong>。<br>FIFO容易实现但是无法提供较好的性能。<br>公平队列：针对每一条输出线路，路由器为每个流设置单独的队列。当路线空闲时，路由器循环扫描各个队列，然后分别取一个进行发送。这样就保证了绝对的公平，但是也有不足(宽带需求小的往往占据了更多的带宽)。</p>
+<p>其他的调度算法：<br>加权的公平队列<br>优先级调度<br>时间戳先后发送</p>
+<h3 id="网络互联"><a href="#网络互联" class="headerlink" title="网络互联"></a>网络互联</h3><h4 id="隧道技术"><a href="#隧道技术" class="headerlink" title="隧道技术"></a>隧道技术</h4><p>处理两个处于不同网络相互连接时的情况超级困难，然而却存在一种非常常见的情形，就是源主机和目的主机的网络类型是完全相同的。但是其中间却隔着一个不同的网络。解决这样问题的技术被称为隧道技术。<br>隧道技术广泛被用于那些因使用了其他网络而被隔离的的主机和网路。结果生成的网络就被称为<b>覆盖网络</b>，因为它有效的覆盖在了基础网络之上。<br>隧道的缺点就是无法到达位于隧道之下的网络的主机，因为数据包无法从隧道中逃生。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/01/05/计算机网路复习笔记之网络层基础/" data-id="cjqkunl0z002z9wudy4y5t6sv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/01/05/计算机网路复习笔记之网络层基础/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/01/05/计算机网路复习笔记之网络层基础/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-计网复习之介质访问控制子层复习笔记" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -307,7 +505,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/" data-id="cjqc4a4230036msudmax8q6ll" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/03/计网复习之介质访问控制子层复习笔记/" data-id="cjqkunl1100349wudcmfpoxxd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -457,7 +655,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/12/31/我的2016/" data-id="cjqc4a41m002cmsudeb2tj7uu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/12/31/我的2016/" data-id="cjqkunl0s002i9wud3llyqftb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -596,7 +794,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/12/12/React全家桶学习资源汇总/" data-id="cjqc4a40f000pmsud34ud6df3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/12/12/React全家桶学习资源汇总/" data-id="cjqkunkzq000e9wud6xxlu2eu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -736,7 +934,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/" data-id="cjqc4a414001ymsudehm7n90g" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/" data-id="cjqkunl0e001o9wudcuazowkf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -871,7 +1069,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/15/使用ES6语法写React/" data-id="cjqc4a40o0015msudbu5b0si5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/15/使用ES6语法写React/" data-id="cjqkunl0600179wudyjcrimu1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1007,7 +1205,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/06/JS定时器知多少/" data-id="cjqc4a3zz0005msudtsh4sfrv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/06/JS定时器知多少/" data-id="cjqkunkzl00089wudh0rliyrp" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1145,7 +1343,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/23/写在去星期一之前/" data-id="cjqc4a40w001hmsudabc050vu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/23/写在去星期一之前/" data-id="cjqkunl0d001l9wudzhehbd6u" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1293,7 +1491,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/21/浅谈JS闭包/" data-id="cjqc4a41s002mmsud7qn6l2jy" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/21/浅谈JS闭包/" data-id="cjqkunl0u002o9wudfmwzqlzl" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1457,7 +1655,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/10/13/踩过React表单的坑后有感/" data-id="cjqc4a4220035msudav0xiozy" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/13/踩过React表单的坑后有感/" data-id="cjqkunl15003b9wud8piee7oi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1535,164 +1733,6 @@
 
 
 
-    <article id="post-在React中使用mixin" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/10/12/在React中使用mixin/">在React中使用mixin</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/10/12/在React中使用mixin/">
-            <time datetime="2016-10-12T11:31:58.000Z" itemprop="datePublished">2016-10-12</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/React/">React</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h2 id="mixin到底为何方神圣？"><a href="#mixin到底为何方神圣？" class="headerlink" title="mixin到底为何方神圣？"></a>mixin到底为何方神圣？</h2><p>mixin被理解为‘混入’的意思，<br>我们知道，如果你经常使用某一段相同的代码的时候，你会把它进行抽象，封装成类或者function，<br>‘混入’也一样，它可以解决代码段重复的问题。</p>
-<h2 id="jade中的Mixins"><a href="#jade中的Mixins" class="headerlink" title="jade中的Mixins"></a>jade中的Mixins</h2><blockquote>
-<p>jade(pug)是一个高性能的模版引擎，它使用javascript实现，并提供给Node使用.<br>我在使用Jade模版引擎接触到了Mixin, 下面给出一个例子理解下</p>
-</blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mixin box(styles)</span><br><span class="line">           .conponent</span><br><span class="line">               -each style <span class="keyword">in</span> styles</span><br><span class="line">                   .squire</span><br><span class="line">                       -<span class="keyword">var</span> x = styles.indexOf(style) + <span class="number">1</span>;</span><br><span class="line">                       a(href='/users/' + x + '/list') #&#123;style&#125;</span><br><span class="line">   .container</span><br><span class="line">   	mixin([<span class="string">'lin'</span>, <span class="string">'limoer'</span>])</span><br><span class="line">   .links</span><br><span class="line">   	mixin([<span class="string">'parents'</span>, <span class="string">'classmates'</span>, <span class="string">'others'</span>])</span><br></pre></td></tr></table></figure>
-<p>你可以无视jade的语法，如果你想学习jade，点<a href="https://segmentfault.com/a/1190000000357534#articleHeader0" target="_blank" rel="noopener">这里</a></p>
-<blockquote>
-<p>首先我使用mixin 关键字申明了一个带参数mixin结构，然后依据传入的参数生成了很多url<br>这个mixin 结构可以在这个模版文件中使用，通过不同的参数来生成url<br>从上面可以看出，mixin的确可以解决代码重复的问题</p>
-</blockquote>
-<h2 id="React中的Mixin"><a href="#React中的Mixin" class="headerlink" title="React中的Mixin"></a>React中的Mixin</h2><blockquote>
-<p>首先来写一个例子</p>
-</blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> TimerComp = React.createClass(&#123;</span><br><span class="line">	getInitialState: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> &#123;<span class="attr">secondsElapsed</span>: <span class="number">0</span>&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	tick: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.stateState(&#123;<span class="attr">secondsElapsed</span>: <span class="keyword">this</span>.state.secondsElapsed + <span class="number">1</span>&#125;)</span><br><span class="line">	&#125;,</span><br><span class="line">	componentDidMount: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.interval = setInterval(<span class="keyword">this</span>.tick, <span class="number">1000</span>)</span><br><span class="line">	&#125;,</span><br><span class="line">	componentWillUnmount: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		clearInterval(<span class="keyword">this</span>.interval)</span><br><span class="line">	&#125;,</span><br><span class="line">	render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;p&gt;Seconds Elapse &#123;<span class="keyword">this</span>.state.secondsElapsed&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>简单的说一下，这里定义了一个定时器组件，会随着时间的增加来自动计时<br>但是一个应用需要多个计时器呢？我们第一时间想到了组件的嵌套，但是组件的嵌套不但会增加组件的复杂程度<br>而且，想要修改计时器也是比较困难的<br>好了，解决代码复用的问题，我们可以使用Mixin， 让其混入进其他组件就好了</p>
-</blockquote>
-<blockquote>
-<p>码起，还是计时器的例子！</p>
-</blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> MixinTimerComp = React.createClass(&#123;</span><br><span class="line">	mixins: [MixinInterval(<span class="number">1000</span>)],</span><br><span class="line">	getInitialState: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> &#123;<span class="attr">secondsElapsed</span>: <span class="number">0</span>&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	onTick: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;<span class="attr">secondsElapsed</span>: <span class="keyword">this</span>.state.secondsElapsed + <span class="number">1</span>&#125;)</span><br><span class="line">	&#125;,</span><br><span class="line">	render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;p&gt;Seconds Elapse &#123;<span class="keyword">this</span>.state.secondsElapsed&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>这里我们使用了mixins属性，把自定义的MixinInterval对象混入了Timer组件</p>
-</blockquote>
-<p>来看看MixinInterval的实现：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> MixinInterval: <span class="function"><span class="keyword">function</span>(<span class="params">interval</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &#123;</span><br><span class="line">		componentDidMount() &#123;</span><br><span class="line">			<span class="keyword">this</span>.__interval = setInterval(<span class="keyword">this</span>.onTick, interval)</span><br><span class="line">		&#125;,</span><br><span class="line">		componentWillUnmount() &#123;</span><br><span class="line">			clearInterval(<span class="keyword">this</span>.__interval)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>就这样实现了一个最简单的问题，和最前面的例子做对比，我们发现，只是把组件中一些代码独立出来成为一个mixin对象<br>但这样做无疑是解决了代码重用的问题，当我们想定义另一个计时器时候，我们只需混入这个mixin代码<br>而不必关心混入的计时处理对象是怎么实现的</p>
-</blockquote>
-<blockquote>
-<p>mixin 实现起来非常简单，React也支持多个mixin的混入(在mixins赋值为一个mixin对象数组)<br>但有一个问题需要注意，在mixin中尝试覆盖state中定义的键的话，React会抛出错误</p>
-</blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">React.createClass(&#123;</span><br><span class="line">	mixins: [&#123;</span><br><span class="line">		getInitialState()&#123;</span><br><span class="line">			<span class="keyword">return</span> &#123;<span class="attr">cover</span>: <span class="number">1</span>&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;],</span><br><span class="line">	getInitialState()&#123;</span><br><span class="line">		<span class="keyword">return</span> &#123;<span class="attr">cover</span>: <span class="number">2</span>&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 错误，尝试覆盖cover属性</span></span><br></pre></td></tr></table></figure>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2016/10/12/在React中使用mixin/" data-id="cjqc4a4160020msudqp05us5w" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2016/10/12/在React中使用mixin/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/10/12/在React中使用mixin/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/4/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/">下一页 &raquo;</a>
     </nav>
@@ -1707,7 +1747,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1716,7 +1756,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -1725,7 +1765,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 10px;">Webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
         </div>
     </div>
 
@@ -1754,7 +1794,7 @@
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Limoer<br>
+            &copy; 2019 Limoer<br>
             Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
         </div>
     </div>

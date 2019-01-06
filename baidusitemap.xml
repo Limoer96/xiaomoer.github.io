@@ -4,8 +4,25 @@
 
     
   <url>
+    <loc>http://yoursite.com/2019/01/06/webpack-dllplugin/</loc>
+    <lastmod>2019-01-06T12:04:20.947Z</lastmod>
+    <data>
+        <display>
+        <title>使用Webpack DllPlugin</title>
+        <pubTime>2019-01-06T11:52:32.000Z</pubTime>
+        
+        <tag>Webpack</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://yoursite.com/2018/12/31/this-year/</loc>
-    <lastmod>2018-12-31T09:23:31.633Z</lastmod>
+    <lastmod>2019-01-06T11:54:31.023Z</lastmod>
     <data>
         <display>
         <title>我的这一年</title>

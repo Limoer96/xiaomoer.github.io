@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                53
+                54
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                11
+                12
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,147 @@
 
             
             <section id="main">
+    <article id="post-使用antd和css-modules冲突的解决办法" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/08/28/使用antd和css-modules冲突的解决办法/">使用antd和css-modules冲突的解决办法</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/08/28/使用antd和css-modules冲突的解决办法/">
+            <time datetime="2017-08-28T13:29:03.000Z" itemprop="datePublished">2017-08-28</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React/">React</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>在暑假做项目实训的时候前端就使用到React构建并且使用了<code>Ant Design</code>作为组件库，当时就使用了<code>extract-text-webpack-plugin</code>把css单独抽离出来成为一个单独的css文件并引入，当时就遇到一个问题，当我使用<code>css-loader</code>来处理css时，并不能处理自定义的css，但是我把CSS直接写进组件中是可行的，由于当时项目比较小并且时间比较赶，就直接使用了这种方式，在开发过程中也有苦说不清，但总算是完成了。</p>
+</blockquote>
+<blockquote>
+<p>最近想写一点东西，又用到<code>antd</code>了，当然是相同的问题，只不过时过境迁，我有足够多的时间来处理这个遗留下来的问题。可是即使有那么多的时间，可是还是踩坑无数，最终还是完成了。相信遇到这个问题的并不止我一个人，这里就先记录下来，希望能对你有所帮助。</p>
+</blockquote>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>经过查询和思考，解决这样的问题最好是单独处理<code>antd</code>CSS和自定义的CSS。好了问题解决办法已经很明显了，我们需要些两个不同的规则来出来css，就像这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">&#123;</span><br><span class="line">	test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	use: ExtractTextPlugin.extract(&#123;</span><br><span class="line">		use: <span class="string">'css-loader'</span></span><br><span class="line">	&#125;)</span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">	use: <span class="string">'css-loader'</span></span><br><span class="line">&#125;,</span><br><span class="line">...</span><br><span class="line">plugins: [</span><br><span class="line">	<span class="keyword">new</span> ExtractTextPlugin(<span class="string">'style.css'</span>)</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码我建立了两规则分别处理自定义css和antd 预定义css，我们可以正常的使用<code>import &#39;./style.css&#39;</code>的形式引入css，但是我们查看页面，并没有加载我们自定义的css。</p>
+<p>好吧，既然这样再试试<code>css-modules</code>的方式算了，我们把第二个规则改成下面这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">&#123;</span><br><span class="line">	test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">	use: [</span><br><span class="line">		loader:<span class="string">'css-loader'</span>,</span><br><span class="line">		options: &#123;</span><br><span class="line">			modules: <span class="literal">true</span>,</span><br><span class="line">			localIndentName: <span class="string">'[local]--[hash:base64:5]'</span></span><br><span class="line">		&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在我们可以通过<code>import style from &#39;./style.css&#39;</code>的形式引入自定义css，并且通过<code>style.className</code>的形式给元素设置类。这次倒好，直接build不成功了，我一气之下索性不搞了；为了继续捣鼓下去，我直接又把CSS写在组件中了，直到我要使用<code>react-transition-group</code>来做路由切换动画，不得不倒回来解决。这次比以往更加冷静，我仔细阅读了<code>extract-text-webpack-plugin</code>的readme过后，恍然大悟，原来我们可以在一个项目中使用多个<code>ExtractTextPlugin</code>实例来生成多个css文件！好了，这次还是通过两个规则处理css，并且构建两个css文件，一个是自定义的css，一个是antd css，问题迎刃而解，又可以开心的捣鼓了！</p>
+<p>好了，show you the code!:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ExtractTextPlugin = <span class="built_in">require</span>(<span class="string">'extract-text-webpack-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> extractANTDCSS = <span class="keyword">new</span> ExtractTextPlugin(<span class="string">'[name]-antd.css'</span>);</span><br><span class="line"><span class="keyword">const</span> extractNormalCSS = <span class="keyword">new</span> ExtractTextPlugin(<span class="string">'[name]-normal.css'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">	...</span><br><span class="line">	<span class="built_in">module</span>:&#123;</span><br><span class="line">		rules: [</span><br><span class="line">			&#123;</span><br><span class="line">				test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">				include: <span class="regexp">/node_modules/</span>,</span><br><span class="line">				loader: extractANTDCSS.extract(&#123;</span><br><span class="line">					fallback: <span class="string">'style-loader'</span>,</span><br><span class="line">					use: [&#123;</span><br><span class="line">						loader: <span class="string">'css-loader'</span>,</span><br><span class="line">						options: &#123;<span class="attr">modules</span>: <span class="literal">false</span>&#125;</span><br><span class="line">					&#125;]</span><br><span class="line">				&#125;)</span><br><span class="line">			&#125;,</span><br><span class="line">			&#123;</span><br><span class="line">				test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">				exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">				use: extractNormalCSS.extract(&#123;</span><br><span class="line">					fallback: <span class="string">'style-loader'</span>,</span><br><span class="line">					use: [&#123;</span><br><span class="line">						loader: <span class="string">'css-loader'</span>,</span><br><span class="line">						options: &#123;</span><br><span class="line">							modules: <span class="literal">true</span>,</span><br><span class="line">							localIndentName: <span class="string">'[local]--[hash:base64:5]'</span></span><br><span class="line">						&#125;</span><br><span class="line">					&#125;]</span><br><span class="line">				&#125;)</span><br><span class="line">			&#125;</span><br><span class="line">		]</span><br><span class="line">	&#125;,</span><br><span class="line">	plugins: [</span><br><span class="line">		extractANTDCSS,</span><br><span class="line">		extractNormalCSS,</span><br><span class="line">		...</span><br><span class="line">	]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上的两个loader会生成两个css文件，分别是<code>vendor-antd.css</code>和<code>main-normal.css</code>，我们只需要在正确的位置引入这两个css文件就好了！</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>我在前面提到我把CSS直接写在元素/组件的style标签中，其实这种方式实不可取的，它会让你在编码和代码review中苦不堪言，因为一旦项目变得很大，当你想修改某个样式的时候，花在定位CSS的时间是非常多的；并且，可读性和可复用性也会大打折扣；而且我们经常在写样式的过程中使用的各种选择器、伪类、伪元素都无法发挥其灵活的作用。所以，无论你是以何种方式写前端，请尽量不以这种方式写CSS。</p>
+<p>当然，我们也要从性能上去考虑。因为css是在页面解析正式前就加载好了的(写在header)里面，在我们再解析页面的时候，加载速度就会变得更快；再有，如果我们使用把CSS写在组件中后，无可避免的会产生更多的重绘和回流，这会严重影响渲染性能。比如我们使用JS修改我们在style属性中标明的样式，那么必然会触发一次repaint。</p>
+<p>好了，到此打住！如果你想学习reflow和repaint，点击<a href="http://blog.csdn.net/ClaireKe/article/details/51375622" target="_blank" rel="noopener">这里</a>，也许会帮助你！</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="cjqkunl08001b9wud216i410v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-three-js" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -255,7 +396,7 @@
 <p>如果你对Three.js比较有兴趣的话可以直接进去<a href="https://threejs.org/" target="_blank" rel="noopener">官网</a>，其中首页展示了很多<code>featured projects</code>，个人比较喜欢这个<a href="https://paperplanes.world/" target="_blank" rel="noopener">Paper Planes</a>。</p>
 <p>你也可以去<a href="https://github.com/mrdoob/three.js/" target="_blank" rel="noopener">gayhub</a>把Three.js代码download下来，里面有很多很多(大约几百个例子)可供学习，当然如果你想学习Three.js，来<a href="https://pan.baidu.com/s/1nvQJsUX" target="_blank" rel="noopener">百度云</a>下载，这是目前少有的全方面介绍Three.js的书籍。</p>
 <p>好了，差不多介绍完该跑了。但是我好想发现了我竟然连副标题都没取，好吧，还是再多讲一会儿，为了彰显Three.js的简单易用的特性，我讲决定再写一个全面但是简单的例子，并且配上必要的讲解。</p>
-<h4 id="例子？不存在的！"><a href="#例子？不存在的！" class="headerlink" title="例子？不存在的！"></a>例子？不存在的！</h4><p>这是一个很小的例子，它将会展示Three.js使用流程，并且是经过测试没有错误(也许有！)，请放心食用。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf8"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">title</span>&gt;</span>使用Three.js<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'./three.js'</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"three-container"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">'text/javascript'</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">			<span class="comment">// three.js中有几个非常重要的知识点，为了构成一个3D程序，我们至少需要以下几部分。</span></span></span><br><span class="line"><span class="javascript">			<span class="comment">// 1. Scene 场景，用于承载一些必要元素</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> scene = <span class="keyword">new</span> THREE.Scene();</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 2. Camera 相机(此相机非你想的那个相机哦！)</span></span></span><br><span class="line"><span class="javascript">			<span class="comment">// Three.js中提供了两种相机，透视相机和正交相机，这里使用的是透视相机(类似于人眼看到的)</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> camera = <span class="keyword">new</span> THREE.PerspectiveCamera(<span class="number">60</span>, <span class="built_in">window</span>.innerWidth/<span class="built_in">window</span>.innerWidth, <span class="number">1</span>, <span class="number">1000</span>);</span></span><br><span class="line"><span class="undefined">			camera.position.set(-20, 40, 20);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 3. renderer 渲染器， 也可以在canvas中渲染，但是复杂场景可能有性能问题</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> renderer = <span class="keyword">new</span> THREE.WebGLRenderer();</span></span><br><span class="line"><span class="undefined">			renderer.setClearColor(0x708090);</span></span><br><span class="line"><span class="javascript">			renderer.setSize(<span class="built_in">window</span>.innerWidth, <span class="built_in">window</span>.innerHeight);</span></span><br><span class="line"><span class="javascript">			renderer.shadowMapEnabled = <span class="literal">true</span>;</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 4. 物体</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> cubegeo = <span class="keyword">new</span> THREE.CubeGeometry(<span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 5. 材质 用于物体表面，不同材质包含不同特性，可设置颜色等。</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> material = <span class="keyword">new</span> THREE.MeshLambertMaterial(&#123;</span></span><br><span class="line"><span class="undefined">				color: 0xffffff</span></span><br><span class="line"><span class="undefined">			&#125;);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 组合物体与材质成为一个网格</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> cube = <span class="keyword">new</span> THREE.Mesh(cubegeo, material);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 设置物体能够产生光源阴影</span></span></span><br><span class="line"><span class="javascript">			cube.castShadow = <span class="literal">true</span>;</span></span><br><span class="line"><span class="undefined">			scene.add(cube);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 6. 光源 Three.js中存在多种光源</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> light = <span class="keyword">new</span> THREE.SpotLight(<span class="number">0xfffff</span>);</span></span><br><span class="line"><span class="undefined">			light.position.set(-30, 40, -20);</span></span><br><span class="line"><span class="javascript">			light.castShadow = <span class="literal">true</span>;</span></span><br><span class="line"><span class="undefined">			scene.add(light);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 设置相机看向场景远点(空间坐标系原点)</span></span></span><br><span class="line"><span class="undefined">			camera.lookAt(scene.position);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 添加到HTML中</span></span></span><br><span class="line"><span class="javascript">			<span class="built_in">document</span>.getElementById(<span class="string">'three-container'</span>).appendChild(renderer.domElement);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 为了更加直观，这里设置一下空间坐标系</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> axes = <span class="keyword">new</span> THREE.AxisHelper(<span class="number">30</span>);</span></span><br><span class="line"><span class="undefined">			scene.add(axes);</span></span><br><span class="line"><span class="javascript">			<span class="comment">// 动起来吧！添加动画</span></span></span><br><span class="line"><span class="javascript">			<span class="function"><span class="keyword">function</span> <span class="title">animation</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">				<span class="comment">// 比如移动转动方块， 这里设置在x、y轴转动平面</span></span></span><br><span class="line"><span class="undefined">				cube.rotation.x += 0.1;</span></span><br><span class="line"><span class="undefined">				cube.rotation.y += 0.1;</span></span><br><span class="line"><span class="undefined">				requestAnimationFrame(animation);</span></span><br><span class="line"><span class="undefined">				renderer.render(scene, camera);</span></span><br><span class="line"><span class="undefined">			&#125;</span></span><br><span class="line"><span class="undefined">			requestAnimationFrame(animation);</span></span><br><span class="line"><span class="undefined">		</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="例子？不存在的！"><a href="#例子？不存在的！" class="headerlink" title="例子？不存在的！"></a>例子？不存在的！</h4><p>这是一个很小的例子，它将会展示Three.js使用流程，并且是经过测试没有错误(也许有！)，请放心食用。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf8"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">title</span>&gt;</span>使用Three.js<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'./three.js'</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"three-container"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">'text/javascript'</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="actionscript">			<span class="comment">// three.js中有几个非常重要的知识点，为了构成一个3D程序，我们至少需要以下几部分。</span></span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 1. Scene 场景，用于承载一些必要元素</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> scene = <span class="keyword">new</span> THREE.Scene();</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 2. Camera 相机(此相机非你想的那个相机哦！)</span></span></span><br><span class="line"><span class="actionscript">			<span class="comment">// Three.js中提供了两种相机，透视相机和正交相机，这里使用的是透视相机(类似于人眼看到的)</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> camera = <span class="keyword">new</span> THREE.PerspectiveCamera(<span class="number">60</span>, <span class="built_in">window</span>.innerWidth/<span class="built_in">window</span>.innerWidth, <span class="number">1</span>, <span class="number">1000</span>);</span></span><br><span class="line"><span class="undefined">			camera.position.set(-20, 40, 20);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 3. renderer 渲染器， 也可以在canvas中渲染，但是复杂场景可能有性能问题</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> renderer = <span class="keyword">new</span> THREE.WebGLRenderer();</span></span><br><span class="line"><span class="undefined">			renderer.setClearColor(0x708090);</span></span><br><span class="line"><span class="javascript">			renderer.setSize(<span class="built_in">window</span>.innerWidth, <span class="built_in">window</span>.innerHeight);</span></span><br><span class="line"><span class="actionscript">			renderer.shadowMapEnabled = <span class="literal">true</span>;</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 4. 物体</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> cubegeo = <span class="keyword">new</span> THREE.CubeGeometry(<span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 5. 材质 用于物体表面，不同材质包含不同特性，可设置颜色等。</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> material = <span class="keyword">new</span> THREE.MeshLambertMaterial(&#123;</span></span><br><span class="line"><span class="undefined">				color: 0xffffff</span></span><br><span class="line"><span class="undefined">			&#125;);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 组合物体与材质成为一个网格</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> cube = <span class="keyword">new</span> THREE.Mesh(cubegeo, material);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 设置物体能够产生光源阴影</span></span></span><br><span class="line"><span class="actionscript">			cube.castShadow = <span class="literal">true</span>;</span></span><br><span class="line"><span class="undefined">			scene.add(cube);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 6. 光源 Three.js中存在多种光源</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> light = <span class="keyword">new</span> THREE.SpotLight(<span class="number">0xfffff</span>);</span></span><br><span class="line"><span class="undefined">			light.position.set(-30, 40, -20);</span></span><br><span class="line"><span class="actionscript">			light.castShadow = <span class="literal">true</span>;</span></span><br><span class="line"><span class="undefined">			scene.add(light);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 设置相机看向场景远点(空间坐标系原点)</span></span></span><br><span class="line"><span class="undefined">			camera.lookAt(scene.position);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 添加到HTML中</span></span></span><br><span class="line"><span class="javascript">			<span class="built_in">document</span>.getElementById(<span class="string">'three-container'</span>).appendChild(renderer.domElement);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 为了更加直观，这里设置一下空间坐标系</span></span></span><br><span class="line"><span class="javascript">			<span class="keyword">let</span> axes = <span class="keyword">new</span> THREE.AxisHelper(<span class="number">30</span>);</span></span><br><span class="line"><span class="undefined">			scene.add(axes);</span></span><br><span class="line"><span class="actionscript">			<span class="comment">// 动起来吧！添加动画</span></span></span><br><span class="line"><span class="actionscript">			<span class="function"><span class="keyword">function</span> <span class="title">animation</span><span class="params">()</span> </span>&#123;</span></span><br><span class="line"><span class="actionscript">				<span class="comment">// 比如移动转动方块， 这里设置在x、y轴转动平面</span></span></span><br><span class="line"><span class="undefined">				cube.rotation.x += 0.1;</span></span><br><span class="line"><span class="undefined">				cube.rotation.y += 0.1;</span></span><br><span class="line"><span class="undefined">				requestAnimationFrame(animation);</span></span><br><span class="line"><span class="undefined">				renderer.render(scene, camera);</span></span><br><span class="line"><span class="undefined">			&#125;</span></span><br><span class="line"><span class="undefined">			requestAnimationFrame(animation);</span></span><br><span class="line"><span class="undefined">		</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <h4 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h4><p>即使是这样一个简单的例子，我如今也没有办法在不参考官方文档的情况下一口气写下来，原因无非在于，虽然其简化了开发，但是概念还是偏多并且需要记住每个API也是在有难度。</p>
 <p>但是，如果我们能够十分清楚的理解制作3D应用的流程，至少是使用Three.js的流程，按照流程十分有条理的写下去，代码总归是十分清晰的。</p>
 <p><code>time waiting for no one</code>，这是我最近在看《穿越时空的少女》看到的。对啊，时间不等人，珍惜好为说不多的’自由’而’枯燥’的时间吧！</p>
@@ -269,7 +410,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="cjqc4a40b000imsudxrgvadpg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="cjqkunkzt000i9wud4g14otdu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -450,7 +591,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="cjqc4a40m0013msud0inta1ku" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="cjqkunl0700199wudh5duxdft" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -602,7 +743,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="cjqc4a41o002gmsudndd6y2w3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="cjqkunl0i001y9wudg9irvyqg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -739,7 +880,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/07/25/孩子/" data-id="cjqc4a41h0026msud531k1wnk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/07/25/孩子/" data-id="cjqkunl0x002v9wudtbibs4zx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -924,7 +1065,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="cjqc4a3zv0002msudwgrra45c" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="cjqkunkzs000g9wudxb8647cp" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1065,7 +1206,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="cjqc4a411001rmsudix54sm9a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="cjqkunl0h001v9wudy7dok613" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1225,7 +1366,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="cjqc4a41j0028msudfvtb9nku" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="cjqkunl0p002d9wudbni7qerd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1368,7 +1509,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjqc4a413001vmsudw94acjb7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjqkunl0l00239wudh0azvijs" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1516,7 +1657,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/" data-id="cjqc4a40q0019msudf7g2fuzj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/" data-id="cjqkunl0g001t9wudq0ywghmf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1594,158 +1735,6 @@
 
 
 
-    <article id="post-Flex弹性布局" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/22/Flex弹性布局/">Flex弹性布局</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/22/Flex弹性布局/">
-            <time datetime="2017-02-22T08:09:48.000Z" itemprop="datePublished">2017-02-22</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/CSS/">CSS</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>说起布局，我脑子里一下就想到了DIV+CSS布局，毕竟曾经被那么多写着DIV+CSS网页开发的书籍洗过脑，然后到现在还不怎么会用这种大众的布局方式。当然了，其实页面还有其它的一些布局方式，比如表格布局，框架布局这样已经逐渐被淘汰的布局方式，也有今天的主角–一颗冉冉上升的新星，弹性盒子布局。</p>
-</blockquote>
-<p>Flex是Flexible Box的简称，我们这里把其翻译为弹性布局，至于为什么不叫“灵活的盒子布局”。额，这个问题也许会在读完本篇文章找到答案。好吧，正式开始。</p>
-<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>flex是display的一个属性，当然对于行内元素还有一个叫做flex-inline的属性，这里我们不多说，但是要注意的是，一旦对一个元素的display属性设为flex，那么它的子元素就不能使用“浮动(float)”这个神奇的属性，而这个元素将会一跃成为容器(container)，而其的子元素将会成为项目。好吧，先从容器说起。</p>
-<p>一旦把一个元素的display属性设置成为’flex’，这个元素就成为一个<code>容器</code>，<code>容器</code>有几个比较重要的属性，学习和掌握这几个属性是学习弹性布局的关键。它们分别是：</p>
-<ol>
-<li>flex-direction: 决定子元素(项目)的排列方向。</li>
-<li>justify-content: 指定子元素在主轴上的对齐方式。</li>
-<li>flex-wrap: 指定多行显示以及显示形式。</li>
-<li>align-items: 决定项目在交叉轴上的对齐方式。</li>
-<li>align-content: 定义项目在多轴线上的对齐方式。</li>
-</ol>
-<p>好吧，大概就是这几个了，我们注意到在上面解释的时候提到了<code>主轴</code>和<code>交叉轴</code>，这里我先简单解释一下：对于这个概念，我们可以很简单的在一个容器上画一个十字坐标轴，如果我们设置flex-direction为row(行)，那么横坐标就为主轴，纵坐标就是交叉轴，这里要注意坐标轴的指向，因为同样有一个属性为<code>row-reverse</code>，此时主轴的方向指向和设置为<code>row</code>的相反方向。</p>
-<h3 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h3><p>作为容器的子元素，项目同样有几个重要的属性：</p>
-<ol>
-<li>order: 控制项目的排列，默认为0，值越小则越靠前。</li>
-<li>flex-grow: 用于定义Flex项目的放大比例，默认为0，即使存在剩余空间，也不放大。</li>
-<li>flex-shrink: 用于定义Flex项目的缩小比例，默认为1，即空间不足，Flex项目将等比缩小。</li>
-<li>align-self: 允许单个Flex项目有不同于其他Flex项目的对齐方式。</li>
-</ol>
-<h3 id="然后"><a href="#然后" class="headerlink" title="然后"></a>然后</h3><p>我并不会把每一个属性具体来讲，因为这样的文章在网络上的确太多了。我正在学习RN，所以在这里就写一个界面，其中的布局将会采用弹性布局，中途我会对布局进行简单的分析，以加深理解。<br>当写到这里的时候我就开始布局这个简单的页面，然后到现在才布局好，时间用了那么长，感觉像是过了一年…好了，不多说了，最终的界面如下图所示。<br><img src="http://olro3ke8a.bkt.clouddn.com/images/hexoSimulator%20Screen%20Shot%2022%20Feb%202017,%209.38.36%20PM.png" width="300px" height="500px"><br>其实我也不知道自己写了啥，还是勉为其难的就叫其“登录页面”吧，现在我来分析一下这个页面哪些元素是容器和项目(当然都是项目啦)，又在什么地方使用了什么属性。</p>
-<p>页面整体采用了弹性布局，所以从整体来看我们一定使用了flex-direction属性，并且其值是<code>column</code>，所以这里的主轴一定是Y轴并且是方向向上。并且我们能够观察到，页面上所有的元素都是居中的，我们于是想到了在交叉轴上的对齐方式是: align-items: ‘center’，而其主轴上的对齐方式则是默认的justify-content: ‘flex-start’。</p>
-<p>接下来来看两个不明显的，页面上有两个输入框，每个输入框其实都是一个<code>View</code>组件包裹，那么在这个组件内部，我们仍然使用了弹性布局(竖轴为主轴)，为了让输入框上下居中，这里必须让justify-content: ‘center’；紧接着最后一行有两个按钮，这两个按钮同样在一个<code>View</code>组件中，并且这个<code>View</code>也是弹性布局，并且一定要设置flex-direction: ‘row’才能让这两个按钮排列在一行。我们同样可以给每个按钮赋予不同的order值，让其进行排序。</p>
-<p>总结一下：<br>我们是用弹性布局完成了一个基本页面的布局(虽然这真的很丑陋)，在这个简单的布局中我们使用到的属性并不多，但是的确比使用css+div布局来得更快，尤其是垂直上的居中，css是比较难以实现的。这里我们一共有四个容器，分别是最外层容器，每一个输入框外层容器，按钮组外层容器，当然，这里面所有的元素都能称为项目，这里就不在多说。</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>说了这么多，那么我对flex布局的态度到底是什么？一句话总结，学习它，了解它，使用它。弹性布局我在刚开始学习React的时候就有了解过，过了也快半年了吧，当时看着阮一峰老师的文章，感觉怎么都不明白，然后渐渐抛之脑后。直到学期开始，我开始学习RN，再一次接触到Flex布局，才想起来画一些时间去了解，然后试着使用，最后再让自己记忆下来。相比第一次我接触Flex布局，我做出了改变，而这种改变是在时间并不充裕的情况下，弥足珍贵的。希望自己能够加油，也希望和我有同样压力的同学加油！</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="cjqc4a404000amsuds922726w" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/02/22/Flex弹性布局/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/22/Flex弹性布局/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
@@ -1760,7 +1749,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1769,7 +1758,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -1778,7 +1767,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 10px;">Webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
         </div>
     </div>
 
@@ -1807,7 +1796,7 @@
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Limoer<br>
+            &copy; 2019 Limoer<br>
             Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
         </div>
     </div>
