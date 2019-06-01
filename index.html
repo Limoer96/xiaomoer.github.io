@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                55
+                56
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                13
+                14
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,179 @@
 
             
             <section id="main">
+    <article id="post-老项目Webpack构建优化" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2019/06/01/老项目Webpack构建优化/">老项目Webpack构建优化</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/06/01/老项目Webpack构建优化/">
+            <time datetime="2019-06-01T14:34:56.000Z" itemprop="datePublished">2019-06-01</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React-Webpack/">React Webpack</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>最近在接手一个项目的时候，由于其开发已经一年有余，整个项目使用了<code>create-react-app</code>脚手架，<em>Webpack</em>版本停留在3.x，<em>React</em>版本15.x，并且在线上使用效果并不好，首页加载缓慢。对于这样一个典型的<strong>老项目</strong>，进行构建优化。</p>
+<blockquote>
+<p>在<code>webpack 3.x</code>之前的构建中，该项目使用<code>CommonChunkPlugin</code>对特定的<code>package</code>进行了抽取，例如<code>react</code>、图表库、组件库，其余使用到的<code>package</code>和业务代码被打包在了一起，<em>Gzip</em>过后差不多<code>1MB</code>。通过分析可以得知，分离出的第三方库和业务代码存在重复打包的情况，并且页面初始加载并不需要用到图标库，而组件库只使用到了部分组件却被完全打包了。</p>
+</blockquote>
+<h3 id="升级Webpack"><a href="#升级Webpack" class="headerlink" title="升级Webpack"></a>升级Webpack</h3><p>由于使用的是<code>create-react-app</code>脚手架，其自带了<code>react-scripts</code>作为<code>webpack</code>的配置，本项目使用的是老版本脚手架生成，<em>Webpack</em>版本是<code>3.x</code>。分析后，在不更新脚手架的前提下，直接升级<em>Webpack</em>，可以使用<code>splitChunk</code>进行代码分隔，配合新版本的<em>React</em>的<code>lazy &amp; Suspense</code>，可不引入三方库的情况下实现按需加载。</p>
+<p>升级<em>Webpack</em>比较容易，直接升级最新版的<code>react-scripts</code>即可（注意不是<code>react-script</code>）。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add --exact react-scripts@2.1.1</span><br></pre></td></tr></table></figure></p>
+<p>安装完后<code>yarn start</code>运行项目，不出意外会有报错提示，因为某些<code>react-scripts</code>依赖的库版本过低，此时只要删除<code>yarn.lock</code>和<code>package-lock.json</code>和<code>node_modules</code>，并且运行<code>yarn install</code>重新安装依赖即可。</p>
+<p>安装完成后，不出意外项目可以正常运行了，此时<em>Webpack</em>已升级。</p>
+<h3 id="代码分隔"><a href="#代码分隔" class="headerlink" title="代码分隔"></a>代码分隔</h3><ol>
+<li><p>考虑到初次构建的时候仅仅分离部分第三方库导致第三方包和业务代码之间存在代码冗余，在新构建的版本中，需要对公用代码进行抽取，这样可以直接避免冗余。具体的<code>splitChunk</code>配置这里不再列出，抽取完成后例如<code>lodash</code>、<code>moment</code>这样的公共库被抽取到了公共包中，构建完成后生成了三个包：业务代码及未抽取的第三方包、特定的第三方包、公共代码包，构建体积明显减少。</p>
+</li>
+<li><p>由于业务的特殊性，首页并不包含任何图表，因此不需要加载图表库，并且图表库打包完成后大小为<code>700KB</code>（未Gzip），因此考虑使用基于路由的按需加载来去除首页不需要加载的资源。</p>
+</li>
+<li><p>进行代码分隔依赖于运行时加载，也就是<code>import()</code>，这是一个<code>ES</code>提案，目前还未标准化(<em>babel</em>已实现)。不同于<code>import</code>语法在预编译时链接代码，<code>import()</code>可以在运行时异步加载资源。而<em>Webpack</em>在解析到这种语法的时候，就会自动的进行代码分隔。</p>
+</li>
+<li><p>目前<em>React</em>懒加载的方案有很多，比如<code>react-loadable</code>，但由于新版的<em>React</em>已经支持了代码分隔，就没必要引入额外的库。<code>React.lazy</code>函数能够让你像处理常规组件一样处理懒加载组件。该函数接收一个函数作为参数，这个函数必须使用到<code>import()</code>动态加载组件，<code>import()</code>返回一个<code>Promise</code>，在<code>resolve</code>后返回这个React组件。<code>Suspense</code>是一个组件，其主要的作用是在懒加载块没有加载完成时使用占位组件进行UI 的优雅降级。</p>
+</li>
+<li><p>经过分析，基于路由的分隔可能最适合本项目。涉及到图表库的三个页面使用懒加载进行代码分隔，其余页面打包在一起，并且完全分离第三方库和业务代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; lazy, Suspense &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; render &#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="keyword">import</span> Loading <span class="keyword">from</span> <span class="string">'@/components/loading'</span></span><br><span class="line"><span class="keyword">const</span> ChartPage = lazy(<span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="comment">/* webpackChunkName: "detail" */</span><span class="string">'@/views/chartPage'</span>));</span><br><span class="line"><span class="keyword">const</span> App = <span class="function"><span class="params">()</span> =&gt;</span> (</span><br><span class="line">  &lt;Router&gt;</span><br><span class="line">    &lt;Suspense fallback=&#123;Loading&#125;&gt;</span><br><span class="line">      &lt;Switch&gt;</span><br><span class="line">        &lt;Route path=<span class="string">'/detail'</span> component=&#123;ChartPage&#125; /&gt;</span><br><span class="line">        ...</span><br><span class="line">      &lt;<span class="regexp">/Switch&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>Suspense&gt;</span><br><span class="line">  &lt;<span class="regexp">/Router&gt;</span></span><br><span class="line"><span class="regexp">);</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>直接运行<code>yarn start</code>，观察打包结果，发现已经按照路由进行了分隔，在总打包大小基本不变的情况下，初始加载的包只有<code>230KB</code>，减少了一大半。</p>
+<ol start="6">
+<li>观察打包结果，发现公共包的命名是<code>0.hash.chunk.js</code>，对于已经在注释中指定了<code>webpackChunkName</code>，这显然是不正常的，可能是<code>react-scripts</code>默认分隔策略的问题。为了修复这个命名问题并且进一步分隔<code>runtime chunk</code>，对<code>splitChunk</code>进行少量的配置。<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SplitCodeConfig = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'all'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">'runtime'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>只需要进行简单的配置，设置<code>splitChunks</code>的<code>chunks</code>为<code>all</code>, <em>Webpack</em>就会使用默认的规则进行打包：抽取公共包，抽取<code>node_modules</code>第三方包等等，具体见<em>Webpack</em>官网 -&gt; <em>文档</em> -&gt; <em>代码分离</em>。</p>
+<p>至此，项目构建已经完成，构建的包可以直接用于生产换环境。</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><ol>
+<li><p>在项目中使用到的组件库包含近百个通用组件和业务组件，但是项目中只使用到了十余个，并且通过观察打包结果，可以看到未被使用到的组件也被打包进来了，这显然不合理。针对这个问题，我们可以查看对应组件库的按需加载方案，并且在<em>Webpack</em>进行相应的配置即可。这里由于使用的是内部开发的组件库，就不在举例。</p>
+</li>
+<li><p>除了使用的组件库，我们需要找到所有能够按需加载却在项目中没有使用的第三方库。例如我要使用<code>lodash</code>的<code>debounce</code>函数进行防抖，我在项目中是这样使用的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="keyword">from</span> <span class="string">'lodash'</span>;</span><br><span class="line"><span class="built_in">window</span>.onscroll = _.debounce(handler);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在构建的时候，整个<code>lodash</code>会被打包，如果只需要打包<code>debounce</code>函数，在<code>import</code>的时候直接<code>import debounce from &#39;lodash/debounce&#39;</code>即可。</p>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li><p>为了直观的查看构建结果，推荐使用<code>webpack-bundle-analyzer</code>插件，它会在构建完成后打开一个页面，该页面可以看到每个<code>bundle</code>的打包情况。使用也很简单:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> BundleAnalyzerPlugin = <span class="built_in">require</span>(<span class="string">'webpack-bundle-analyzer'</span>).BundleAnalyzerPlugin;</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> BundleAnalyzerPlugin(),</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果想测试<code>Gzip</code>后的文件大小，在<code>webpack-dev-server</code>的配置项中添加<code>compress: true</code>即可。但如果查看生产环境下构建的<code>Gzip</code>包大小，可以使用<code>compression-webpack-plugin</code>插件，该插件会在构建完成后生成对应<code>bundle</code>的<code>Gzip</code>包。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> CompressionPlugin = <span class="built_in">require</span>(<span class="string">'compression-webpack-plugin'</span>);</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CompressionPlugin(&#123; <span class="attr">threshold</span>: <span class="number">8192</span> &#125;), <span class="comment">// 只有大于8KB的资源才压缩</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在一般的情况下开启<code>Gzip</code>只需要设置生产服务器即可，并不需要在构建时生成<code>Gzip</code>包，但如果每次请求时再<code>Gzip</code>无疑会加大服务器的负担，因此事先准备好<code>gzip</code>包，服务器不必压缩而是直接返回，这不失为一个好的选择。</p>
+<p>开启<code>Gzip</code>会极大的减小传输体积，但无论是压缩还是解压都需要大量的运算，对于某些较小的资源，使用<code>Gzip</code>可能反而会降低性能，因此建议只对较大的资源进行<code>Gzip</code>压缩，而较小的资源直接传输。</p>
+<p>完。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="cjwdmmkl60031z0j6fmjrcgog" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/06/01/老项目Webpack构建优化/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-webpack-in-thinking" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -375,7 +548,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="cjskcovkw000xe0ud89fy0ch5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="cjwdmmkhi000gz0j6srmfy19t" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -617,7 +790,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="cjskcovkl000ee0udaule8o7j" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="cjwdmmkka001jz0j6r0vli6p3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -783,7 +956,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/12/31/this-year/" data-id="cjskcovla001le0ud16r4bo6v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/12/31/this-year/" data-id="cjwdmmkhg000ez0j63fnes0i2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -961,7 +1134,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/12/02/month-record-1202/" data-id="cjskcovkq000ne0udarugj7j8" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/12/02/month-record-1202/" data-id="cjwdmmkhj000iz0j6xfak6bd1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1112,7 +1285,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/11/03/week-record-1103/" data-id="cjskcovl5001ee0udfnespcb1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/11/03/week-record-1103/" data-id="cjwdmmkkc001nz0j63ou9wmxw" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1265,7 +1438,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/10/15/week-record-1014/" data-id="cjskcovkx000ze0udvljod3t8" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/10/15/week-record-1014/" data-id="cjwdmmkk7001fz0j66jgb2c0v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1413,7 +1586,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/10/02/week-record-1002/" data-id="cjskcovl00015e0udelkh13u2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/10/02/week-record-1002/" data-id="cjwdmmkk8001hz0j6f2lq7dzz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1544,7 +1717,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/22/week-record-0922/" data-id="cjskcovkt000se0ud28cvlzxa" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/22/week-record-0922/" data-id="cjwdmmkji0016z0j6f3p6otdw" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1691,7 +1864,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjskcovky0011e0ude8wuhy88" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjwdmmkjd000yz0j686fko8lc" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1769,173 +1942,6 @@
 
 
 
-    <article id="post-week-record-0908" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/09/08/week-record-0908/">每周一记（9月来了）</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/09/08/week-record-0908/">
-            <time datetime="2018-09-08T02:31:05.000Z" itemprop="datePublished">2018-09-08</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/周记/">周记</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>我真是一个坐不住的人。</p>
-</blockquote>
-<h3 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h3><blockquote>
-<p>我以前总以为在别人搭好的架子下写代码是体力活，而现在这个观念的的确确需要改变了。</p>
-</blockquote>
-<p>我的这周的前三天我都在开发新的报表，周四被安排了一天“轮休”仔仔细细检查了已经开发的报表，周五由于没有安排活所以还是开发报表。我一直以为开发报表是一件实打实的体力活，我们不需要知道报表/图表组件具体实现的方式，我们甚至不需要关心页面布局，因为用于布局容器组件都写好了，我只需要读懂把<code>Delphi</code>代码，然后把对应的数据传入到<code>props</code>中就可以了。这当然有难点，理解<code>Delphi</code>需要花上一些时间，细节也要想方设法去实现。可是当大多数报表实现十分类似，熟练过后基本没什么难度，那么这项任务也就对我来说就成了不折不扣的<em>体力活</em>了。</p>
-<p>真的是这样吗？</p>
-<p>刚开始开发的时候，其实犯了很多错，这些错误都来自对项目的不理解和粗心大意。甚至我在很长一段时间内并没有发掘，直到阴差阳错这些隐含着错误的报表被纳入到发布版本，测试检测出错误的那一刻。</p>
-<p>这中间还有一个小插曲，前面说到阴差阳错的报表就上线了，其实是因为配置文件被更改了。因为这个事情在晨会上我还和<code>leader</code>争了几句，当然到最后谁都没有再追究。把这件事讲给小伙伴，所有人都说我情商低，可我总是这样，我会忍气吞声，当然如果三番两次，总会忍不了，我是来写代码，可不是来背锅的。</p>
-<p>回到正题，修复了很早以前开发留下的<code>bug</code>外，在“轮休”那天，我好好检查了那些后来开发的报表，虽然没有了功能上的<code>bug</code>，但还是由于粗心大意，比如字段描述中的文字写错，数字格式化不正确等。好在这些报表都没上线，不然这个就真得我背锅了。</p>
-<p>周五开发了一个十分复杂的报表，它让我意识到，这不仅仅是一份体力活。我差不多花了5个小时来完成这张表，除了非常难懂<code>Delphi</code>代码外，限制条件也十分多，因为需要实现具体的功能，发现已经封装好的组件并不能满足需求的时候，又需要去沟通增加需求，并且在开发的过程中，因为实在架子下工作，反而为了实现某些功能，需要额外的想办法。</p>
-<p>好吧，说了这么多，我承认我现在做的工作不仅仅是体力活，当然就算是体力活，我也要把任务做到极致。</p>
-<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><blockquote>
-<p>这周大块大块空余的时间并不多，在闲散的时间里，我主要通过在<em>掘金</em>和<em>github</em>看文章来学习。</p>
-</blockquote>
-<h4 id="文件获取和上传"><a href="#文件获取和上传" class="headerlink" title="文件获取和上传"></a>文件获取和上传</h4><ol>
-<li>使用<code>input[type=&#39;file&#39;]</code>模拟点击上传</li>
-<li>使用拖动/放置事件来上传<code>drag/drop</code></li>
-<li>剪切板的粘贴事件</li>
-</ol>
-<h4 id="高阶函数-HOC"><a href="#高阶函数-HOC" class="headerlink" title="高阶函数(HOC)"></a>高阶函数(HOC)</h4><p>函数作为参数传入/作为返回值返回。</p>
-<ol>
-<li><code>AOP</code>面向切面编程。把与业务无关的模块抽离出来，然后动态织入到业务中去。</li>
-<li>柯里化(部分求值)。函数并不会立即求值，而是返回一个另一个函数，已经传入的参数活因为形成的闭包而得以保留。</li>
-<li>函数节流与分时函数。</li>
-<li>惰性加载函数。</li>
-</ol>
-<h4 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h4><ol>
-<li>有关于<code>getBoundingClientRect</code>的学习。</li>
-<li>哈希碰撞与生日攻击。</li>
-</ol>
-<h4 id="框架-库-工具"><a href="#框架-库-工具" class="headerlink" title="框架/库/工具"></a>框架/库/工具</h4><ol>
-<li><code>store.js</code> 多浏览器实现的本地存储库。</li>
-<li><code>pica</code> 一个很好用的图片压缩工具</li>
-<li><code>tween</code></li>
-<li><code>Vue.js</code> 基础知识重温</li>
-</ol>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>周五的<em>前端资格考试</em>已挂，期待下周补考。</p>
-<p>最近绝地暖暖开挂的人太多了，把把都有大哥，快要弃游了。</p>
-<p>最后：无糖全麦麦片真好吃🤮</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjskcovks000qe0udxwqwl2o7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2018/09/08/week-record-0908/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/09/08/week-record-0908/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
@@ -1950,7 +1956,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1959,7 +1965,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Webpack/">React Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -1968,7 +1974,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 10px;">Webpack</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/React-Webpack/" style="font-size: 10px;">React Webpack</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 10px;">Webpack</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
         </div>
     </div>
 

@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                55
+                56
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                13
+                14
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,173 @@
 
             
             <section id="main">
+    <article id="post-week-record-0908" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/09/08/week-record-0908/">每周一记（9月来了）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/09/08/week-record-0908/">
+            <time datetime="2018-09-08T02:31:05.000Z" itemprop="datePublished">2018-09-08</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/周记/">周记</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>我真是一个坐不住的人。</p>
+</blockquote>
+<h3 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h3><blockquote>
+<p>我以前总以为在别人搭好的架子下写代码是体力活，而现在这个观念的的确确需要改变了。</p>
+</blockquote>
+<p>我的这周的前三天我都在开发新的报表，周四被安排了一天“轮休”仔仔细细检查了已经开发的报表，周五由于没有安排活所以还是开发报表。我一直以为开发报表是一件实打实的体力活，我们不需要知道报表/图表组件具体实现的方式，我们甚至不需要关心页面布局，因为用于布局容器组件都写好了，我只需要读懂把<code>Delphi</code>代码，然后把对应的数据传入到<code>props</code>中就可以了。这当然有难点，理解<code>Delphi</code>需要花上一些时间，细节也要想方设法去实现。可是当大多数报表实现十分类似，熟练过后基本没什么难度，那么这项任务也就对我来说就成了不折不扣的<em>体力活</em>了。</p>
+<p>真的是这样吗？</p>
+<p>刚开始开发的时候，其实犯了很多错，这些错误都来自对项目的不理解和粗心大意。甚至我在很长一段时间内并没有发掘，直到阴差阳错这些隐含着错误的报表被纳入到发布版本，测试检测出错误的那一刻。</p>
+<p>这中间还有一个小插曲，前面说到阴差阳错的报表就上线了，其实是因为配置文件被更改了。因为这个事情在晨会上我还和<code>leader</code>争了几句，当然到最后谁都没有再追究。把这件事讲给小伙伴，所有人都说我情商低，可我总是这样，我会忍气吞声，当然如果三番两次，总会忍不了，我是来写代码，可不是来背锅的。</p>
+<p>回到正题，修复了很早以前开发留下的<code>bug</code>外，在“轮休”那天，我好好检查了那些后来开发的报表，虽然没有了功能上的<code>bug</code>，但还是由于粗心大意，比如字段描述中的文字写错，数字格式化不正确等。好在这些报表都没上线，不然这个就真得我背锅了。</p>
+<p>周五开发了一个十分复杂的报表，它让我意识到，这不仅仅是一份体力活。我差不多花了5个小时来完成这张表，除了非常难懂<code>Delphi</code>代码外，限制条件也十分多，因为需要实现具体的功能，发现已经封装好的组件并不能满足需求的时候，又需要去沟通增加需求，并且在开发的过程中，因为实在架子下工作，反而为了实现某些功能，需要额外的想办法。</p>
+<p>好吧，说了这么多，我承认我现在做的工作不仅仅是体力活，当然就算是体力活，我也要把任务做到极致。</p>
+<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><blockquote>
+<p>这周大块大块空余的时间并不多，在闲散的时间里，我主要通过在<em>掘金</em>和<em>github</em>看文章来学习。</p>
+</blockquote>
+<h4 id="文件获取和上传"><a href="#文件获取和上传" class="headerlink" title="文件获取和上传"></a>文件获取和上传</h4><ol>
+<li>使用<code>input[type=&#39;file&#39;]</code>模拟点击上传</li>
+<li>使用拖动/放置事件来上传<code>drag/drop</code></li>
+<li>剪切板的粘贴事件</li>
+</ol>
+<h4 id="高阶函数-HOC"><a href="#高阶函数-HOC" class="headerlink" title="高阶函数(HOC)"></a>高阶函数(HOC)</h4><p>函数作为参数传入/作为返回值返回。</p>
+<ol>
+<li><code>AOP</code>面向切面编程。把与业务无关的模块抽离出来，然后动态织入到业务中去。</li>
+<li>柯里化(部分求值)。函数并不会立即求值，而是返回一个另一个函数，已经传入的参数活因为形成的闭包而得以保留。</li>
+<li>函数节流与分时函数。</li>
+<li>惰性加载函数。</li>
+</ol>
+<h4 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h4><ol>
+<li>有关于<code>getBoundingClientRect</code>的学习。</li>
+<li>哈希碰撞与生日攻击。</li>
+</ol>
+<h4 id="框架-库-工具"><a href="#框架-库-工具" class="headerlink" title="框架/库/工具"></a>框架/库/工具</h4><ol>
+<li><code>store.js</code> 多浏览器实现的本地存储库。</li>
+<li><code>pica</code> 一个很好用的图片压缩工具</li>
+<li><code>tween</code></li>
+<li><code>Vue.js</code> 基础知识重温</li>
+</ol>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>周五的<em>前端资格考试</em>已挂，期待下周补考。</p>
+<p>最近绝地暖暖开挂的人太多了，把把都有大哥，快要弃游了。</p>
+<p>最后：无糖全麦麦片真好吃🤮</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjwdmmkjf0011z0j6k0j8txk6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2018/09/08/week-record-0908/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/09/08/week-record-0908/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-week-record-0901" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -287,7 +454,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjskcovkz0012e0udsbewhbtv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjwdmmkjc000wz0j63whgkl4d" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -439,7 +606,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjskcovkv000ve0ud24d923hx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjwdmmkjg0013z0j6axw0x3sc" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -583,7 +750,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjskcovm70039e0ud5qv8eosj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjwdmmkkm0024z0j6aejki2g6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -749,7 +916,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjskcovm30032e0udcckwxe99" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjwdmmkl90036z0j6n4ga163j" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -898,7 +1065,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/06/30/尾巴/" data-id="cjskcovlq002de0udhy4xdh0j" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/06/30/尾巴/" data-id="cjwdmmkks002ez0j6vgzemflz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1037,7 +1204,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/05/01/Hello-Goodbye-Hello/" data-id="cjskcovk40001e0udsnnm64m4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/05/01/Hello-Goodbye-Hello/" data-id="cjwdmmkgv0001z0j6ue2k8xxi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1193,7 +1360,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="cjskcovlg001ye0ude4wpwfcj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="cjwdmmkkv002iz0j6te7mhb6h" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1345,7 +1512,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/02/24/最近这段时间/" data-id="cjskcovlw002oe0ud8yvsc7vi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/02/24/最近这段时间/" data-id="cjwdmmkky002pz0j6ooq35oo4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1490,7 +1657,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="cjskcovkj000ce0udhe2b4nuc" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="cjwdmmkh80009z0j64gzoen0u" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1568,181 +1735,6 @@
 
 
 
-    <article id="post-我的应聘经历-不断更新中" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/09/20/我的应聘经历-不断更新中/">我的应聘经历(不断更新中...)</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/09/20/我的应聘经历-不断更新中/">
-            <time datetime="2017-09-20T08:28:15.000Z" itemprop="datePublished">2017-09-20</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/杂谈/">杂谈</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>只有在写简历的时候才会明白，真后悔自己平凡的大学四年，没有拔尖的学习成绩、没有丰富的实践经历、也没有牛X的技术，对于大牛而言，自己就是简历收割机，而对于我而言…好吧，如果谁能看得上我，管吃管住就行！可是，时间没有倒带，不会从头再来/感慨。</p>
-</blockquote>
-<h3 id="概括"><a href="#概括" class="headerlink" title="概括"></a>概括</h3><blockquote>
-<p>从8月开始到如今一个多月过去了，简历虽不是海投但还是投了有数十家，除去没有参加笔试的，剩下通过笔试拿到面试的就更少了，接下来我好好回顾一下，算是一个小小的总结吧，虽然到目前还没有找到工作…</p>
-</blockquote>
-<h4 id="某测-通信测试行业"><a href="#某测-通信测试行业" class="headerlink" title="某测(通信测试行业)"></a>某测(通信测试行业)</h4><p>经历：</p>
-<p>这是校招来学校宣讲的第一家企业，很小型的宣讲会，参会人数不多；在简单的介绍企业过后，就直接现场笔试。吐槽下笔试题，融合了C++/前端/智力测试的一张综合试卷，难度不大，我花15分钟做完了试卷上前端相关的试题就离开了，一个小时后就收到通知当天下午面试得通知。</p>
-<p>面试(时间50分钟)：</p>
-<p>面试也安排的特别简单，二面一，连自我介绍都没有(害得我准备好久…)。问题主要有以下几个：</p>
-<ol>
-<li>你了解通信测试行业吗？</li>
-<li>你觉得本公司适合你吗？ 这里的时候我直接问了他几个问题然后做出判断，我们都觉得不适合</li>
-<li>你期待的工作方式？ 构思以下结合公司实际谈了谈数据可视化</li>
-<li>数据挖掘相关知识。 基本的分类、聚类算法，分词等。</li>
-<li>给我的建议。 推荐我要有自己的想法，最好选择互联网公司，并且赞了我字写得比较好(谢谢！)。</li>
-</ol>
-<h4 id="某某网络-初创互联网公司"><a href="#某某网络-初创互联网公司" class="headerlink" title="某某网络(初创互联网公司)"></a>某某网络(初创互联网公司)</h4><p>经历：</p>
-<p>来自于知乎大牛的推荐，一家自认为小而美的公司！投递简历差不多一个月才进行电话面试。面试时间也真是会挑，早上8点过就打来电话(幸好每天都早起！)，大概谈了超过一个小时，到目前为止仍然在等结果。</p>
-<p>面试：</p>
-<p>面试官大概是在上班路上给我打的电话，电话那头有点吵。面试流程也比较常规，自我介绍，介绍项目，目前在做的事，有关于React及其技术栈。当然还包括面试官对公司的介绍，要求我谈对公司发展的看法；后面又聊了前端开发的潮流；有关于SSR、SPA等。最后告诉了我他们公司前端开发团队的现状(规模很小！)，问我如何看待，特别是如何快速的融入和承担起相应的责任。</p>
-<p>总结：</p>
-<p>当了解了他们正在做的事情的时候，我觉得这就是我想要加入的公司。我喜欢小而美的公司！面试过程十分愉快，虽说是等通知但是都快一周了还是没有音讯，大概是挂了吧~</p>
-<h4 id="某家网-卖房的？"><a href="#某家网-卖房的？" class="headerlink" title="某家网(卖房的？)"></a>某家网(卖房的？)</h4><p>经历：</p>
-<p>就在中午临时决定去试一试，幸好赶上校车去了宣讲现场。宣讲过程中真的能够感受到这是一家非常了不起和大牛聚集的地方。宣讲完直接笔试，笔试后就等面试通知咯。晚上接到面试通知，第二天在某某咖啡馆参加了面试，最终是倒在终面前。</p>
-<p>笔试：</p>
-<p>难度四星，10题全算法，对于数据结构和算法没掌握好的同学就是煎熬，我花了一个半小时做完了自己会做的题目，然后还是错过了一家不错企业面试的机会/哭。</p>
-<p>面试：</p>
-<p>一面一上来就是自我介绍，随便问问。然后十题算法挨个回顾，并且面试官对每道题进行打分(自己得了好多零！)，然后一面结束，等通知。</p>
-<p>二面已经是下午了，前端方向就我一个人，所以聊了比较久，一个半小时。面试过程中主要聊了：</p>
-<ol>
-<li>Java和JavaScript的特性(被我引入了我喜欢JS而不喜欢Java的怪圈…)</li>
-<li>做过最酷的项目(介绍了一下正在开发的视频编辑器)</li>
-<li>从架构角度谈某个数据平台(简历上提到)的建立和开发过程</li>
-<li>如何做情感分析(数据挖掘方面)</li>
-<li>提问环节</li>
-</ol>
-<p>吐槽：</p>
-<p>在面完二面后又是等通知，十分钟后我去问通过了吗，然后HR小姐姐告诉了过了，等待三面，我当时的那颗心啊，真的高兴，以为自己就要进入这家感觉十分良好的企业了！结果过了几分钟，HR姐姐给我说我没过，然后这就尴尬了😓。总的来说，本次面试的体验还是不错的(主要是中午管饭了！)。</p>
-<h4 id="某有-b2b"><a href="#某有-b2b" class="headerlink" title="某有(b2b)"></a>某有(b2b)</h4><p>经历：</p>
-<p>很早很早就投了简历，并且做完测评等着来软件园宣讲。真的到了那一天去现场一看，人真的多！短暂的企业介绍后，就开始了笔试(分前端、Java、基础三套试卷)。结果由于弄错试卷做了前端、基础两套。试卷难度不大，但都是十分容易出错的地方。晚上收到通知，第二天面试。面试过程非常愉快，上午面完下午HR就打来电话说通过了，然后我说考虑一下，最终开始放弃了到手的offer(说好的就去第一家能看上你的公司呢！)，到现在好几天了，我有点后悔自己做的决定。</p>
-<p>面试：</p>
-<p>面试官应该是管理层，年龄40+，基本不问技术方面，谈谈项目，谈谈个人经历，再结合职业测评问问就完了。二面HR问了问家庭状况，是否考研，以及如何看待将要在工作中遇到的一些问题，后面又问道期待薪资(最大的败笔)，然后就结束了。</p>
-<p>总结：后悔 X N!!!</p>
-<h4 id="还有很多…但是…"><a href="#还有很多…但是…" class="headerlink" title="还有很多…但是…"></a>还有很多…但是…</h4><p>不知不觉半个月又过去了，期间不间断的参加过很多公司的招聘，但始终没能更进一步。有些时候晚上睡不着觉，就在想，到底是哪里出了问题，没抓住机遇？实力不够？表现不好？… 我不知道。</p>
-<p>可是，就在今天，我暂时不用去为自己的将来而担忧，能够有时间去做自己想要去做的事，能够静下心来提升自己。所以，我愉快的做了决定，好比平时做决定那样–洒脱？。</p>
-<p>我打电话通知了家人，以往不想让我离家太远的母亲也很高兴，至少无论他们口头上怎么反对我去外地工作，可真当找到工作后，无论在哪里，只有一如既往的支持。</p>
-<p>我认为我就是一个平庸(凡？)的人，我每天会花时间在打游戏娱乐上，我也会时不时睡睡懒觉，天气冷了我可能更多的会宅在宿舍。</p>
-<p>尾巴里面提到我不会错过第二家看上我的公司，但是我也食言了，可是我真的不会再错过这一个机会了。我准备好来年在人生的下一站，开启我的程序猿人生了。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/09/20/我的应聘经历-不断更新中/" data-id="cjskcovlv002me0udafgkpg5o" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/09/20/我的应聘经历-不断更新中/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/09/20/我的应聘经历-不断更新中/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/">下一页 &raquo;</a>
     </nav>
@@ -1757,7 +1749,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1766,7 +1758,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Webpack/">React Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -1775,7 +1767,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 10px;">Webpack</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/React-Webpack/" style="font-size: 10px;">React Webpack</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 10px;">Webpack</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
         </div>
     </div>
 

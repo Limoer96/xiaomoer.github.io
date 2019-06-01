@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>在Express中使用Cookie | Limoer的记事小本</title>
+    <title>老项目Webpack构建优化 | Limoer的记事小本</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说cookie到底是什么。  cookieCookie是服务器保存在浏览器中的一段小(一般而言size&amp;lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信">
-<meta name="keywords" content="Node.js">
+    <meta name="description" content="最近在接手一个项目的时候，由于其开发已经一年有余，整个项目使用了create-react-app脚手架，Webpack版本停留在3.x，React版本15.x，并且在线上使用效果并不好，首页加载缓慢。对于这样一个典型的老项目，进行构建优化。  在webpack 3.x之前的构建中，该项目使用CommonChunkPlugin对特定的package进行了抽取，例如react、图表库、组件库，其余使用">
+<meta name="keywords" content="React Webpack">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在Express中使用Cookie">
-<meta property="og:url" content="http://yoursite.com/2017/03/16/在express中使用cookie/index.html">
+<meta property="og:title" content="老项目Webpack构建优化">
+<meta property="og:url" content="http://yoursite.com/2019/06/01/老项目Webpack构建优化/index.html">
 <meta property="og:site_name" content="Limoer的记事小本">
-<meta property="og:description" content="文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说cookie到底是什么。  cookieCookie是服务器保存在浏览器中的一段小(一般而言size&amp;lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信">
+<meta property="og:description" content="最近在接手一个项目的时候，由于其开发已经一年有余，整个项目使用了create-react-app脚手架，Webpack版本停留在3.x，React版本15.x，并且在线上使用效果并不好，首页加载缓慢。对于这样一个典型的老项目，进行构建优化。  在webpack 3.x之前的构建中，该项目使用CommonChunkPlugin对特定的package进行了抽取，例如react、图表库、组件库，其余使用">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-03-20T13:21:42.000Z">
+<meta property="og:updated_time" content="2019-06-01T14:43:24.725Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在Express中使用Cookie">
-<meta name="twitter:description" content="文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说cookie到底是什么。  cookieCookie是服务器保存在浏览器中的一段小(一般而言size&amp;lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信">
+<meta name="twitter:title" content="老项目Webpack构建优化">
+<meta name="twitter:description" content="最近在接手一个项目的时候，由于其开发已经一年有余，整个项目使用了create-react-app脚手架，Webpack版本停留在3.x，React版本15.x，并且在线上使用效果并不好，首页加载缓慢。对于这样一个典型的老项目，进行构建优化。  在webpack 3.x之前的构建中，该项目使用CommonChunkPlugin对特定的package进行了抽取，例如react、图表库、组件库，其余使用">
     
 
     
@@ -211,7 +211,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-在express中使用cookie" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-老项目Webpack构建优化" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -219,7 +219,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            在Express中使用Cookie
+            老项目Webpack构建优化
         </h1>
     
 
@@ -228,8 +228,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/03/16/在express中使用cookie/">
-            <time datetime="2017-03-16T08:11:42.000Z" itemprop="datePublished">2017-03-16</time>
+        <a href="/2019/06/01/老项目Webpack构建优化/">
+            <time datetime="2019-06-01T14:34:56.000Z" itemprop="datePublished">2019-06-01</time>
         </a>
     </div>
 
@@ -238,7 +238,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Node-js/">Node.js</a>
+        <a class="tag-link" href="/tags/React-Webpack/">React Webpack</a>
     </div>
 
                     </div>
@@ -249,23 +249,53 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <blockquote>
-<p>文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说<code>cookie</code>到底是什么。</p>
+            <p>最近在接手一个项目的时候，由于其开发已经一年有余，整个项目使用了<code>create-react-app</code>脚手架，<em>Webpack</em>版本停留在3.x，<em>React</em>版本15.x，并且在线上使用效果并不好，首页加载缓慢。对于这样一个典型的<strong>老项目</strong>，进行构建优化。</p>
+<blockquote>
+<p>在<code>webpack 3.x</code>之前的构建中，该项目使用<code>CommonChunkPlugin</code>对特定的<code>package</code>进行了抽取，例如<code>react</code>、图表库、组件库，其余使用到的<code>package</code>和业务代码被打包在了一起，<em>Gzip</em>过后差不多<code>1MB</code>。通过分析可以得知，分离出的第三方库和业务代码存在重复打包的情况，并且页面初始加载并不需要用到图标库，而组件库只使用到了部分组件却被完全打包了。</p>
 </blockquote>
-<h3 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h3><p>Cookie是服务器保存在浏览器中的一段小(一般而言size&lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信息。</p>
-<p>在浏览器中我们只需要使用<code>document.cookie</code>来得到当前页面所属的cookie。请注意，返回的cookie是以字符串形式存在的，不同的key-value之间通过’;’来分割，所以如果你想对齐进行进一步操作，需要相应的处理。</p>
-<p>这里需要注意的是，<code>document.cookie</code>属性是可写的，这就意味着你可以手动添加cookie，使用<code>document.cookie=&quot;name=value&quot;</code>的形式。注意，这里是添加，而不产生覆盖。</p>
-<p>好了，关于cookie的属性的具体含义和用法，大家可以自行去了解。</p>
-<h3 id="我的问题"><a href="#我的问题" class="headerlink" title="我的问题"></a>我的问题</h3><p>我在使用服务器端使用cookie的时候出现了问题，出现这样问题的原因很简单，首先我对cookie存在错误的理解，请务必注意，cookie是服务器发送给客户端，而客户端在发起请求的时候携带cookie而已。在正确认识cookie之后，并且成功的将cookie发送到浏览器过后，问题又来了，我在请求的时候，cookie却不能发送到服务端。我使用的是下面一段代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'/login?'</span>+stringify_data, &#123;</span><br><span class="line">        method: <span class="string">'GET'</span></span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> res.json();</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(json.status);</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'oh ! error!'</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里我使用了fetch API，在能够正确的发送请求的情况下，服务器无法读取到相应的cookie信息，同样在chrome开发者工具中查看请求头也发现请求并没有携带cookie信息。我想着一定是fetch API的问题，所以我赶快写了一个使用Ajax的请求，很显然，能够正确的发起携带cookie的请求。好吧，写到现在，我想的确是fetch API的问题了，阅读文档发现fetch API发送的请求默认是不带cookie的，必须手动设置(无论是出于什么样的考虑，但还是觉得坑)！好吧，问题迎刃而解，我们只需要在fetch函数第二个参数设置<code>credentials: &#39;include&#39;</code>就可以发送cookie了/无奈！</p>
-<h3 id="在express中使用cookie"><a href="#在express中使用cookie" class="headerlink" title="在express中使用cookie"></a>在express中使用cookie</h3><p>在express中使用cookie是一件十分惬意的事情，因为如果你使用<code>cookie-parser</code>中间件的话，那么我们只需要使用<code>res.cookie(name, value[,options])</code>就可以设置cookie了，关于options相关的参数可以自行学习！</p>
-<p>如果想删除cookie，也很简单，使用<code>res.clearCookie(name)</code>就可以啦。</p>
-<p>当然如果想获取请求头发过来的cookie，我们只需要使用<code>req.cookies</code>就可以了，这里返回的是一个JS对象，我们直接可以使用<code>name</code>来读取值，从而做进一步的操作。</p>
-<p>在使用了<code>cookie-parser</code>中间件过后，在服务端操作cookie已经足够简单，并且<code>cookie-parser</code>不但提供了非签名使用的方式，还提供了签名的使用方式，具体使用是在使用中间件的时候添加一个secret，<code>app.use(cookieParser(&#39;secret&#39;))</code>即可，当然，在获取cookie的时候使用 <code>req.signedCookies</code>属性就好了。</p>
-<p>好了，如果你不想使用<code>cookie-parser</code>，我们也能够通过<code>req.headers.cookies</code>(感到罪恶所以不推荐/无奈)访问到cookie，如果想写cookie的话，使用<code>res.setHeader(name, value)</code>(再次感到罪恶)或者<code>res.writeHead(status[,options])</code>就可以了…</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>一般情况下，文章末尾，我总会写一点鸡汤/无奈，这次也不例外。距离写上一篇博客已经过了很久了，起初有两篇想写的文章，一篇是在RN中使用Navigator，另外一篇则是介绍我自己正在学习的几种分类算法。可是当创建好文件准备开工时，我因为写一篇文章可能需要2-3个小时(我速度慢)或者是因为真的动笔写的时候反而觉得没什么要说的就放弃了。然后一段时间过后，或许是因为忙，或许是因为懒，或许是因为浮躁，就是没有去实践，没有去巩固，而把一切都抛之脑后，然后把前面学习到的忘得一干二净！</p>
-<p>嗯，这的确的真实的！仅此而已！</p>
-<p>END</p>
+<h3 id="升级Webpack"><a href="#升级Webpack" class="headerlink" title="升级Webpack"></a>升级Webpack</h3><p>由于使用的是<code>create-react-app</code>脚手架，其自带了<code>react-scripts</code>作为<code>webpack</code>的配置，本项目使用的是老版本脚手架生成，<em>Webpack</em>版本是<code>3.x</code>。分析后，在不更新脚手架的前提下，直接升级<em>Webpack</em>，可以使用<code>splitChunk</code>进行代码分隔，配合新版本的<em>React</em>的<code>lazy &amp; Suspense</code>，可不引入三方库的情况下实现按需加载。</p>
+<p>升级<em>Webpack</em>比较容易，直接升级最新版的<code>react-scripts</code>即可（注意不是<code>react-script</code>）。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add --exact react-scripts@2.1.1</span><br></pre></td></tr></table></figure></p>
+<p>安装完后<code>yarn start</code>运行项目，不出意外会有报错提示，因为某些<code>react-scripts</code>依赖的库版本过低，此时只要删除<code>yarn.lock</code>和<code>package-lock.json</code>和<code>node_modules</code>，并且运行<code>yarn install</code>重新安装依赖即可。</p>
+<p>安装完成后，不出意外项目可以正常运行了，此时<em>Webpack</em>已升级。</p>
+<h3 id="代码分隔"><a href="#代码分隔" class="headerlink" title="代码分隔"></a>代码分隔</h3><ol>
+<li><p>考虑到初次构建的时候仅仅分离部分第三方库导致第三方包和业务代码之间存在代码冗余，在新构建的版本中，需要对公用代码进行抽取，这样可以直接避免冗余。具体的<code>splitChunk</code>配置这里不再列出，抽取完成后例如<code>lodash</code>、<code>moment</code>这样的公共库被抽取到了公共包中，构建完成后生成了三个包：业务代码及未抽取的第三方包、特定的第三方包、公共代码包，构建体积明显减少。</p>
+</li>
+<li><p>由于业务的特殊性，首页并不包含任何图表，因此不需要加载图表库，并且图表库打包完成后大小为<code>700KB</code>（未Gzip），因此考虑使用基于路由的按需加载来去除首页不需要加载的资源。</p>
+</li>
+<li><p>进行代码分隔依赖于运行时加载，也就是<code>import()</code>，这是一个<code>ES</code>提案，目前还未标准化(<em>babel</em>已实现)。不同于<code>import</code>语法在预编译时链接代码，<code>import()</code>可以在运行时异步加载资源。而<em>Webpack</em>在解析到这种语法的时候，就会自动的进行代码分隔。</p>
+</li>
+<li><p>目前<em>React</em>懒加载的方案有很多，比如<code>react-loadable</code>，但由于新版的<em>React</em>已经支持了代码分隔，就没必要引入额外的库。<code>React.lazy</code>函数能够让你像处理常规组件一样处理懒加载组件。该函数接收一个函数作为参数，这个函数必须使用到<code>import()</code>动态加载组件，<code>import()</code>返回一个<code>Promise</code>，在<code>resolve</code>后返回这个React组件。<code>Suspense</code>是一个组件，其主要的作用是在懒加载块没有加载完成时使用占位组件进行UI 的优雅降级。</p>
+</li>
+<li><p>经过分析，基于路由的分隔可能最适合本项目。涉及到图表库的三个页面使用懒加载进行代码分隔，其余页面打包在一起，并且完全分离第三方库和业务代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; lazy, Suspense &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; render &#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="keyword">import</span> Loading <span class="keyword">from</span> <span class="string">'@/components/loading'</span></span><br><span class="line"><span class="keyword">const</span> ChartPage = lazy(<span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="comment">/* webpackChunkName: "detail" */</span><span class="string">'@/views/chartPage'</span>));</span><br><span class="line"><span class="keyword">const</span> App = <span class="function"><span class="params">()</span> =&gt;</span> (</span><br><span class="line">  &lt;Router&gt;</span><br><span class="line">    &lt;Suspense fallback=&#123;Loading&#125;&gt;</span><br><span class="line">      &lt;Switch&gt;</span><br><span class="line">        &lt;Route path=<span class="string">'/detail'</span> component=&#123;ChartPage&#125; /&gt;</span><br><span class="line">        ...</span><br><span class="line">      &lt;<span class="regexp">/Switch&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>Suspense&gt;</span><br><span class="line">  &lt;<span class="regexp">/Router&gt;</span></span><br><span class="line"><span class="regexp">);</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>直接运行<code>yarn start</code>，观察打包结果，发现已经按照路由进行了分隔，在总打包大小基本不变的情况下，初始加载的包只有<code>230KB</code>，减少了一大半。</p>
+<ol start="6">
+<li>观察打包结果，发现公共包的命名是<code>0.hash.chunk.js</code>，对于已经在注释中指定了<code>webpackChunkName</code>，这显然是不正常的，可能是<code>react-scripts</code>默认分隔策略的问题。为了修复这个命名问题并且进一步分隔<code>runtime chunk</code>，对<code>splitChunk</code>进行少量的配置。<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SplitCodeConfig = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'all'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">'runtime'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>只需要进行简单的配置，设置<code>splitChunks</code>的<code>chunks</code>为<code>all</code>, <em>Webpack</em>就会使用默认的规则进行打包：抽取公共包，抽取<code>node_modules</code>第三方包等等，具体见<em>Webpack</em>官网 -&gt; <em>文档</em> -&gt; <em>代码分离</em>。</p>
+<p>至此，项目构建已经完成，构建的包可以直接用于生产换环境。</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><ol>
+<li><p>在项目中使用到的组件库包含近百个通用组件和业务组件，但是项目中只使用到了十余个，并且通过观察打包结果，可以看到未被使用到的组件也被打包进来了，这显然不合理。针对这个问题，我们可以查看对应组件库的按需加载方案，并且在<em>Webpack</em>进行相应的配置即可。这里由于使用的是内部开发的组件库，就不在举例。</p>
+</li>
+<li><p>除了使用的组件库，我们需要找到所有能够按需加载却在项目中没有使用的第三方库。例如我要使用<code>lodash</code>的<code>debounce</code>函数进行防抖，我在项目中是这样使用的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="keyword">from</span> <span class="string">'lodash'</span>;</span><br><span class="line"><span class="built_in">window</span>.onscroll = _.debounce(handler);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在构建的时候，整个<code>lodash</code>会被打包，如果只需要打包<code>debounce</code>函数，在<code>import</code>的时候直接<code>import debounce from &#39;lodash/debounce&#39;</code>即可。</p>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li><p>为了直观的查看构建结果，推荐使用<code>webpack-bundle-analyzer</code>插件，它会在构建完成后打开一个页面，该页面可以看到每个<code>bundle</code>的打包情况。使用也很简单:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> BundleAnalyzerPlugin = <span class="built_in">require</span>(<span class="string">'webpack-bundle-analyzer'</span>).BundleAnalyzerPlugin;</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> BundleAnalyzerPlugin(),</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果想测试<code>Gzip</code>后的文件大小，在<code>webpack-dev-server</code>的配置项中添加<code>compress: true</code>即可。但如果查看生产环境下构建的<code>Gzip</code>包大小，可以使用<code>compression-webpack-plugin</code>插件，该插件会在构建完成后生成对应<code>bundle</code>的<code>Gzip</code>包。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> CompressionPlugin = <span class="built_in">require</span>(<span class="string">'compression-webpack-plugin'</span>);</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CompressionPlugin(&#123; <span class="attr">threshold</span>: <span class="number">8192</span> &#125;), <span class="comment">// 只有大于8KB的资源才压缩</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在一般的情况下开启<code>Gzip</code>只需要设置生产服务器即可，并不需要在构建时生成<code>Gzip</code>包，但如果每次请求时再<code>Gzip</code>无疑会加大服务器的负担，因此事先准备好<code>gzip</code>包，服务器不必压缩而是直接返回，这不失为一个好的选择。</p>
+<p>开启<code>Gzip</code>会极大的减小传输体积，但无论是压缩还是解压都需要大量的运算，对于某些较小的资源，使用<code>Gzip</code>可能反而会降低性能，因此建议只对较大的资源进行<code>Gzip</code>压缩，而较小的资源直接传输。</p>
+<p>完。</p>
 
         
         </div>
@@ -276,7 +306,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjwdmmkl2002wz0j65arg70ui" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="cjwdmmkl60031z0j6fmjrcgog" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -344,7 +374,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/03/16/在express中使用cookie/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/03/16/在express中使用cookie/">评论</a>
+        <a href="http://yoursite.com/2019/06/01/老项目Webpack构建优化/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/">评论</a>
     
 
         </footer>
@@ -353,19 +383,10 @@
         
 <nav id="article-nav">
     
-        <a href="/2017/04/21/实用的JavaScript技巧、经验总结/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    实用的JavaScript技巧、经验总结
-                
-            </div>
-        </a>
     
-    
-        <a href="/2017/02/28/兑水的心灵鸡汤/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2019/02/25/webpack-in-thinking/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">兑水的心灵鸡汤</div>
+            <div class="article-nav-title">Webpack 4.x 简易使用指南</div>
         </a>
     
 </nav>
@@ -452,9 +473,9 @@
     <script>
     var disqus_config = function () {
         
-            this.page.url = 'http://yoursite.com/2017/03/16/在express中使用cookie/';
+            this.page.url = 'http://yoursite.com/2019/06/01/老项目Webpack构建优化/';
         
-        this.page.identifier = '在express中使用cookie';
+        this.page.identifier = '老项目Webpack构建优化';
     };
     (function() { 
         var d = document, s = d.createElement('script');  

@@ -4,6 +4,67 @@
   
     
     <entry>
+      <title><![CDATA[老项目Webpack构建优化]]></title>
+      <url>http://yoursite.com/2019/06/01/%E8%80%81%E9%A1%B9%E7%9B%AEWebpack%E6%9E%84%E5%BB%BA%E4%BC%98%E5%8C%96/</url>
+      <content type="html"><![CDATA[<p>最近在接手一个项目的时候，由于其开发已经一年有余，整个项目使用了<code>create-react-app</code>脚手架，<em>Webpack</em>版本停留在3.x，<em>React</em>版本15.x，并且在线上使用效果并不好，首页加载缓慢。对于这样一个典型的<strong>老项目</strong>，进行构建优化。</p>
+<blockquote>
+<p>在<code>webpack 3.x</code>之前的构建中，该项目使用<code>CommonChunkPlugin</code>对特定的<code>package</code>进行了抽取，例如<code>react</code>、图表库、组件库，其余使用到的<code>package</code>和业务代码被打包在了一起，<em>Gzip</em>过后差不多<code>1MB</code>。通过分析可以得知，分离出的第三方库和业务代码存在重复打包的情况，并且页面初始加载并不需要用到图标库，而组件库只使用到了部分组件却被完全打包了。</p>
+</blockquote>
+<h3 id="升级Webpack"><a href="#升级Webpack" class="headerlink" title="升级Webpack"></a>升级Webpack</h3><p>由于使用的是<code>create-react-app</code>脚手架，其自带了<code>react-scripts</code>作为<code>webpack</code>的配置，本项目使用的是老版本脚手架生成，<em>Webpack</em>版本是<code>3.x</code>。分析后，在不更新脚手架的前提下，直接升级<em>Webpack</em>，可以使用<code>splitChunk</code>进行代码分隔，配合新版本的<em>React</em>的<code>lazy &amp; Suspense</code>，可不引入三方库的情况下实现按需加载。</p>
+<p>升级<em>Webpack</em>比较容易，直接升级最新版的<code>react-scripts</code>即可（注意不是<code>react-script</code>）。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add --exact react-scripts@2.1.1</span><br></pre></td></tr></table></figure></p>
+<p>安装完后<code>yarn start</code>运行项目，不出意外会有报错提示，因为某些<code>react-scripts</code>依赖的库版本过低，此时只要删除<code>yarn.lock</code>和<code>package-lock.json</code>和<code>node_modules</code>，并且运行<code>yarn install</code>重新安装依赖即可。</p>
+<p>安装完成后，不出意外项目可以正常运行了，此时<em>Webpack</em>已升级。</p>
+<h3 id="代码分隔"><a href="#代码分隔" class="headerlink" title="代码分隔"></a>代码分隔</h3><ol>
+<li><p>考虑到初次构建的时候仅仅分离部分第三方库导致第三方包和业务代码之间存在代码冗余，在新构建的版本中，需要对公用代码进行抽取，这样可以直接避免冗余。具体的<code>splitChunk</code>配置这里不再列出，抽取完成后例如<code>lodash</code>、<code>moment</code>这样的公共库被抽取到了公共包中，构建完成后生成了三个包：业务代码及未抽取的第三方包、特定的第三方包、公共代码包，构建体积明显减少。</p>
+</li>
+<li><p>由于业务的特殊性，首页并不包含任何图表，因此不需要加载图表库，并且图表库打包完成后大小为<code>700KB</code>（未Gzip），因此考虑使用基于路由的按需加载来去除首页不需要加载的资源。</p>
+</li>
+<li><p>进行代码分隔依赖于运行时加载，也就是<code>import()</code>，这是一个<code>ES</code>提案，目前还未标准化(<em>babel</em>已实现)。不同于<code>import</code>语法在预编译时链接代码，<code>import()</code>可以在运行时异步加载资源。而<em>Webpack</em>在解析到这种语法的时候，就会自动的进行代码分隔。</p>
+</li>
+<li><p>目前<em>React</em>懒加载的方案有很多，比如<code>react-loadable</code>，但由于新版的<em>React</em>已经支持了代码分隔，就没必要引入额外的库。<code>React.lazy</code>函数能够让你像处理常规组件一样处理懒加载组件。该函数接收一个函数作为参数，这个函数必须使用到<code>import()</code>动态加载组件，<code>import()</code>返回一个<code>Promise</code>，在<code>resolve</code>后返回这个React组件。<code>Suspense</code>是一个组件，其主要的作用是在懒加载块没有加载完成时使用占位组件进行UI 的优雅降级。</p>
+</li>
+<li><p>经过分析，基于路由的分隔可能最适合本项目。涉及到图表库的三个页面使用懒加载进行代码分隔，其余页面打包在一起，并且完全分离第三方库和业务代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; lazy, Suspense &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; render &#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="keyword">import</span> Loading <span class="keyword">from</span> <span class="string">'@/components/loading'</span></span><br><span class="line"><span class="keyword">const</span> ChartPage = lazy(<span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="comment">/* webpackChunkName: "detail" */</span><span class="string">'@/views/chartPage'</span>));</span><br><span class="line"><span class="keyword">const</span> App = <span class="function"><span class="params">()</span> =&gt;</span> (</span><br><span class="line">  &lt;Router&gt;</span><br><span class="line">    &lt;Suspense fallback=&#123;Loading&#125;&gt;</span><br><span class="line">      &lt;Switch&gt;</span><br><span class="line">        &lt;Route path=<span class="string">'/detail'</span> component=&#123;ChartPage&#125; /&gt;</span><br><span class="line">        ...</span><br><span class="line">      &lt;<span class="regexp">/Switch&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>Suspense&gt;</span><br><span class="line">  &lt;<span class="regexp">/Router&gt;</span></span><br><span class="line"><span class="regexp">);</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>直接运行<code>yarn start</code>，观察打包结果，发现已经按照路由进行了分隔，在总打包大小基本不变的情况下，初始加载的包只有<code>230KB</code>，减少了一大半。</p>
+<ol start="6">
+<li>观察打包结果，发现公共包的命名是<code>0.hash.chunk.js</code>，对于已经在注释中指定了<code>webpackChunkName</code>，这显然是不正常的，可能是<code>react-scripts</code>默认分隔策略的问题。为了修复这个命名问题并且进一步分隔<code>runtime chunk</code>，对<code>splitChunk</code>进行少量的配置。<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SplitCodeConfig = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'all'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">'runtime'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>只需要进行简单的配置，设置<code>splitChunks</code>的<code>chunks</code>为<code>all</code>, <em>Webpack</em>就会使用默认的规则进行打包：抽取公共包，抽取<code>node_modules</code>第三方包等等，具体见<em>Webpack</em>官网 -&gt; <em>文档</em> -&gt; <em>代码分离</em>。</p>
+<p>至此，项目构建已经完成，构建的包可以直接用于生产换环境。</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><ol>
+<li><p>在项目中使用到的组件库包含近百个通用组件和业务组件，但是项目中只使用到了十余个，并且通过观察打包结果，可以看到未被使用到的组件也被打包进来了，这显然不合理。针对这个问题，我们可以查看对应组件库的按需加载方案，并且在<em>Webpack</em>进行相应的配置即可。这里由于使用的是内部开发的组件库，就不在举例。</p>
+</li>
+<li><p>除了使用的组件库，我们需要找到所有能够按需加载却在项目中没有使用的第三方库。例如我要使用<code>lodash</code>的<code>debounce</code>函数进行防抖，我在项目中是这样使用的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="keyword">from</span> <span class="string">'lodash'</span>;</span><br><span class="line"><span class="built_in">window</span>.onscroll = _.debounce(handler);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在构建的时候，整个<code>lodash</code>会被打包，如果只需要打包<code>debounce</code>函数，在<code>import</code>的时候直接<code>import debounce from &#39;lodash/debounce&#39;</code>即可。</p>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li><p>为了直观的查看构建结果，推荐使用<code>webpack-bundle-analyzer</code>插件，它会在构建完成后打开一个页面，该页面可以看到每个<code>bundle</code>的打包情况。使用也很简单:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> BundleAnalyzerPlugin = <span class="built_in">require</span>(<span class="string">'webpack-bundle-analyzer'</span>).BundleAnalyzerPlugin;</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> BundleAnalyzerPlugin(),</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果想测试<code>Gzip</code>后的文件大小，在<code>webpack-dev-server</code>的配置项中添加<code>compress: true</code>即可。但如果查看生产环境下构建的<code>Gzip</code>包大小，可以使用<code>compression-webpack-plugin</code>插件，该插件会在构建完成后生成对应<code>bundle</code>的<code>Gzip</code>包。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> CompressionPlugin = <span class="built_in">require</span>(<span class="string">'compression-webpack-plugin'</span>);</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CompressionPlugin(&#123; <span class="attr">threshold</span>: <span class="number">8192</span> &#125;), <span class="comment">// 只有大于8KB的资源才压缩</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在一般的情况下开启<code>Gzip</code>只需要设置生产服务器即可，并不需要在构建时生成<code>Gzip</code>包，但如果每次请求时再<code>Gzip</code>无疑会加大服务器的负担，因此事先准备好<code>gzip</code>包，服务器不必压缩而是直接返回，这不失为一个好的选择。</p>
+<p>开启<code>Gzip</code>会极大的减小传输体积，但无论是压缩还是解压都需要大量的运算，对于某些较小的资源，使用<code>Gzip</code>可能反而会降低性能，因此建议只对较大的资源进行<code>Gzip</code>压缩，而较小的资源直接传输。</p>
+<p>完。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> React Webpack </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Webpack 4.x 简易使用指南]]></title>
       <url>http://yoursite.com/2019/02/25/webpack-in-thinking/</url>
       <content type="html"><![CDATA[<blockquote>
