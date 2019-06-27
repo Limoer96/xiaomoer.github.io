@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                57
+                58
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,167 @@
 
             
             <section id="main">
+    <article id="post-scrollload" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2019/06/27/scrollload/">来，实现一个“滚动加载”</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/06/27/scrollload/">
+            <time datetime="2019-06-27T12:37:20.000Z" itemprop="datePublished">2019-06-27</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React/">React</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="从问题入手，实现一个滚动加载"><a href="#从问题入手，实现一个滚动加载" class="headerlink" title="从问题入手，实现一个滚动加载"></a>从问题入手，实现一个滚动加载</h3><h4 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h4><p>懒加载的实现很简单，例如图片需要懒加载的时候，在初始加载时并不直接加载图片，而是用一个其它的图片或者占位符占位，当其它优先级更高的内容加载完成后，再使用真实的图片替换占位图。具体呢就是在初始加载时并不知道图片的<code>src</code>或者<code>src</code>指向一个占位图片，而真实图片的路径则是放在<code>data-src</code>这样的自定义属性中，当需要加载时，使用<code>data-src</code>替换<code>src</code>即可。</p>
+<p>在React中，如果我们需要懒加载一个组件，实现原理也类似：当不需要加载的时候渲染占位符，当需要加载的时候再去加载真正的加载。滚动加载就是懒加载的一种特殊情况，其触发方式是滚动，只有当组件在可视区域中时，才开始加载。</p>
+<p>实现滚动加载并不简单，我们需要考虑以下几个问题：</p>
+<ol>
+<li>如何找到组件所处的滚动容器。</li>
+<li>如何判定组件是否可见。</li>
+<li>如何使用“更好”组件占位符。</li>
+<li>处理性能瓶颈。</li>
+</ol>
+<h4 id="ScrollLoad实现"><a href="#ScrollLoad实现" class="headerlink" title="ScrollLoad实现"></a>ScrollLoad实现</h4><p>懒加载使用最为广泛的实现是<a href="https://www.npmjs.com/package/react-lazy-load" target="_blank" rel="noopener">react-lazy-load</a>，使用起来也很方便：<code>&lt;LazyLoad&gt;&lt;MyComponent /&gt;&lt;/LazyLoad&gt;</code>，使用提供的<code>LazyLoad</code>组件包裹需要懒加载的组件即可，并且它提供了多个属性，例如<code>height</code>可以设置当内容未加载时的高度，<code>offset</code>则可以指定组件开始加载时需要偏移的距离(单位:<code>px</code>)，除此之外，我们还可以指定懒加载是否使用防抖和节流来提升性能，具体的使用见<a href="https://www.npmjs.com/package/react-lazy-load" target="_blank" rel="noopener">react-lazy-load</a>。</p>
+<p>虽然<code>react-lazy-load</code>是一个使用广泛的懒加载解决方案，但是在最近的项目中，我却不得不放弃使用它。因为<code>react-lazy-load</code>会更改<strong>原有的DOM结构!!!</strong>，所以如果要使用<code>react-lazy-load</code>，我必须更改原本的样式，这将会是一个浩大的工程。</p>
+<p>所以，接下来将会实现一个不需要额外DOM结构的滚动加载组件<code>ScrollLoad</code>组件。</p>
+<h5 id="问题1：如果找到组件所在的可滚动元素"><a href="#问题1：如果找到组件所在的可滚动元素" class="headerlink" title="问题1：如果找到组件所在的可滚动元素"></a>问题1：如果找到组件所在的可滚动元素</h5><p>这个问题其实是：<em>如何找到组件所在的最近的可滚动的父元素</em>。</p>
+<p>但是为什么需要找到那个可滚动的父元素呢？因为需要在该父元素上绑定<code>scroll eventListener</code>，当父元素在滚动时，就可以根据监听函数实时获取滚动的距离，并依此决定组件显示与否。</p>
+<p>那怎么样才能找到<strong>最近可滚动父元素</strong>呢？为了定位父元素，我们需要定位当前元素，然后再向上遍历，去查找<code>overflow</code>显式设置为<code>auto|scroll</code>的元素。</p>
+<p>查找可滚动父元素代码如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getScrollParent</span>(<span class="params">element</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> style = <span class="function">(<span class="params">elem, prop</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (getComputedStyle !== <span class="literal">undefined</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> getComputedStyle(elem, <span class="literal">null</span>).getPropertyValue(prop);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> elem.style[prop];</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">const</span> overflow = <span class="function"><span class="params">node</span> =&gt;</span> style(node, <span class="string">'overflow'</span>) + style(node, <span class="string">'overflow-x'</span>) + style(node, <span class="string">'overflow-y'</span>);</span><br><span class="line">  <span class="comment">// 循环判断父节点是否可滚动这里暂不添加，直接去直接父元素</span></span><br><span class="line">  <span class="keyword">if</span> (!(element <span class="keyword">instanceof</span> HTMLElement)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">window</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> parent = element;</span><br><span class="line">  <span class="keyword">while</span> (parent) &#123;</span><br><span class="line">    <span class="comment">// 当前节点是body或者document</span></span><br><span class="line">    <span class="keyword">if</span> (parent === <span class="built_in">document</span>.body || parent === <span class="built_in">document</span>.documentElement) &#123;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 当期元素无父节点</span></span><br><span class="line">    <span class="keyword">if</span> (!parent.parentNode) &#123;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 判断节点是否含有overflow等属性的值</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="regexp">/(scroll|auto|inherit)/</span>.test(overflow(parent))) &#123;</span><br><span class="line">      <span class="keyword">return</span> parent;</span><br><span class="line">    &#125;</span><br><span class="line">    parent = parent.parentNode;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">window</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实现参考了<code>react-lazy-load</code>的实现，通过当前节点向上查找直到找到第一个可滚动的父元素或遍历到顶层元素，并且每进行一次遍历，会通过正则检查当前元素的样式的<code>overflow overflow-x overflow-y</code>，如果为<code>scroll|auto</code>，则返回该父元素。</p>
+<p>那么怎么得到当前元素呢？可以通过<code>ReactDOM.findDOMNode(component)</code>访问真实的DOM节点，如果有多个子节点的话，默认返回第一个。因为<code>ScrollLoad</code>组件并没有添加额外的DOM结构，所以通过<code>findDOMNode(this)</code>拿到的节点就是目标节点，也就是占位节点(因为就算组件初始状态下可见，那么也要等应用挂载后才去判断，所以首次渲染的是占位组件)。</p>
+<h5 id="问题2：如何判定组件是否可见"><a href="#问题2：如何判定组件是否可见" class="headerlink" title="问题2：如何判定组件是否可见"></a>问题2：如何判定组件是否可见</h5><p>如果只考虑上下滚动的话，一个很简单的判断公式是：<code>offsetTop &lt; seenHeight + scrollTop</code>，就是：<strong>组件相对于可滚动父元素的偏移</strong> &lt; <strong>可滚动父元素的可视高度</strong> + <strong>可滚动父元素的滚动距离</strong>。上面的三个计算量中<code>offsetTop</code>和<code>seenHeight</code>都是固定不变的，所以一个组件是否可见取决于父元素当前滚动的距离。<code>seenHeight</code>很好计算：<code>parent.clientHeight</code>即可，<code>scrollTop</code>也很简单：<code>parent.scrollTop</code>，<code>offsetTop</code>计算稍微复杂。</p>
+<p>如何计算<code>offsetTop</code>？如果最近可滚动父元素是直接父元素的话，直接通过<code>elem.offsetTop</code>就可以得到，如果包含多层嵌套，那么<code>offsetTop</code>就需要每一层元素相对于父元素的<code>offsetTop</code>相加，直到父元素等于目标父元素。简单的实现如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 该函数没有考虑节点异常的情况</span></span><br><span class="line"><span class="keyword">let</span> getNodeOffsetTop = <span class="function">(<span class="params">node, parent</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> current = node;</span><br><span class="line">  <span class="keyword">let</span> offsetTop = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (current !== parent) &#123;</span><br><span class="line">    offsetTop += current.offsetTop;</span><br><span class="line">    current = current.parentElement;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> offsetTop;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后是判断组件是否可见的实现：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> checkVisible = <span class="function">(<span class="params">node, parent</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (!node || !parent) &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123; <span class="attr">visible</span>: <span class="literal">true</span> &#125;);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; visible &#125; = <span class="keyword">this</span>.state;</span><br><span class="line">    <span class="keyword">if</span> (visible) &#123;</span><br><span class="line">      <span class="keyword">this</span>.parent.removeEventListener(<span class="string">'scroll'</span>, <span class="keyword">this</span>.scrollHandler);</span><br><span class="line">      <span class="keyword">return</span>; <span class="comment">// 直接返回不执行当次eventListener</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> seenHeight = parent.clientHeight;</span><br><span class="line">    <span class="keyword">let</span> scrollHeight = parent.scrollTop;</span><br><span class="line">    <span class="keyword">let</span> currentNode = findDOMNode(<span class="keyword">this</span>); <span class="comment">// 获取最新的dom结构</span></span><br><span class="line">    <span class="keyword">let</span> offsetTop = <span class="keyword">this</span>.getNodeOffsetTop(currentNode, parent);</span><br><span class="line">    <span class="comment">// 1. 当偏移高度小于可见高度</span></span><br><span class="line">    <span class="comment">// 2. 初始不可见的时候，当可视高度+滚动高度大于了偏移高度</span></span><br><span class="line">    <span class="keyword">if</span> (offsetTop &lt;= seenHeight + scrollHeight) &#123;</span><br><span class="line">      <span class="keyword">this</span>.setState(&#123; <span class="attr">visible</span>: <span class="literal">true</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="问题3：如何使用“更好”组件占位符"><a href="#问题3：如何使用“更好”组件占位符" class="headerlink" title="问题3：如何使用“更好”组件占位符"></a>问题3：如何使用“更好”组件占位符</h5><p>理想情况下，一个好的占位组件应该是和真实组件一样大的<code>size</code>，这样的话初始情况和加载完成的情况下滚动条的长度都是一样长的，且在组件由不可见到可见这个过程中页面并不会因为组件前后的<code>size</code>而出现抖动。</p>
+<p>而实际的情况是，我们并不能很好的拿到目标组件的样式并作用到占位组件上，因为占位组件总是先渲染。所以折中的做法是让<code>ScrollLoad</code>的使用者去提供占位组件，这样就把如何提供一个好的占位组件交给了使用者。</p>
+<p>还有一种办法是，既然一个好的(只是我认为的)占位组件的<code>size</code>是等于目标组件的，那么我直接把用于布局的样式从目标组件上拿过来不就行了！所以无论是目标组件渲染后的真实DOM上的<code>className id style...</code>全部拿过来，如果高度是内容撑开的话，我们就拿渲染完成的高度直接设置到占位组件上。经过尝试，这种方法的确可行，但是需要付出的代价是需要花费时间在获取目标组件的样式和样式整理上，并且代码的可读性将一定程度的降低。</p>
+<p>所以，关于占位组件，我暂时没有好的方法。</p>
+<h5 id="问题4：性能瓶颈"><a href="#问题4：性能瓶颈" class="headerlink" title="问题4：性能瓶颈"></a>问题4：性能瓶颈</h5><p>在前面介绍<code>react-lazy-load</code>的时候提到过我们可以决定是否使用节流或防抖来解决性能问题。所以，在<code>ScrollLoad</code>上，也是用了<em>节流</em>来控制<code>scroll</code>触发的频率。代码如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.scrollHandler = throttle(<span class="keyword">this</span>.checkVisible(dom, parent), <span class="number">100</span>);</span><br><span class="line">parent.addEventListener(<span class="string">'scroll'</span>, <span class="keyword">this</span>.scrollHandler, &#123; <span class="attr">passive</span>: <span class="literal">true</span> &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>这里使用了<code>lodash/throttle</code>来实现节流，这样默认情况下，<code>scroll</code>事件只会每隔<code>100ms</code>触发一次。</p>
+<p>上面的代码在使用<code>addEventListener</code>绑定监听函数时还是用到了该函数的第三个参数：<code>{ passive: true }</code>，<code>passive</code>的意思是<code>消极的、被动的</code>，如果不指定，在新版的<code>Chrome</code>中会有性能提示：<code>[Violation] Added non-passive event listener to a scroll-blocking &lt;some&gt; event. Consider marking event handler as &#39;passive&#39; to make the page more responsive.</code></p>
+<p>其实在监听滚动事件是，我们可以通过<code>event.preventDefault()</code>来阻止浏览器的默认滚动行为，可当滚动触发时，浏览器并不知道我们的监听函数中是否阻止了默认行为，所以浏览器会等待，直到监听函数执行完，此时浏览器才会选择滚动与否。而执行监听函数往往需要时间，性能就会受到影响。</p>
+<p>而设置<code>{ passive: true }</code>，可以在执行监听函数之前就告诉浏览器，并没有阻止默认滚动，因此在滚动触发时，浏览器就不会等待，直接滚动。显然<code>ScrollLoad</code>是需要执行浏览器滚动的，因此设置<code>{ passive: true }</code>可以提升性能。</p>
+<p>在<code>checkVisible</code>函数中，有一段代码：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; visible &#125; = <span class="keyword">this</span>.state;</span><br><span class="line"><span class="keyword">if</span> (visible) &#123;</span><br><span class="line">  <span class="keyword">this</span>.parent.removeEventListener(<span class="string">'scroll'</span>, <span class="keyword">this</span>.scrollHandler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码很好理解，除了在组件卸载之前需要移除<code>listener</code>之外，一旦当某个组件可见，那么此时就没必要再监听滚动了，所以需要移除监听函数。</p>
+<p>上面的代码还有一个问题，如果当某两次触发监听函数组件的状态刚好从<code>visible</code>为<code>false</code>切换到<code>true</code>，此时移除了监听函数，但当次函数还会再次执行，所以在移除监听函数后，直接返回，可以避免执行下面不必要的逻辑。因此，这段代码应该是：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; visible &#125; = <span class="keyword">this</span>.state;</span><br><span class="line"><span class="keyword">if</span> (visible) &#123;</span><br><span class="line">  <span class="keyword">this</span>.parent.removeEventListener(<span class="string">'scroll'</span>, <span class="keyword">this</span>.scrollHandler);</span><br><span class="line">  <span class="keyword">return</span>; <span class="comment">// 直接返回不执行当次eventListener</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h3><p>到此为止，一个基本可用的<code>ScrollLoad</code>组件就实现了，其实对于不同的使用场景，<code>ScrollLoad</code>的实现也可以略有不同，例如如果当前需要<code>scrollload</code>的组件是一些列表项组件，每个组件的样式外观都是一致的。这样的话，我们在写<code>lazyload</code>组件的时候，就可以把所有组件使用一个<code>LazyLoad</code>组件包裹起来，然后绑定一个监听函数，使用可显示的组件个数作为组件状态，每次滚动时监听函数根据已经滚动的高度去计算可见组件的个数，最后在渲染的时候遍历<code>this.props.children</code>，选择渲染组件或是占位组件即可。</p>
+<p>附 <code>LazyLoad</code>实现代码：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; findDOMNode &#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="keyword">import</span> throttle <span class="keyword">from</span> <span class="string">'lodash/throttle'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Spin &#125; <span class="keyword">from</span> <span class="string">'@xx/xx-ui'</span>;</span><br><span class="line"><span class="keyword">import</span> ReactPlaceHolder <span class="keyword">from</span> <span class="string">'react-placeholder'</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getScrollParent</span>(<span class="params">element</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> style = <span class="function">(<span class="params">elem, prop</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (getComputedStyle !== <span class="literal">undefined</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> getComputedStyle(elem, <span class="literal">null</span>).getPropertyValue(prop);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> elem.style[prop];</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">const</span> overflow = <span class="function"><span class="params">node</span> =&gt;</span> style(node, <span class="string">'overflow'</span>) + style(node, <span class="string">'overflow-x'</span>) + style(node, <span class="string">'overflow-y'</span>);</span><br><span class="line">  <span class="comment">// 循环判断父节点是否可滚动这里暂不添加，直接去直接父元素</span></span><br><span class="line">  <span class="keyword">if</span> (!(element <span class="keyword">instanceof</span> HTMLElement)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">window</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> parent = element;</span><br><span class="line">  <span class="keyword">while</span> (parent) &#123;</span><br><span class="line">    <span class="comment">// 当前节点是body或者document</span></span><br><span class="line">    <span class="keyword">if</span> (parent === <span class="built_in">document</span>.body || parent === <span class="built_in">document</span>.documentElement) &#123;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 当期元素无父节点</span></span><br><span class="line">    <span class="keyword">if</span> (!parent.parentNode) &#123;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 判断节点是否含有overflow等属性的值</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="regexp">/(scroll|auto|inherit)/</span>.test(overflow(parent))) &#123;</span><br><span class="line">      <span class="keyword">return</span> parent;</span><br><span class="line">    &#125;</span><br><span class="line">    parent = parent.parentNode;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">window</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> EmptyCompBox = <span class="function">(<span class="params">&#123; ...props &#125;</span>) =&gt;</span> (</span><br><span class="line">  &lt;div &#123;...props&#125;&gt;</span><br><span class="line">    &lt;Spin size=<span class="string">"large"</span> className=<span class="string">"lazyload-center-spin"</span> /&gt;</span><br><span class="line">  &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">);</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">class ScrollLoad extends React.Component &#123;</span></span><br><span class="line"><span class="regexp">  state = &#123;</span></span><br><span class="line"><span class="regexp">    visible: false,</span></span><br><span class="line"><span class="regexp">  &#125;;</span></span><br><span class="line"><span class="regexp">  componentDidMount() &#123;</span></span><br><span class="line"><span class="regexp">    let dom = findDOMNode(this); /</span><span class="regexp">/ 取得当前节点</span></span><br><span class="line"><span class="regexp">    let parent = getScrollParent(dom);</span></span><br><span class="line"><span class="regexp">    this.parent = parent;</span></span><br><span class="line"><span class="regexp">    let visible = this.checkVisible(dom, parent); /</span><span class="regexp">/ 初始化检查是否可见</span></span><br><span class="line"><span class="regexp">    visible();</span></span><br><span class="line"><span class="regexp">    this.scrollHandler = throttle(this.checkVisible(dom, parent), 100);</span></span><br><span class="line"><span class="regexp">    parent.addEventListener('scroll', this.scrollHandler, &#123; passive: true &#125;);</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">  componentWillUnmount() &#123;</span></span><br><span class="line"><span class="regexp">    this.parent.removeEventListener('scroll', this.scrollHandler);</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">  getNodeOffsetTop = (node, parent) =&gt; &#123;</span></span><br><span class="line"><span class="regexp">    let current = node;</span></span><br><span class="line"><span class="regexp">    let offsetTop = 0;</span></span><br><span class="line"><span class="regexp">    while (current !== parent) &#123;</span></span><br><span class="line"><span class="regexp">      offsetTop += current.offsetTop;</span></span><br><span class="line"><span class="regexp">      current = current.parentElement;</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">    return offsetTop;</span></span><br><span class="line"><span class="regexp">  &#125;;</span></span><br><span class="line"><span class="regexp">  checkVisible = (node, parent) =&gt; &#123;</span></span><br><span class="line"><span class="regexp">    if (!node || !parent) &#123;</span></span><br><span class="line"><span class="regexp">      this.setState(&#123; visible: true &#125;);</span></span><br><span class="line"><span class="regexp">      return null;</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">    let seenHeight = parent.clientHeight;</span></span><br><span class="line"><span class="regexp">    let scrollHeight = parent.scrollTop;</span></span><br><span class="line"><span class="regexp">    return () =&gt; &#123;</span></span><br><span class="line"><span class="regexp">      const &#123; visible &#125; = this.state;</span></span><br><span class="line"><span class="regexp">      if (visible) &#123;</span></span><br><span class="line"><span class="regexp">        this.parent.removeEventListener('scroll', this.scrollHandler);</span></span><br><span class="line"><span class="regexp">        return; /</span><span class="regexp">/ 直接返回不执行当次eventListener</span></span><br><span class="line"><span class="regexp">      &#125;</span></span><br><span class="line"><span class="regexp">      let currentNode = findDOMNode(this); /</span><span class="regexp">/ 获取最新的dom结构</span></span><br><span class="line"><span class="regexp">      let offsetTop = this.getNodeOffsetTop(currentNode, parent);</span></span><br><span class="line"><span class="regexp">      /</span><span class="regexp">/ 1. 当偏移高度小于可见高度</span></span><br><span class="line"><span class="regexp">      /</span><span class="regexp">/ 2. 初始不可见的时候，当可视高度+滚动高度大于了偏移高度</span></span><br><span class="line"><span class="regexp">      if (offsetTop &lt;= seenHeight + scrollHeight) &#123;</span></span><br><span class="line"><span class="regexp">        this.setState(&#123; visible: true &#125;);</span></span><br><span class="line"><span class="regexp">      &#125;</span></span><br><span class="line"><span class="regexp">    &#125;;</span></span><br><span class="line"><span class="regexp">  &#125;;</span></span><br><span class="line"><span class="regexp">  render() &#123;</span></span><br><span class="line"><span class="regexp">    const &#123; visible &#125; = this.state;</span></span><br><span class="line"><span class="regexp">    const &#123; id, className, style &#125; = this.props;</span></span><br><span class="line"><span class="regexp">    return (</span></span><br><span class="line"><span class="regexp">      &lt;ReactPlaceHolder</span></span><br><span class="line"><span class="regexp">        ready=&#123;visible&#125;</span></span><br><span class="line"><span class="regexp">        customPlaceholder=&#123;&lt;EmptyCompBox id=&#123;id&#125; className=&#123;className&#125; style=&#123;style&#125; /</span>&gt;&#125;</span><br><span class="line">      &gt;</span><br><span class="line">        &#123;<span class="keyword">this</span>.props.children&#125;</span><br><span class="line">      &lt;<span class="regexp">/ReactPlaceHolder&gt;</span></span><br><span class="line"><span class="regexp">    );</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">export default ScrollLoad;</span></span><br></pre></td></tr></table></figure></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="cjxenqfeq00185gj6irizhp5p" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/06/27/scrollload/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/06/27/scrollload/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-eject" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -295,7 +456,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="cjwii9fbw000h80j65dgy38ux" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="cjxenqfe4000b5gj6ohezbo30" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -468,7 +629,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="cjwii9fdb002p80j6llrqdqil" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="cjxenqffw003g5gj6fvp1efvg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -714,7 +875,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="cjwii9fck001h80j6qet4gcot" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="cjxenqfem00105gj6upkg7mu9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -956,7 +1117,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="cjwii9fc8000x80j6wwwp9chk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="cjxenqfeh000r5gj6t65niurb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1122,7 +1283,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/12/31/this-year/" data-id="cjwii9fc4000r80j6bgwx044a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/12/31/this-year/" data-id="cjxenqfee000m5gj6jxg5edse" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1300,7 +1461,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/12/02/month-record-1202/" data-id="cjwii9fc5000t80j65il7yh45" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/12/02/month-record-1202/" data-id="cjxenqfeb000i5gj6rahhus9h" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1451,7 +1612,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/11/03/week-record-1103/" data-id="cjwii9fci001d80j6i49fctcm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/11/03/week-record-1103/" data-id="cjxenqff600215gj6f0kplxq4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1604,7 +1765,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/10/15/week-record-1014/" data-id="cjwii9fcf001980j6rdocnt17" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/10/15/week-record-1014/" data-id="cjxenqfep00155gj69gqoc860" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1752,7 +1913,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/10/02/week-record-1002/" data-id="cjwii9fcg001b80j6hmcx92ks" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/10/02/week-record-1002/" data-id="cjxenqfer00195gj66o6wn8c6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1830,137 +1991,6 @@
 
 
 
-    <article id="post-week-record-0922" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/09/22/week-record-0922/">每周一记(中秋)</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/09/22/week-record-0922/">
-            <time datetime="2018-09-22T03:16:41.000Z" itemprop="datePublished">2018-09-22</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/周记/">周记</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>放假第一天(上周六)，打篮球，用力过猛戳到手指，又肿又痛的，键盘都没法敲，两天过去了，现在是这个样子的。<img src="http://olro3ke8a.bkt.clouddn.com/IMG_0525.JPG" alt="受伤了...">肿是消了，但是只要按压就痛的不行，所以每周一记推迟了。</p>
-</blockquote>
-<p>如果真要写的话，可能手指受伤的这几天，受最大影响的莫过于我的“电竞事业”了😂。</p>
-<p>再补上。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2018/09/22/week-record-0922/" data-id="cjwii9fcb001380j6lu2qno2i" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2018/09/22/week-record-0922/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/09/22/week-record-0922/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
@@ -1975,7 +2005,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1984,7 +2014,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
