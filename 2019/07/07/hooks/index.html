@@ -3,15 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>标签: 心灵记事 | Limoer的记事小本</title>
+    <title>记一次React Hooks的使用 | Limoer的记事小本</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Limoer的记事小本">
-<meta property="og:url" content="http://yoursite.com/tags/心灵记事/index.html">
+    <meta name="description" content="有这么一个需求：需要渲染一个表格，表格的内容会随着用户的操作而重新请求数据，并且在用户离开这个表格所在的页面(路由)后缓存数据，再次进入该页面的时使用已缓存数据。   目前在使用的表格组件是纯函数组件，只负责渲染，数据请求则写在其父组件，数组则存在Redux中。经过考虑，需要把数据请求的逻辑移入表格组件中，使得表格组件承担更多的职责，在React 16.8之前，我们不得不把表格组件写成class">
+<meta name="keywords" content="React">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次React Hooks的使用">
+<meta property="og:url" content="http://yoursite.com/2019/07/07/hooks/index.html">
 <meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="有这么一个需求：需要渲染一个表格，表格的内容会随着用户的操作而重新请求数据，并且在用户离开这个表格所在的页面(路由)后缓存数据，再次进入该页面的时使用已缓存数据。   目前在使用的表格组件是纯函数组件，只负责渲染，数据请求则写在其父组件，数组则存在Redux中。经过考虑，需要把数据请求的逻辑移入表格组件中，使得表格组件承担更多的职责，在React 16.8之前，我们不得不把表格组件写成class">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-07T00:53:26.800Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Limoer的记事小本">
+<meta name="twitter:title" content="记一次React Hooks的使用">
+<meta name="twitter:description" content="有这么一个需求：需要渲染一个表格，表格的内容会随着用户的操作而重新请求数据，并且在用户离开这个表格所在的页面(路由)后缓存数据，再次进入该页面的时使用已缓存数据。   目前在使用的表格组件是纯函数组件，只负责渲染，数据请求则写在其父组件，数组则存在Redux中。经过考虑，需要把数据请求的逻辑移入表格组件中，使得表格组件承担更多的职责，在React 16.8之前，我们不得不把表格组件写成class">
     
 
     
@@ -206,200 +211,178 @@
 </aside>
 
             
-            <section id="main">
-<div class="timeline timeline-wrap">
-    <div class="timeline-row timeline-row-major">
-        <span class="node"><i class="fa fa-tag"></i></span>
-        <h1 class="title">#心灵记事</h1>
-    </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+            <section id="main"><article id="post-hooks" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/12/31/this-year/">我的这一年</a>
+        <h1 class="article-title" itemprop="name">
+            记一次React Hooks的使用
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2018/12/31/this-year/">
-            <time datetime="2018-12-31T06:17:36.000Z" itemprop="datePublished">2018-12-31</time>
+        <a href="/2019/07/07/hooks/">
+            <time datetime="2019-07-07T00:48:50.000Z" itemprop="datePublished">2019-07-07</time>
         </a>
     </div>
 
 
-                    
-                    
+                        
+                        
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
+        <a class="tag-link" href="/tags/React/">React</a>
     </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+                    </div>
                 
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/06/30/尾巴/">尾巴</a>
-        </h1>
-    
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>有这么一个需求：需要渲染一个表格，表格的内容会随着用户的操作而重新请求数据，并且在用户离开这个表格所在的页面(路由)后缓存数据，再次进入该页面的时使用已缓存数据。</p>
+</blockquote>
+<blockquote>
+<p>目前在使用的表格组件是纯函数组件，只负责渲染，数据请求则写在其父组件，数组则存在<code>Redux</code>中。经过考虑，需要把数据请求的逻辑移入表格组件中，使得表格组件承担更多的职责，在<code>React 16.8</code>之前，我们不得不把表格组件写成<code>class</code>组件。</p>
+</blockquote>
+<p>而现在，可以使用<code>hooks</code>，以最少的更改，来实现这一需求。</p>
+<h3 id="需要哪些hooks"><a href="#需要哪些hooks" class="headerlink" title="需要哪些hooks?"></a>需要哪些<code>hooks</code>?</h3><p>我们的需求是把请求数据的逻辑移入到表格组件中，表格的数据仍然保存在<code>Redux</code>中。众所周知，<em>数据获取</em>是一个有副作用的操作，而<code>useEffect</code>这个<code>hooks</code>就是用来处理有副作用的操作。</p>
+<p>在使用<code>hooks</code>之前，我们一般在<code>componentDidMount</code>和<code>componentDidUpdate</code>或者是很少使用的<code>componentWillUnMount</code>来进行DOM操作，数据请求等副作用操作。而<code>useEffect</code>则可以简单的看做是这三个生命周期函数的合集，其在组件的这三个生命周期时，都会被调用到。</p>
+<p>所以，使用<code>useEffect</code>解决了所有问题。</p>
+<h4 id="“真”解决了所有问题？"><a href="#“真”解决了所有问题？" class="headerlink" title="“真”解决了所有问题？"></a>“真”解决了所有问题？</h4><p>先把代码写起来:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; useEffect &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">const</span> MyTable = <span class="function">(<span class="params">&#123; fetchData, param &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    fetchData(param);</span><br><span class="line">  &#125;, [param])</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;Table /&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> connect(stateToProps,actionToProps)(MyTable);</span><br></pre></td></tr></table></figure></p>
+<p>仅仅三行代码，就搞定了。更改<code>params</code>，一切正常；从其它页面进入，看起来也很正常。可为什么是看起来正常呢？因为你打开控制台，查看<code>network xhr</code>，再进入页面，请求发送了！并没有使用缓存的数据！</p>
+<p>所以，问题并没有解决。</p>
+<h3 id="如何更好的利用缓存数据"><a href="#如何更好的利用缓存数据" class="headerlink" title="如何更好的利用缓存数据"></a>如何更好的利用缓存数据</h3><blockquote>
+<p>问题：既然<code>useEffect</code>能够在上述三个生命周期中都执行，那么有没有办法区分出首次渲染和更新呢？</p>
+</blockquote>
+<p>答案是肯定的！在上面的代码中，我们使用了<code>useEffect(func, [param])</code>的形式，其实<code>useEffect</code>的第二个参数如果指定，那么<code>useEffect</code>就不是每次都执行了，而是只有<code>param</code>改变了才会执行。并且特别的，如果第二个参数传入<code>[]</code>空数组，那么<code>useEffect</code>只会执行一次，也就是说，<code>useEffect</code>只会在<code>componentDidMount</code>执行！代码写起来：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 其它代码不变，再加一个hook</span></span><br><span class="line">useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (data.status !== <span class="string">'fulfilled'</span>) &#123;</span><br><span class="line">    fetchData(param);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, [])</span><br></pre></td></tr></table></figure></p>
+<p>上面的<code>hook</code>会在初次渲染完成后执行，如果缓存数据的状态不是<code>fulfilled</code>，才请求数据。</p>
+<h3 id="问题仍然没有解决"><a href="#问题仍然没有解决" class="headerlink" title="问题仍然没有解决"></a>问题仍然没有解决</h3><blockquote>
+<p>很显而易见的是，即便是加了一个<code>hook</code>，而第二个<code>useEffect</code>仍然会执行，所以仍然会在初次加载完成后请求数据。</p>
+</blockquote>
+<p>这时候，就需要另一个<code>hook</code>出场了，那就是<code>useState</code>，我们需要在组件中维持一个是否是首次渲染的状态，只有当非首次渲染的时候，才会去执行第一个<code>hook</code>，因此可以避免不必要的的数据请求。代码码起来：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> [isInitial, changeInitialToFalse] = useState(<span class="literal">true</span>);</span><br><span class="line">useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (!isInitial) &#123;</span><br><span class="line">    fetchData(param);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, [param]);</span><br><span class="line">useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  changeInitialToFalse(<span class="literal">false</span>);</span><br><span class="line">  <span class="keyword">if</span> (data.status !== <span class="string">'fulfilled'</span>) &#123;</span><br><span class="line">    fetchData(param);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, []);</span><br></pre></td></tr></table></figure></p>
+<p>经过测试，这一次是真一切正常了，缓存也已经用上。</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>这是一次再普通不过的组件改造，这也是我在实际项目中第一次使用<code>hooks</code>。并且经历了从最开始遇到需求到决定使用<code>hooks</code>来最小化修改，到遇到问题差点改成更熟悉的<code>class</code>组件，到最终解决问题。最大的收货是，我对<code>useEffect</code>的了解又深刻了一些。把数据请求逻辑移到组件内部，除了降低组件间的耦合，更大程度上可以配合前一篇提到的<code>ScrollLoad</code>来做真正的滚动加载。毕竟数据才是组件的灵魂，数据都不懒加载，组件懒加载的意义就减了一半，手动狗头。</p>
+<p>完。</p>
 
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/06/30/尾巴/">
-            <time datetime="2018-06-30T06:37:02.000Z" itemprop="datePublished">2018-06-30</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                </div>
-            </div>
+        
         </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/05/01/Hello-Goodbye-Hello/">Hello Goodbye &amp; Hello</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/05/01/Hello-Goodbye-Hello/">
-            <time datetime="2018-05-01T13:12:22.000Z" itemprop="datePublished">2018-05-01</time>
-        </a>
-    </div>
+        <footer class="article-footer">
+            <div class="share-container">
 
 
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2017/07/25/孩子/">孩子</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/07/25/孩子/">
-            <time datetime="2017-07-24T23:14:01.000Z" itemprop="datePublished">2017-07-25</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2017/02/28/兑水的心灵鸡汤/">兑水的心灵鸡汤</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/28/兑水的心灵鸡汤/">
-            <time datetime="2017-02-28T13:02:27.000Z" itemprop="datePublished">2017-02-28</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2017/01/26/我们的世界/">我们的世界</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/01/26/我们的世界/">
-            <time datetime="2017-01-26T13:40:17.000Z" itemprop="datePublished">2017-01-26</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
 </div>
+
+    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="cjxs8ujha000fp0j65qt7b7sf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/07/07/hooks/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/07/07/hooks/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2019/07/07/resolve/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Webpack resolve解析</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
 </section>
             
                 
@@ -468,11 +451,13 @@
     <script>
     var disqus_config = function () {
         
-        this.page.identifier = 'undefined';
+            this.page.url = 'http://yoursite.com/2019/07/07/hooks/';
+        
+        this.page.identifier = 'hooks';
     };
     (function() { 
         var d = document, s = d.createElement('script');  
-        s.src = '//' + 'limoer' + '.disqus.com/count.js';
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
     })();

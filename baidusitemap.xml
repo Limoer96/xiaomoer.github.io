@@ -4,6 +4,40 @@
 
     
   <url>
+    <loc>http://yoursite.com/2019/07/07/resolve/</loc>
+    <lastmod>2019-07-07T00:56:28.722Z</lastmod>
+    <data>
+        <display>
+        <title>Webpack resolve解析</title>
+        <pubTime>2019-07-07T00:48:39.000Z</pubTime>
+        
+        <tag>Webpack</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://yoursite.com/2019/07/07/hooks/</loc>
+    <lastmod>2019-07-07T00:53:26.800Z</lastmod>
+    <data>
+        <display>
+        <title>记一次React Hooks的使用</title>
+        <pubTime>2019-07-07T00:48:50.000Z</pubTime>
+        
+        <tag>React</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://yoursite.com/2019/06/27/scrollload/</loc>
     <lastmod>2019-06-27T12:41:52.632Z</lastmod>
     <data>

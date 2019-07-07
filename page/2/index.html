@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                58
+                60
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,307 @@
 
             
             <section id="main">
+    <article id="post-week-record-1014" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/10/15/week-record-1014/">每周一记(节后综合征)</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/10/15/week-record-1014/">
+            <time datetime="2018-10-15T11:18:07.000Z" itemprop="datePublished">2018-10-15</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/周记/">周记</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>我似乎是患上节后综合征了，具体表现为：晚上睡不着，早上起不来。</p>
+</blockquote>
+<h3 id="周一"><a href="#周一" class="headerlink" title="周一"></a>周一</h3><p>上周整个周末都因为电竞事业繁忙甚至抽不出来一个小时写<em>周记</em>，毕竟有那么多比赛/直播要看，看完还要打，真的嫌时间不够😂。所以上周的周记只好在周一补上了。</p>
+<p>项目进行到最后一周，开发和测试工作已经结束了，所以这周的任务就是<em>摸鱼</em>，比如说今天，上班八小时，<em>摸鱼</em>七小时，好不容易熬到了下班😂。</p>
+<p>回来的时候，开始下起雨来，昏暗的路灯下，行人匆匆。我想起了大学最后的一年，那个冬天，同样的傍晚，刚从健身房出来，身体还温热，猛地吸入一口冷空气，冻得直哆嗦。而一年不到，当初健身的小伙伴许久不联系，自己也开始发福？(离开公司前刚上称 139斤)。</p>
+<h3 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h3><p>上周的工作有点划水前奏的意思，开发快要完成，改完了测试提的<code>bug</code>，剩下的就是琐碎的事了。可是就是这么点事，却出了最多的问题，需要花最多的时间去尝试解决。</p>
+<ol>
+<li><p>在开发一个图形分析的功能，一个类似图浏览器的功能，包括缩略图和图主体两部分，由于<code>boss</code>强调封装，所以并没有开发一个新的组件，而是融合到<code>reportChart</code>中，这使得原本就有好几百行的<code>echarts</code>配置文件又多出了一大截，代码可读性当然不用说了，一个字形容就是：<em>差</em>(虽然不是我开发的)。好了，开发完毕，给到开发们，一开始还好，随着需求越来越多，代码出问题了，并且影响到了先前开发的代码，并且难以追踪。排查了好久，最后是因为一个配置项默认值的问题。当然，<code>bug</code>还很多，比如说<code>yAxis</code>无法正常显示刻度/负数和特殊数据无法绘制等。除了<code>bug</code>以外，性能也是很低下的，基本上达到了不可用级别。因为在初始化时，需要请求数据用于绘制缩略图，这会导致太多的网络请求和组件的更新，最后折中了一下，使用<code>icon</code>代替了缩略图。结果这周刚来，接到通知，图形分析被砍了，也就是说，上周有一半的活就白干了😂。</p>
+</li>
+<li><p>项目本身遗留一个很大的问题，就是当存在主子表的时候，如果有筛选条件，那么当更改筛选条件并且主表没有数据的时候，子表会拿到上一个参数并且成功请求到数据，这显然是不对的。这个<code>bug</code>很早就被发现了，但又因为各种各样的原因，还没得到解决，并且在测试把<code>bug</code>算到我头上和<code>boss</code>出差的情况下，我只好硬着头皮上了。首先分析点击<em>提取数据</em>按钮后发生了什么事，结果当然是<code>dispatch</code>了一个<code>action</code>；但这个<code>action</code>并没有去请求数据，而是更新了一个标记，这个标记通过<code>props</code>的方式传入到顶层组件中，该组件在<code>componentWillRecieveProps</code>中对对该标记进行了捕获，并且还做了其它的操作；最后是<code>ReportTable</code>组件更新，重新请求数据，并且把请求到的数据渲染出来。这里使用了高阶组件，用户请求数据的参数和事件捕获函数都在父组件中，并且通过<code>props</code>来传递。分析到这里，已经很明了了，我们需要在父组件更新的时候清空<code>selectedRow</code>(也就是被选中行)，那么一旦主表无数据，<code>selectedRow</code>将无数据，字表不会发起请求，也就不会错误渲染了，至此，问题得到解决。</p>
+</li>
+<li><p>在我开发的一个名叫<code>QAPanel</code>问答面板的组件中，有一个问题，就是一旦滚动到某个地方后再请求数据，页面并不会滚动到顶端，而仍然停留再上一次滚动的地方。这个问题很好解决，一旦组件渲染，我们需要拿到组件的<code>ref</code>(引用)，并且再请求新数据之前，把页面滚动到顶端。这原本不是问题，一顿操作过后，竟然报错，<code>createRef undefined?</code>，一脸懵逼。谁叫我们还用的是<code>React 15</code>呢，又是一顿操作，改成原来的模样，差点记不住😂，因为我刚接触<code>React</code>的时候，就已经是<code>React 15</code>，那年我才20岁😂。</p>
+</li>
+<li><p>当然，我们的<code>webpack</code>肯定是<code>3.X</code>的，由于使用了<code>create-react-app</code>脚手架，具体构建细节都被隐藏了，所以<code>eject</code>一下就好了嘛。对的，配置是暴露了，也修改了，可就是无法正常构建了，我承认这是我的问题，但是久经排查，并没有发现<code>bug</code>，所以还是老老实实的用覆盖的形式吧，不需要过多的修改，构建的时候需要分包，把第三方库都打包到一起，运行时代码再分开打包。结果差不多压缩后加起来有<code>3MB</code>，并且构建的时间差不多<code>90秒</code>，慢得让人流泪。果断<code>happyPack</code>走一波，总算<code>happy</code>了。</p>
+</li>
+</ol>
+<p>还有很多很有意思的事情这里就不细说了。总的来说就是，填别人的坑，让别人无坑可填。</p>
+<h3 id="生活"><a href="#生活" class="headerlink" title="生活"></a>生活</h3><ol>
+<li><p>如果说电竞是生活的话，那么吃肯定也少不了。上周末两天，累计叫外卖<code>3</code>次，共计消费<code>90+</code>，贵也就算了，关键是特别难吃。这让我想到了我的家乡，随便一个路边面馆，一碗十块<em>豌豆炸酱面</em>，简直不要太好吃。所以啊，想要逃离，这可能是我需要好好思考的了。</p>
+</li>
+<li><p>打篮球也要玩心跳？对的，我指的是这款名叫<code>NBA 2K OL2</code>的篮球游戏，因为它的球员交易市场就像炒股一样，你家有矿你随意。从公测开始，陆陆续续完了一个多月，人民币也花了一百多，总算把自己的阵容弄到<code>500w</code>了，谁知道12号一波更新，出了一个合同费礼包，导致合同费贬值严重，我的阵容在一天时间里涨了了<code>300w</code>，也就我在仅仅的一天里，赚到了<code>60%</code>,除去<code>25%</code>的交易费用，也要净赚<code>35%</code>，这可比A股刺激啊。<br><img src="http://olro3ke8a.bkt.clouddn.com/2K.PNG" alt="阵容截图"></p>
+</li>
+<li><p>当然还是打球。NBA有一种很吃香的球员那就是<code>3D</code>球员，例如<em>佛主</em>就是典型的<code>3D</code>球员。随着身体变得更强壮，再加上良好的防守习惯和态度，让我在野球场上成了一个优秀的防守者，可是越来越不自信的投篮，别说三分，就是中距离也都靠蒙，以前还能算个<code>2D</code>球员，这下好了，只剩一个<code>D</code>了。所以啊，整个NBA，<em>萝卜丝</em>(罗伯森)最像我了😂。可是，<em>萝卜</em>有瑞秋，而我的瑞秋呢？😂😂</p>
+</li>
+</ol>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>生活还要继续，我爱编程，编程使我快乐。好了，电竞事业繁忙，告辞。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2018/10/15/week-record-1014/" data-id="cjxs8ujhw001fp0j6bm2re4mb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2018/10/15/week-record-1014/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/10/15/week-record-1014/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-week-record-1002" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/10/02/week-record-1002/">每周一记(长假前夕)</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/10/02/week-record-1002/">
+            <time datetime="2018-10-02T03:19:59.000Z" itemprop="datePublished">2018-10-02</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/周记/">周记</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>您的一周六天班体验卡已到期，请尽快续费，否则将会被放假一周。</p>
+</blockquote>
+<h3 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h3><p>当开发阶段的工作暂告一段落，那么接下来的工作总会是比较轻松的，我也不例外。这个上六天班的一周，可以被划分为三个阶段，轻松-&gt;懵逼-&gt;抓狂。</p>
+<h4 id="轻松"><a href="#轻松" class="headerlink" title="轻松"></a>轻松</h4><p>每天除了等测试反馈bug然后再修改以外，在code review 中提到的代码风格的问题也需要修改，虽然有定制的团队代码规范约束，但是例如变量/属性命名，存在性检测，数据格式验证等都需要修改，按照每个人维持的代码量不一样，我这一改就是三天，并且还发现了一些低级错误，比如中文漏打/错打，生成表格列宽严重不足等。</p>
+<h4 id="懵逼"><a href="#懵逼" class="headerlink" title="懵逼"></a>懵逼</h4><p>接到新的需求，需要对某些业务做定制化的开发。刚刚拿到任务的时候简直是懵逼，第一眼看上去就不简单。深入Delphi代码了解，发现除了很难画出来的图，连表格都很难去完成。表格表头是动态生成的，需要通过接口去拿到数据生成百表头，再通过其它接口拿到数据，再渲染。限于在既有框架下开发存在许多限制，要实现这样的需求是比较困难的。原本可能只会花2小时的任务，半天才搞完。这里还得吐槽一句，接口返回的数据又是<code>columnX</code>的方式，对应几十个字段的数据没有对照表真的很难完成。</p>
+<h4 id="抓狂"><a href="#抓狂" class="headerlink" title="抓狂"></a>抓狂</h4><p>上班的最后一天，内心也变得浮躁起来，经过前一天的研究，今天的任务就是开发出图形，原本的框架当然不能使用了，已经想好了两种解决方案，使用<code>echarts</code>自定义系列或者使用<code>canvas</code>来自行绘制。</p>
+<p>首先尝试<code>echarts</code>，摸索了好久配合上demo终于完成了单元格的绘制，然后是多<code>xAxis</code>绘制，怎么尝试都无法达到想要的效果。因为在绘制等高等宽单元格的时候，<code>xAxis</code>的单位标度成了单元格宽度，其是<code>value</code>类型，而原本<code>xAxis</code>期望是使用时间作为<code>xAxis</code>，其类型是<code>category</code>，因此基于时间标度的折线图无法绘制成功。这几乎是一个无法跨越的问题，正当我准备舍弃这种方案的时候。突然想到，既然这条<code>xAxis</code>是无意义的，那么我们再配置一条<code>xAxis</code>，并且不渲染这条无意义的<code>xAxis</code>不就可以了。</p>
+<p>经过尝试，的确可以！接下来就是接入数据，绘制图的数据需要做整理，首先需要做二维数组的转置，去除无用数据。然后是进行标记，因为业务要求需要标记每天每个行业的涨跌幅和涨跌幅排名，来进行图的颜色渲染和富文本渲染。做到这里，差不多demo就完成了，效果与设想的差距不大，剩下的就是细节的完善了。真是令人抓狂的一天！</p>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li><p>转正答辩。虽然过来人都说走走过场，但真当落到自己头上的时候，还真是这样。可又不是这样，气氛非常融洽的一次答辩，到场的大佬都很nice，答辩完还在会议室里闲聊。后来发现架构部的老大去年就是面我的那位，瞬间无比亲切。又聊到目前的一些新技术在公司的运用，工程技术中心一直走在前。经过这次答辩，我突然又有点看到了未来。这是以前从来没有过的。</p>
+</li>
+<li><p>遇到一个问题。我在开发一个公共组件的时候，需要加一个<code>loading</code>的效果，使用了<code>Spin</code>这个组件作为容器，但是开发完成后发现并不能滚动。因为<code>Spin</code>容器的高度取决于其内容的高度，而内部内容容器的高度又是继承至外部容器，所以这里相互冲突了。要解决这个问题也很简单，我们仍然需要<code>Spin</code>组件成为一个容器，当时其不应该在组件最外层，而是只包括内容，这样一来，内容容器继承的高度就是外部容器的高度而不是<code>Spin</code>的高度，当内容高度超过内容容器高度的时候，就可以进行滚动。</p>
+</li>
+<li><p>学习TypeScript。一直在花时间学习<code>TS</code>，因为工作需要需要去理解源码和做定制化，除此之外，我想扩充自己的技能树。</p>
+</li>
+</ol>
+<h3 id="小尾巴"><a href="#小尾巴" class="headerlink" title="小尾巴"></a>小尾巴</h3><p>我从高中开始关注智能手机，对参数配置了如指掌，也因此选择了成为一名程序员；后来上了学，我关注电脑，无论是是笔记本还是PC，对电脑的配置也颇有见解。这些年来，找我推荐手机电脑的朋友真的不要太多。</p>
+<p>大四的时候，因为一档二手车节目关注汽车，目前对车型/配置/售价也是颇为了解，也会花时间去专研发动机/变速箱原理等。我在想，如果除了做程序员，我可能也会去修车？</p>
+<p>上班了，也开始关注楼市。虽然比起智能手机电脑，对于楼市的理解真是知之甚少，目前还在加深理解。</p>
+<p>人在不同阶段所关注的点也不一样，关注手机电脑我往往是有这个需求，而当没有这个需求的时候，这样的关注就会发生转移。从高中到步入社会，我的关注一直在变，所以在如今的这个阶段，需求不是那么不好满足的时候，能做的只有努力。</p>
+<p>废话说完后，匿。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2018/10/02/week-record-1002/" data-id="cjxs8ujhx001hp0j69d2kax54" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2018/10/02/week-record-1002/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/10/02/week-record-1002/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-week-record-0922" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -260,7 +561,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/22/week-record-0922/" data-id="cjxenqfel000y5gj6ju99u1zi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/22/week-record-0922/" data-id="cjxs8ujhs0018p0j6flmhghci" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -407,7 +708,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjxenqfen00135gj65ad3zcbn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/15/week-record-0915/" data-id="cjxs8ujhv001dp0j6cycrb49o" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -574,7 +875,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjxenqfek000w5gj6e4dsaai1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/08/week-record-0908/" data-id="cjxs8ujhq0015p0j6m4woa68t" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -732,7 +1033,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjxenqfex001j5gj64vcwjdyq" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/09/01/week-record-0901/" data-id="cjxs8ujhr0017p0j68wtm8vo5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -884,7 +1185,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjxenqff4001w5gj6c2sfhnah" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/26/week-record-0826/" data-id="cjxs8ujhn0010p0j63vh9bx4j" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1028,7 +1329,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjxenqfi5003q5gj61fgsvhla" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/08/18/周记2018mid/" data-id="cjxs8ujkf003qp0j6gti849u1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1194,7 +1495,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjxenqffr00355gj6933u81zr" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/07/31/第一个月/" data-id="cjxs8ujit0036p0j6e5j0c4e4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1343,7 +1644,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/06/30/尾巴/" data-id="cjxenqffg002j5gj62rrgrhyt" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/06/30/尾巴/" data-id="cjxs8ujii002mp0j6vonpvkfn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1421,301 +1722,6 @@
 
 
 
-    <article id="post-Hello-Goodbye-Hello" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/05/01/Hello-Goodbye-Hello/">Hello Goodbye &amp; Hello</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/05/01/Hello-Goodbye-Hello/">
-            <time datetime="2018-05-01T13:12:22.000Z" itemprop="datePublished">2018-05-01</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>5月1日，阴天，雾霾挺严重的。下午，戴着耳机，出门；傍晚，下起了雨，躲进快餐店；点了宫保鸡丁和土豆豆角，开始狼吞虎咽，然后，等着雨伞送到；离学校最后的一公里路程，需要十分钟。直到现在，12时，雨还在下，伴随着风。</p>
-</blockquote>
-<p>小长假的最后一天，也是五月的第一天。对啊，五月已经来了。</p>
-<p>打开网易云音乐，点开日推，第一首歌就是<code>《Hello Goodbye &amp; Hello》</code>，很早以前看过的番剧<code>《追逐繁星的孩子》</code>ED。此刻我正苦于构思一个标题，所以就用了这个歌名“你好，再见，再也不见”。</p>
-<p>在为数众多的看过的动画中，<code>《追逐繁星的孩子》</code>故事讲得不算好，但那句<em>原来是我太孤独</em>直戳内心深处。我想，我何尝不是这样呢，虽然性格不内向，容易和人打成一片，但我还是习惯一个人呆，去健身，躲在网吧打游戏。可我也挺怕一个人的，会因为一个人吃饭吃得特别快，走路也走得特别快，久而久之，给别人留下了不可接近的印象。</p>
-<p>五月带给我的印象里就是忙吧，无论是高中还是上了大学，所有的事情都会在五月变得忙碌起来。而这个五月，也就是现在，我却过得非常的悠闲，甚至有点百无聊赖。早早的做完毕业设计，我有很多时间去做很多做感兴趣的事。这样的日子，还会持续两个月。不知道是好是坏。</p>
-<p>我的生日一般都在六月，这个时候我呆都在学校，所以这么多年来，我都没怎么过过生日。高中的时候，有时候学习特别忙，都忘记了哪天是五月初三，每次都是妈妈打电话提醒我，让我吃顿好的；上了大学，我更不想让同学们知道我过生日，所以那天我很早就出门，找个自习室好好的学习一天。如果说要有什么不同，那一定是17岁那年，端午节。</p>
-<p>至于为什么不同，因为我收到了特别的礼物。为数不多的收到过的贺卡，学生时代追了个遍的小说，画得还算不错的画。</p>
-<p>去年寒假回去叔叔家把遗留在那里的高中记忆都翻了个遍，很可惜的是，贺卡不见了；而那本单行本也码在书堆中早已泛黄，我拿走了那本书，把它带在身边，就像那幅画一样。</p>
-<p>对于只会画条条框框的我，无法描述那幅画的内容，但站在一个观赏者的角度，还算可以把，仅此而已了。</p>
-<p>说起那幅画，我曾经给很多人看过，他们问我画的什么有什么含义，我总是说，我怎么知道啊，就是别人送的礼物而已。其实背后的故事我是知道的，那是我最珍贵的宝物，那是我的记忆啊。</p>
-<p>其实记忆才是是每个人最珍贵的宝物。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2018/05/01/Hello-Goodbye-Hello/" data-id="cjxenqfe000075gj6w8m5g4mb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2018/05/01/Hello-Goodbye-Hello/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/05/01/Hello-Goodbye-Hello/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-前端路由拦截和http响应拦截" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/05/前端路由拦截和http响应拦截/">前端路由拦截和http响应拦截</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/05/前端路由拦截和http响应拦截/">
-            <time datetime="2018-04-05T05:12:41.000Z" itemprop="datePublished">2018-04-05</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Vue/">Vue</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="问题由来"><a href="#问题由来" class="headerlink" title="问题由来"></a>问题由来</h3><p>最近在制作毕业设计的时候，遇到一个问题，那就是用户的访问控制。简单点来说，就是未登录用户只能访问某些特定的页面、API。最初我的想法是用户登录后返回一个凭证，用户以后的每次http请求都带上该凭证，进行验证，只有验证成功才能继续请求。然后在每个<code>页面</code>进行判断，如果用户是未登录或者凭证失效，则进行相应的提示和路由跳转。刚开始的时候，这个方法是完全可行的，但是在开发过程中，随着业务逻辑变得复杂、页面增多，重复代码太多，这样的方式也许并不合适。</p>
-<h3 id="如何解决"><a href="#如何解决" class="headerlink" title="如何解决"></a>如何解决</h3><p>首先是后端，我使用了<code>jsonwebtoken</code>，用户登录成功都会生成一个具有一定时效的    <code>token</code>，这个token会发回到客户端，并且接下来每次发起http请求，都在http头的<code>authorization</code>字段带上这个<code>token</code>。我这里使用了<a href="https://www.npmjs.com/package/axios" target="_blank" rel="noopener">axios</a>这个http请求库，只需要在拿到<code>token</code>后：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axios.defaults.headers.common.authorization = <span class="string">`Bearer <span class="subst">$&#123;token&#125;</span>`</span>;</span><br></pre></td></tr></table></figure></p>
-<p>就可以了。</p>
-<p>由于在开发过程中涉及到跨域，这里我使用CORS来解决：通过设置一系列<code>Access-Control-Allow-*</code>响应头进行访问控制，上面提到了在请求头的<code>authorization</code>字段中设置token，因此发出的请求都不是简单请求，所以注意在每次发起http请求时，就会自动发起一个<code>OPTIONS</code>请求。</p>
-<p>我服务器端用的是<code>Express</code>框架，我们需要写一个中间件来处理每一个请求。处理逻辑为：针对每个<code>OPTIONS</code>请求，直接放行；对于某些请求，如果在白名单中(例如登录、注册等不需要验证的路由)，放行；对于其他请求，我们拿到其携带的token，并且进行验证，如果验证通过，放行，否则结束请求，返回未授权。具体的代码如下，这里我使用<code>jsonwebtoken</code>这个package，用于生成<code>token</code>和进行<code>token</code>验证。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'methods'</span> ,req.method);</span><br><span class="line">  <span class="keyword">if</span>( req.method === <span class="string">'OPTIONS'</span> ) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'option请求直接通过'</span>);</span><br><span class="line">    next();</span><br><span class="line">  &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 除去某些特定的API，其余的都做token的验证</span></span><br><span class="line">    <span class="keyword">let</span> &#123; path &#125; = req;</span><br><span class="line">    <span class="keyword">if</span>(path === <span class="string">'/api/users/auth'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/auth_vc'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/check_id_validation'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/regist'</span></span><br><span class="line">      || path === <span class="string">'/api/users/send_reset_email'</span></span><br><span class="line">      || path === <span class="string">'/api/users/reset_password'</span></span><br><span class="line">    ) </span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'本次请求不需要验证权限'</span>);</span><br><span class="line">      next();</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> token = req.headers.authorization ? req.headers.authorization.split(<span class="string">' '</span>)[<span class="number">1</span>] : <span class="string">''</span>;</span><br><span class="line">      req.token = token;</span><br><span class="line">      jwt.verify(token, KEY, (err, decoded) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span>(err) &#123;</span><br><span class="line">          res.status(<span class="number">401</span>).json(&#123; <span class="attr">status</span>: <span class="number">3</span>, <span class="attr">error</span>: <span class="string">'用户认证失败'</span>, <span class="attr">data</span>: <span class="string">''</span> &#125;)</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'验证权限通过'</span>);</span><br><span class="line">          req.decoded = decoded;</span><br><span class="line">          next();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>然后是前端，我想如果能像后端拦截每个请求一样，写一个逻辑拦截所有的相应，并进行处理，信号，<code>axios</code>自带拦截器，我们只需要写我们的逻辑就可以了。我的想法是，拦截每一个相应，如果其状态码是<code>401</code>，那么久提示<code>token</code>失效，并且进行路由跳转。<br>以<code>vue-cli</code>构建的应用为例，在<code>main.js</code>中，下面是实现：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.response.use(<span class="function"><span class="params">data</span> =&gt;</span> data, (error) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span>(error.response) &#123;</span><br><span class="line">    <span class="keyword">switch</span>(error.response.status) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">401</span>: &#123;</span><br><span class="line">        localStorage.removeItem(<span class="string">'token'</span>);</span><br><span class="line">        router.replace(&#123;</span><br><span class="line">          path: <span class="string">'/auth'</span>,</span><br><span class="line">          query: &#123;<span class="attr">redirect</span>: router.currentRoute.fullPath&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>值得说明的是，如果我们在某个访问的过程中，<code>token</code>失效，我们需要跳转到登录页面，但是想登录过后再跳转回来，所以这里在进行路由跳转的时候，我设置了一个参数, <code>redirect</code>，表示传入当前的路径，当我们登录成功后，在跳转回来即可。</p>
-<p>最后是路由拦截，这里我使用了<code>vue-router</code>，其实<code>vue-router</code>的路由对象提供一个钩子函数<code>beforeEach</code>，其会在每一次路由跳转之前，执行这个函数，我们就在这里进行路由拦截。原理很简单，使用一个标志位标明每个路由是否需要用户权限，如果需要的话，我们检查保存在本地的凭证，一般存在<code>localStorage</code>中，如果不含凭证就直接跳转到登录页面。</p>
-<p>好了，找到根路由文件，添加：</p>
-<pre><code class="javascript">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span> , next</span>) =&gt;</span> {
-  <span class="keyword">if</span>(to.matched.some(<span class="function"><span class="params">res</span> =&gt;</span> res.meta.requireAuth)) {
-    <span class="keyword">if</span>(localStorage.getItem(<span class="string">'token'</span>)) {
-      next();
-    }<span class="keyword">else</span> {
-      next({
-        path: <span class="string">'/auth'</span>,
-        query: { <span class="attr">redirect</span>: to.fullPath }
-      })
-    }
-  }<span class="keyword">else</span> {
-    next();
-  }
-})
-
-</code></pre>
-<p>这里要注意的是，<code>res.meta.requireAuth</code>是你自己在声明路由的时候自定义的。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>差不多，这算是一个比较好的解决方案了。但是有这样一个情况：如果用户凭证有效期是1小时，那么如果我浏览网页超过一个小时了，凭证还是保存在本地的，当我们进行路由跳转的时候，并没有验证凭证是否失效，所以还是会进行路由跳转。这里不用担心，因为进入进入了一个路由后，一旦发起http请求，<code>token</code>失效，http相应拦截就会生效，进而跳转到登录页面。</p>
-<p>加油！</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="cjxenqff900255gj6lwg2nia2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/">下一页 &raquo;</a>
     </nav>
@@ -1730,7 +1736,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
         </div>
     </div>
 
@@ -1739,7 +1745,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -1748,7 +1754,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.67px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.33px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 13.33px;">Webpack</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 16.67px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 13.33px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 13.33px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.67px;">计算机网络</a>
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.43px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.57px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 14.29px;">Webpack</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 17.14px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15.71px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 12.86px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 12.86px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.43px;">计算机网络</a>
         </div>
     </div>
 
