@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>从globalCompositeOperatio到蒙版弹幕 | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="从globalCompositeOperation到蒙版弹幕globalCompositeOperation属性Canvas 有一个不那么常用的属性globalCompositeOperation，作用是设置如何将一个源图像绘制到目标图像上。该如何理解？ 在使用Canvas绘制图像时，我们可以多次调用ctx.drawImage()或者是其它绘图函数ctx.fillRect()等进行绘制。而glob">
+<meta name="keywords" content="canvas">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从globalCompositeOperatio到蒙版弹幕">
+<meta property="og:url" content="http://yoursite.com/2019/08/07/barrage/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="从globalCompositeOperation到蒙版弹幕globalCompositeOperation属性Canvas 有一个不那么常用的属性globalCompositeOperation，作用是设置如何将一个源图像绘制到目标图像上。该如何理解？ 在使用Canvas绘制图像时，我们可以多次调用ctx.drawImage()或者是其它绘图函数ctx.fillRect()等进行绘制。而glob">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2019/08/07/barrage/sourceover.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/08/07/barrage/sourcein.bmp">
+<meta property="og:image" content="http://yoursite.com/2019/08/07/barrage/source.bmp">
+<meta property="og:image" content="http://yoursite.com/2019/08/07/barrage/result.bmp">
+<meta property="og:image" content="http://yoursite.com/2019/08/07/barrage/flower.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/08/07/barrage/flower1.png">
+<meta property="og:image" content="http://yoursite.com/2019/08/07/barrage/maskdemo.bmp">
+<meta property="og:updated_time" content="2019-08-07T12:33:25.749Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从globalCompositeOperatio到蒙版弹幕">
+<meta name="twitter:description" content="从globalCompositeOperation到蒙版弹幕globalCompositeOperation属性Canvas 有一个不那么常用的属性globalCompositeOperation，作用是设置如何将一个源图像绘制到目标图像上。该如何理解？ 在使用Canvas绘制图像时，我们可以多次调用ctx.drawImage()或者是其它绘图函数ctx.fillRect()等进行绘制。而glob">
+<meta name="twitter:image" content="http://yoursite.com/2019/08/07/barrage/sourceover.jpg">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                61
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                14
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-barrage" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            从globalCompositeOperatio到蒙版弹幕
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/08/07/barrage/">
+            <time datetime="2019-08-07T12:29:05.000Z" itemprop="datePublished">2019-08-07</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/canvas/">canvas</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="从globalCompositeOperation到蒙版弹幕"><a href="#从globalCompositeOperation到蒙版弹幕" class="headerlink" title="从globalCompositeOperation到蒙版弹幕"></a>从<code>globalCompositeOperation</code>到<strong>蒙版弹幕</strong></h1><h2 id="globalCompositeOperation属性"><a href="#globalCompositeOperation属性" class="headerlink" title="globalCompositeOperation属性"></a><code>globalCompositeOperation</code>属性</h2><p><em>Canvas</em> 有一个不那么常用的属性<code>globalCompositeOperation</code>，作用是<strong>设置如何将一个源图像绘制到目标图像上</strong>。该如何理解？</p>
+<p>在使用<em>Canvas</em>绘制图像时，我们可以多次调用<code>ctx.drawImage()</code>或者是其它绘图函数<code>ctx.fillRect()</code>等进行绘制。而<code>globalCompositeOperation</code>属性就指定了当前将要绘制的图像在画布上如果和已绘制的图形重合该怎样显示。该属性有多个可选值：</p>
+<ul>
+<li><code>source-over</code>默认值，目标图像重合部分将显示在上方(源图像被覆盖)。</li>
+<li><code>source-in</code>目标图像中显示源图像。源图像只显示重合的部分，目标图像透明。</li>
+<li><code>source-out</code>在目标图像之外显示源图像。只会显示非重合的部分，目标图像透明。</li>
+<li><code>lighter</code> 显示源图像+目标图像。</li>
+<li><code>copy</code> 只显示源图像。</li>
+<li><code>xor</code> 亦或。</li>
+<li><code>destination-*</code></li>
+</ul>
+<p>例如：当设置属性值为<code>source-over</code>时，下例将会显示为：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">'canvas'</span>);</span><br><span class="line"><span class="keyword">const</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line">ctx.fillStyle = <span class="string">'red'</span>;</span><br><span class="line">ctx.fillRect(<span class="number">10</span>, <span class="number">10</span>, <span class="number">80</span>, <span class="number">40</span>);</span><br><span class="line">ctx.globalCompositeOperation = <span class="string">'source-over'</span>;</span><br><span class="line">ctx.fillStyle = <span class="string">'green'</span>;</span><br><span class="line">ctx.fillRect(<span class="number">20</span>, <span class="number">20</span>, <span class="number">80</span>, <span class="number">40</span>);</span><br></pre></td></tr></table></figure></p>
+<p><img src="sourceover.jpg" alt="source-over"></p>
+<p>可以看到，后绘制的绿色图像(源图像)和先绘制的红色图像(目标图像)发生了重叠，而源图像在层叠上层。</p>
+<p>再来看看属性值为<code>source-in</code>的情况：</p>
+<p><img src="sourcein.bmp" alt="source-in"></p>
+<p>源图像和目标图像发生了重合，结果只显示了源图像的重合部分。</p>
+<h2 id="蒙版弹幕"><a href="#蒙版弹幕" class="headerlink" title="蒙版弹幕"></a><strong>蒙版弹幕</strong></h2><p>不考虑弹幕内容、显示等因素，使用<code>Canvas</code>实现弹幕就是一个不断擦除和绘制的过程，弹幕本身是绘制在画布上的，和内容(视频、图片等)是分层显示的，并无直接关系。</p>
+<p><code>Canvas</code>弹幕且不论性能，如果弹幕过多往往会挡住内容本身，体验并不好。<em>B站</em>的弹幕使用了名为<strong>蒙版弹幕</strong>的技术，这种技术可以让弹幕不遮挡内容主体。这里不讨论<em>B站</em>的<strong>蒙版弹幕</strong>是如何实现的，先来看看<code>CSS</code>中一个名叫<code>mask</code>的属性。</p>
+<p><code>mask</code>属性用来设置<strong>遮罩</strong>，那么何为遮罩呢？简单点来说就是使用一张图片来遮住另一张图片，并且如果用于遮罩的图片包含透明的部分，透明部分将会被遮住，非透明部分将会显示为被遮罩图片的内容。</p>
+<p><code>mask</code>的内容到此为止，是不是和<code>globalCompositeOperation = &#39;source-in&#39;</code>很像？其实我认为不是很像。</p>
+<p>修改上面的例子，如果将两个图形绘制的区域完全重合，那么设置<code>globalCompositeOperation = &#39;source-in&#39;</code>后，不出意外，源图像将会完全覆盖目标图像。</p>
+<p>如果我们把目标图像和源图像均换成两张等宽高的图片，那么源图片将会完全遮挡目标图片。</p>
+<p>如果目标图像和源图像存在透明区域(<em>RGBA</em> 中 <em>Alpha</em> 为<code>0</code>的区域)，那么源图像会完全遮住目标图像，但是目标图像的透明区域仍然是透明的。</p>
+<p>如果反向抠图后，目标图像只有主体是透明的，那么源图像将会覆盖目标图像的非主体区域，主体区域由于是透明的，无能为力。</p>
+<p>把目标图像换成蒙版图片，把源图像换成包含弹幕的图像，那么，蒙版图像透明区域不会被覆盖。</p>
+<p>此时再把覆盖后的图片渲染在<code>Canvas</code>上，大功告成。</p>
+<p>回顾一下<code>globalCompositeOperation = &#39;source-in&#39;</code>的解释：<br><strong>目标图像中显示源图像。源图像只显示重合的部分，目标图像透明。</strong><br>目标图像会被完全覆盖，而源图像只显示重合的部分，由于透明区域并不属于目标图像，所以在透明区域并不会显示源图像。</p>
+<p>先来看一个例子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ctx.fillStyle = <span class="string">'red'</span>;</span><br><span class="line">ctx.beginPath();</span><br><span class="line">ctx.moveTo(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">ctx.lineTo(<span class="number">0</span>, <span class="number">150</span>);</span><br><span class="line">ctx.lineTo(<span class="number">150</span>, <span class="number">0</span>);</span><br><span class="line">ctx.fill();</span><br><span class="line">ctx.moveTo(<span class="number">150</span>, <span class="number">0</span>);</span><br><span class="line">ctx.lineTo(<span class="number">300</span>, <span class="number">150</span>);</span><br><span class="line">ctx.lineTo(<span class="number">300</span>, <span class="number">0</span>);</span><br><span class="line">ctx.fill();</span><br></pre></td></tr></table></figure>
+<p>在<code>300</code>*<code>150</code>的画布上先绘制两个红色的三角形，作为目标图像，此时画布中间的区域是透明的。</p>
+<p><img src="source.bmp" alt="目标图像"></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ctx.globalCompositeOperation = <span class="string">'source-in'</span>;</span><br><span class="line">ctx.fillStyle = <span class="string">'green'</span>;</span><br><span class="line">ctx.fillRect(<span class="number">0</span>, <span class="number">0</span>, <span class="number">300</span>, <span class="number">150</span>);</span><br></pre></td></tr></table></figure>
+<p>然后再绘制一个充满画布的矩形覆盖到目标图像上，此时的结果是这样的：</p>
+<p><img src="result.bmp" alt="覆盖结果"></p>
+<p>目标图像(两个红色的三角形)已经被完全覆盖了，而透明区域仍然透明。</p>
+<h2 id="简易实现"><a href="#简易实现" class="headerlink" title="简易实现"></a>简易实现</h2><p>为了实现<strong>蒙版弹幕</strong>，需要准备：</p>
+<ul>
+<li>原版图像</li>
+<li>蒙版图像</li>
+<li>Canvas弹幕</li>
+</ul>
+<p>这里原版图像使用下面这张<strong>菊花图</strong>：</p>
+<p><img src="flower.jpg" alt="原版图片"></p>
+<p>经过抠图(主体变成透明)，生成的蒙版图片如下：</p>
+<p><img src="flower1.png" alt="蒙版图像"></p>
+<p>弹幕系统的实现不做过多的介绍，这里只关注绘制，和上例的绘制过程一致，首先绘制蒙版图像，再绘制弹幕内容到蒙版上进行覆盖。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">drawBarrages() &#123;</span><br><span class="line">  <span class="keyword">let</span> context = <span class="keyword">this</span>.useMask ? <span class="keyword">this</span>.bgCtx : <span class="keyword">this</span>.ctx;</span><br><span class="line">  <span class="keyword">if</span>(<span class="keyword">this</span>.barrageList.length) &#123;</span><br><span class="line">    context.clearRect(<span class="number">0</span>, <span class="number">0</span>, <span class="keyword">this</span>.width, <span class="keyword">this</span>.height);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">let</span> i=<span class="number">0</span>; i &lt; <span class="keyword">this</span>.barrageList.length; i++) &#123;</span><br><span class="line">      <span class="comment">// 此时弹幕将要移除画布</span></span><br><span class="line">      <span class="keyword">let</span> barrage = <span class="keyword">this</span>.barrageList[i];</span><br><span class="line">      <span class="keyword">if</span>(barrage.left + barrage.width &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.barrageList.splice(i, <span class="number">1</span>); <span class="comment">// 移除该弹幕</span></span><br><span class="line">        i -= <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span>((barrage.left + barrage.width+<span class="number">600</span>) &lt; <span class="keyword">this</span>.width &amp;&amp; barrage.isChecked === <span class="literal">false</span>) &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 此时已经完全出跑道并且还没有发起检查。</span></span><br><span class="line">        <span class="keyword">let</span> index = vm.statics.findIndex(<span class="function">(<span class="params">item</span>) =&gt;</span> item === barrage.top);</span><br><span class="line">        barrage.isChecked = <span class="literal">true</span>;</span><br><span class="line">        used[index] = <span class="number">0</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      barrage.left = barrage.left - barrage.offset;</span><br><span class="line">      <span class="keyword">this</span>.drawOneBarrage(barrage);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// #1 擦除上次绘制</span></span><br><span class="line">    <span class="keyword">this</span>.ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, <span class="keyword">this</span>.width, <span class="keyword">this</span>.height);</span><br><span class="line">    <span class="comment">// #2 绘制蒙版图像</span></span><br><span class="line">    <span class="keyword">this</span>.ctx.putImageData(<span class="keyword">this</span>.maskImage, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// #3 设置compose类型</span></span><br><span class="line">    <span class="keyword">this</span>.ctx.globalCompositeOperation = <span class="string">'source-in'</span>;</span><br><span class="line">    <span class="comment">// #4 绘制弹幕</span></span><br><span class="line">    <span class="keyword">this</span>.ctx.drawImage(<span class="keyword">this</span>.bgCanvas, <span class="number">0</span>, <span class="number">0</span>, <span class="keyword">this</span>.width, <span class="keyword">this</span>.height);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>.stop = requestAnimationFrame(<span class="keyword">this</span>.drawBarrages.bind(<span class="keyword">this</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码是完整绘制一帧的逻辑，跳过绘制弹幕文本的循环，关注整体绘制和层叠逻辑。其中绘制总分为四步，擦除上一帧结果，绘制蒙版(作为目标图像)，设置<code>compose</code>类型为<code>source-in</code>，绘制弹幕(作为源图像)。</p>
+<p>注意到，蒙版图像使用<code>ctx.putImageData</code>绘制，这表示蒙版图像是<code>ImageData</code>类型，可以通过<code>ctx.getImageData()</code>拿到(需先绘制在画布上)，这里也可以<code>png</code>图片作为蒙版图片直接绘制在画布上。</p>
+<p><code>this.ctx.drawImage(this.bgCanvas, 0, 0, this.width, this.height)</code>用于绘制弹幕，<code>this.bgCanvas</code>是绘制了弹幕文本的<code>Canvas</code>画布，这里使用了<em>离屏Canvas</em> 技术，该画布并不会单独绘制在屏幕上。</p>
+<p>绘制结果如下图：</p>
+<p><img src="maskdemo.bmp" alt="弹幕绘制结果"></p>
+<p>可以看到，弹幕并没有遮挡我们的主体(<strong>菊花</strong>)，实现了<strong>蒙版弹幕</strong>的预期效果。</p>
+<h2 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h2><p>我们的确实现了蒙版弹幕，其主体是使用<em>Canvas</em>绘制蒙版图片和弹幕在同一张画布上，并且设置<code>globalCompositeOperation = &#39;source-in&#39;</code>来达到弹幕完全覆盖蒙版的效果。</p>
+<p>简易实现的内容主体是一张静态的图片，如果要实现视频<strong>蒙版弹幕</strong>效果，需要提供每一帧的蒙版图像。在渲染某一帧时，最终的结果使用该帧的蒙版图像和实时弹幕组合而成。</p>
+<p>其实<strong>蒙版弹幕</strong>的关键是提供蒙版图像，对于单个图片还好，我们可以针对这张图片单独制作一张蒙版图像。但是对于视频<strong>蒙版弹幕</strong>，我们需要逐帧生成蒙版图像，工作量之大可想而知。并且如何生成蒙版图像，如何标注主体是关键中的关键。这一部分理应借助机器学习，进行图像识别和分割。</p>
+<p>一个可行的办法是事先针对每个视频，先逐帧生成蒙版图像，在进行流媒体播放的时候同时传递蒙版图像，最终在前端进行组装，完成视频<strong>蒙版弹幕</strong>。</p>
+<p>完。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="cjz18hg4s000el8j6onwr28x0" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/08/07/barrage/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/08/07/barrage/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2019/07/07/hooks/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">记一次React Hooks的使用</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.43px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.57px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 14.29px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 17.14px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15.71px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 12.86px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 12.86px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.43px;">计算机网络</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2019/08/07/barrage/';
+        
+        this.page.identifier = 'barrage';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
