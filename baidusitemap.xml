@@ -4,6 +4,23 @@
 
     
   <url>
+    <loc>http://yoursite.com/2019/08/21/polyfill/</loc>
+    <lastmod>2019-08-21T11:37:27.795Z</lastmod>
+    <data>
+        <display>
+        <title>从@babel/preset-env谈多浏览支持构建</title>
+        <pubTime>2019-08-21T11:35:57.000Z</pubTime>
+        
+        <tag>Webpack</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://yoursite.com/2019/08/07/barrage/</loc>
     <lastmod>2019-08-07T12:39:26.524Z</lastmod>
     <data>
