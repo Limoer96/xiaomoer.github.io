@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                62
+                38
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                14
+                9
                 <span>标签</span>
             </div>
         </div>
@@ -207,7 +207,7 @@
 
             
             <section id="main">
-    <article id="post-从decorator到Mobx" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-使用webpack-npm进行React开发" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -215,7 +215,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/08/02/从decorator到Mobx/">从Decorator到Mobx</a>
+            <a class="article-title" href="/2016/11/19/使用webpack-npm进行React开发/">使用webpack+npm进行React开发</a>
         </h1>
     
 
@@ -224,8 +224,283 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/08/02/从decorator到Mobx/">
-            <time datetime="2017-08-02T06:03:25.000Z" itemprop="datePublished">2017-08-02</time>
+        <a href="/2016/11/19/使用webpack-npm进行React开发/">
+            <time datetime="2016-11-19T08:17:52.000Z" itemprop="datePublished">2016-11-19</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React/">React</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>这一期的知识我早就想写了，因为在学习React之初，心里面就有很多疑问，当然其中一个就是：我能不能不把所有的Component写在一个文件中，当然后面没有关注这样的问题，直到前些日子学习Flux才重视起来，恰逢周六，在这里写一篇，关于如何使用webpack+npm进行React开发。</p>
+<h2 id="webpack–脚手架工具而已"><a href="#webpack–脚手架工具而已" class="headerlink" title="webpack–脚手架工具而已"></a>webpack–脚手架工具而已</h2><p>在这里我并不打算详细介绍webpack如何使用，webpack只是一个前端脚手架工具而已，在进行React开发的时候，我们只是使用babel转换ES6的代码而已，但是webpack也是一个好用而简单的打包工具，想了解更多关于webpack的知识，点击<a href="http://webpackdoc.com/index.html" target="_blank" rel="noopener">这里</a>。<br>好吧，正式开始吧！<br>首先我们需要安装node 和 npm, 因为webpack也是依赖node的，安装好node和npm后我们就可以开始安装webpack了，首先安装webpack：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g webpack</span><br></pre></td></tr></table></figure></p>
+<p>当然这里你也可以不全局安装，使用<code>npm init</code>初始化一个package.json文件，使用<code>npm install --save webpack</code>安装。</p>
+<p>这里我将会跳过使用命令进行打包，直接进到使用配置管理文件就好了，如果想更深层次的了解webpack，点击上面的介绍咯(真的很详细)。</p>
+<p>首先介绍一下这个配置文件，默认命名为webpack.config.js，其是一个node的文件，就像如下的这个样子。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">	</span><br><span class="line">	<span class="built_in">module</span>.exports = &#123;</span><br><span class="line">		entry: <span class="string">'./base.jsx'</span>,</span><br><span class="line">    output: &#123;</span><br><span class="line">        filename: <span class="string">'./output.js'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="built_in">module</span>: &#123;</span><br><span class="line">    	loaders:[</span><br><span class="line">    		&#123;</span><br><span class="line">            test: <span class="regexp">/\.jsx?$/</span>,</span><br><span class="line">            exclude: <span class="regexp">/(node_modules|bower_components)/</span>,</span><br><span class="line">            loader: <span class="string">'babel'</span>,</span><br><span class="line">            query: &#123;</span><br><span class="line">                presets: [<span class="string">'es2015'</span>,<span class="string">'react'</span>]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    	]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>好吧，介绍一下上面的这个文件到底描述了些什么，首先我们输出了一个配置对象，<code>entry</code>定义了要引入的文件，当然如果需要引入多个文件的话可以使用一个数组。<code>output</code>顾名思义定义要输出的文件名，这里可以把它理解为打包好存放的文件。<br>最后，下面的这个<code>module</code>属性用于定义加载器，比如我们需要使用babel来吧jsx转为普通的js代码，test属性表示给所有匹配的jsx执行解析，<br>exclude表示将会不解析node模块和通过bower安装的模块。loader表示使用解析工具，query则表示的扩展参数，这里表示应用es6和react的解析规则。<br>好了，对示例文件的简单介绍就告一段路，当然还有一个属性plugins，用于使用插件，有关插件的使用请移至官方文档。</p>
+<h2 id="搭建react的开发环境"><a href="#搭建react的开发环境" class="headerlink" title="搭建react的开发环境"></a>搭建react的开发环境</h2><p>细心的童鞋可以发现了，上面我演示的配置文件就是一个用于开发react的基本配置文件。好吧，直接开始，首先安装react，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install --save react</span><br><span class="line">npm install --save react-dom</span><br></pre></td></tr></table></figure></p>
+<p>接着安装babel用于解析jsx和es6，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install --save babel-loader</span><br></pre></td></tr></table></figure></p>
+<p>最后安装一些解析规则<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install babel-plugin-transform-es2015-arrow-functions --save-dev</span><br><span class="line">npm install babel-preset-es2015 --save-dev</span><br><span class="line">npm install babel-preset-react</span><br></pre></td></tr></table></figure></p>
+<p>到这里，我们就安装完了开发react所需要的模块了，好吧，直接进入最后一步，在这里我将写一个和小很小的例子</p>
+<h2 id="一个栗子"><a href="#一个栗子" class="headerlink" title="一个栗子"></a>一个栗子</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;render&#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InputComp</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span></span>&#123;</span><br><span class="line">	<span class="keyword">constructor</span>(props)&#123;</span><br><span class="line">		<span class="keyword">super</span>(props);</span><br><span class="line">		<span class="keyword">this</span>.handleChange = <span class="keyword">this</span>.handleChange.bind(<span class="keyword">this</span>);</span><br><span class="line">		<span class="keyword">this</span>.state = &#123;</span><br><span class="line">			value: <span class="string">''</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	handleChange(e)&#123;</span><br><span class="line">		<span class="keyword">var</span> newvalue = e.target.value.trim();</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;<span class="attr">value</span>: newvalue&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;input ref=<span class="string">"name"</span> type=<span class="string">"text"</span> defaultValue=&#123;<span class="keyword">this</span>.props.tag&#125; onChange=&#123;<span class="keyword">this</span>.handleChange&#125;/&gt;</span><br><span class="line">				&lt;p&gt;&#123;<span class="keyword">this</span>.state.value&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">InputComp.propTypes = &#123;</span><br><span class="line">	tag: React.PropTypes.string.isRequired</span><br><span class="line">&#125;</span><br><span class="line">InputComp.defaultProps = &#123;</span><br><span class="line">	tag: <span class="string">'输入点什么东西吧！'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> tag = <span class="string">'请输入'</span>;</span><br><span class="line">render(<span class="xml"><span class="tag">&lt;<span class="name">InputComp</span> /&gt;</span>,document.getElementById('app'));</span></span><br></pre></td></tr></table></figure>
+<p>上面的小例子来源于react首页上面的一个例子，这里使用react的写法，对es6不是很了解的童鞋可以点<a href="http://es6.ruanyifeng.com/" target="_blank" rel="noopener">这里</a>,关于适用ES5开发react和使用es6开发有什么区别，可以看我的上一篇博客，这里就不做过多的介绍，<br>接下来，使用webpack进行打包就好了，使用上面举例的config文件，运行命令<code>webpack</code>就可以了，然后将输出文件引入到html文件中就可以看到效果了，当然如果你不想每一次修改都运行一遍命令的话那就使用监听更新模式，运行<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">webpack --progress --watch</span><br></pre></td></tr></table></figure></p>
+<p>当你修改完文件后，其会监听到文件的改变而做出增量的修改打包（当然第一次还是得手动打包）</p>
+<h2 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h2><p>写到这里，这篇文章就算完了，当你一步步完成上面的步骤，你就搭建了一个十分简陋的React开发环境，这里所说的的是简陋，我并没有加载对css文件的打包，这里大家可以根据自己的需求添加不同的loader来完成。作为一个React的初学者，感觉React这一个体系是十分庞大的，庞大到学习React一个多月仍然觉得力不从心，作为一个大三孩纸，每天被上不完的专业课实验课所压着，抽出来学习的时间并不多，再有自身比较懒惰所以…<br>好吧，不多说了，好好努力吧，毕竟路都是自己选的。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/" data-id="ck00osj9d001tacj6hove6u4q" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/11/19/使用webpack-npm进行React开发/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-使用ES6语法写React" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2016/11/15/使用ES6语法写React/">使用ES6语法写React</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2016/11/15/使用ES6语法写React/">
+            <time datetime="2016-11-15T11:30:52.000Z" itemprop="datePublished">2016-11-15</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React/">React</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><blockquote>
+<p>最近在学习Redux，不可避免使用npm + webpack的方式来写React Component，由于不是很熟悉ES6踩了很多坑，在这里作为笔记写下来，供以后回顾。 </p>
+</blockquote>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><p>惯例，先写一个例子吧<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">	<span class="keyword">import</span> React, &#123; Component &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line">	<span class="keyword">import</span> &#123; PropTypes &#125; <span class="keyword">from</span> <span class="string">'prop-types'</span>;</span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">class</span> <span class="title">InputComp</span> <span class="keyword">extends</span> <span class="title">Component</span></span>&#123;</span><br><span class="line">	<span class="keyword">constructor</span>(props)&#123;</span><br><span class="line">		<span class="keyword">super</span>(props);</span><br><span class="line">		<span class="keyword">this</span>.state = &#123;</span><br><span class="line">			name: <span class="string">''</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	handleChange = <span class="function">(<span class="params">e</span>) =&gt;</span>&#123;</span><br><span class="line">		<span class="keyword">var</span> newvalue = e.target.value.trim();</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;[e.target.name]: newvalue&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">const</span> &#123; value &#125; = <span class="keyword">this</span>.state; </span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;input name=<span class="string">"name"</span> type=<span class="string">"text"</span> value=&#123;value&#125; defaultValue=&#123;<span class="keyword">this</span>.props.tag&#125; onChange=&#123;<span class="keyword">this</span>.handleChange&#125;/&gt;</span><br><span class="line">				&lt;p&gt;&#123;value&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">InputComp.propTypes = &#123;</span><br><span class="line">	tag: PropTypes.string.isRequired</span><br><span class="line">&#125;</span><br><span class="line">InputComp.defaultProps = &#123;</span><br><span class="line">	tag: <span class="string">'输入点什么东西吧！'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面是使用ES6语法写的一个简单的Component，有过ES6基础的同学对<code>class</code>, ‘extends’关键字等不会陌生，简单来说，这算是js的语法糖了吧。<br>组件是一个自定义的js对象，在es5中使用React.createClass();在es6中必须继承React.component。</p>
+<p>上面的小例子没什么特别的，我们只需要注意两点就好了：<br>对于props,我们不能使用getDefaultProps()来添加默认的props，在ES6中有一个属性defalutProps,同理属性校验器propTypes,我们也必须写在外面，内容都和以前一样。也可以把这两个属性都写在’类’里面，使用static关键字申明.<br>对于state,我们不能使用getInitialState()来设置state的初始值，转而在构造器中使用state属性设置值即可。<br>对于事件而言，this指向的是当前创建的Component对象，所以需要手动绑定。<br>还有一些其他的差别，比如es6支持解构等<br>好吧，简单的就写在这里了</p>
+<blockquote>
+<p>好忙好忙，语言都没办法组织了!<br>加油！</p>
+</blockquote>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2016/11/15/使用ES6语法写React/" data-id="ck00osj8z0013acj63oux02x0" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2016/11/15/使用ES6语法写React/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/11/15/使用ES6语法写React/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-JS定时器知多少" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2016/11/06/JS定时器知多少/">JS定时器知多少</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2016/11/06/JS定时器知多少/">
+            <time datetime="2016-11-06T11:36:11.000Z" itemprop="datePublished">2016-11-06</time>
         </a>
     </div>
 
@@ -245,61 +520,16 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <blockquote>
-<p>最近在开发一款视频编辑器，其中就用到了Mobx作为状态管理工具。Mobx中很重要的概念例如可观察(observable)的状态，可计算(computed)的值都用到了decorator(当然在使用Mobx时可以不用)。Decorator作为ES7引入的新特性，用于给类/属性添加新行为。对于不少初学者而言，可能对其并不是很了解，所以在这里从装饰器开始，聊聊我对Decorator和Mobx的理解。如果你正在学习Mobx，希望能对你快速上手Mobx能有所帮助。</p>
-</blockquote>
-<h3 id="先说装饰器-Decorator"><a href="#先说装饰器-Decorator" class="headerlink" title="先说装饰器(Decorator)"></a>先说装饰器(Decorator)</h3><p>装饰器是ES7中引入的，其目的在于修改类/方法的行为。例如我们可以在不修改“类”的情况下为其增加新的功能。</p>
-<p>例如：我们定义了一个学生“类”，其中有<code>name</code>，<code>age</code>两个属性，以及<code>showInfo</code>一个方法。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">	<span class="keyword">constructor</span>(name, age) &#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">		<span class="keyword">this</span>.age = age;</span><br><span class="line">	&#125;</span><br><span class="line">	showInfo = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="string">`name:<span class="subst">$&#123;<span class="keyword">this</span>.name&#125;</span>, age: <span class="subst">$&#123;<span class="keyword">this</span>.age&#125;</span>`</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果此时我们想为这个类添加一个属性<code>school</code>用于标明学校，，在不修改“类”的情况下，我们可以使用装饰器这么做：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addSchool</span>(<span class="params">target</span>) </span>&#123;</span><br><span class="line">	target.prototype.school = <span class="string">'SDU'</span>;</span><br><span class="line">&#125;</span><br><span class="line">@addId</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">	<span class="comment">//	...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">	@decorator</span></span><br><span class="line"><span class="comment">	class A&#123;&#125;</span></span><br><span class="line"><span class="comment">	等价于</span></span><br><span class="line"><span class="comment">	A = decorator(A);</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> limoer = <span class="keyword">new</span> Student(<span class="string">'limoer'</span>, <span class="number">21</span>);</span><br><span class="line"><span class="built_in">console</span>.log(limoer.school); <span class="comment">// &gt; SDU</span></span><br></pre></td></tr></table></figure>
-<p>addSchool()给Student“类”的原型对象上添加了一个属性，现在所有实例都可以取到<code>school</code>这个属性。</p>
-<p>更深入一步，上面看到用于装饰的函数只接收一个目标“类”作为参数，如果我们有多个参数的话，可以写成高阶函数的形式(即返回一个函数)。同样是上面的例子，现在学校由参数指定，我们可以这样写：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addSchool</span>(<span class="params">school_name</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">target</span>) </span>&#123;</span><br><span class="line">		target.prototype.school = school_name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">@addSchool(<span class="string">'CQMU'</span>)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">	<span class="comment">//	...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> lin = <span class="keyword">new</span> Student(<span class="string">'lin'</span>, <span class="number">20</span>);</span><br><span class="line"><span class="built_in">console</span>.log(lin.school); <span class="comment">// &gt; CQMU</span></span><br></pre></td></tr></table></figure>
-<p>装饰器不但可以装饰“类”，也可以对方法(…属性)进行修饰，使用的方式类似于对“类”的修饰，不过用于修饰的函数接收三个参数,<code>target</code>将要被修饰的对象, <code>name</code>被修饰的属性名, <code>descriptor</code>被修饰的属性的描述对象(ES5中详细介绍过)。 写一个简单的例子：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showCount</span>(<span class="params">target, name, descriptor</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">let</span> prev = descriptor.value;</span><br><span class="line">	descriptor.value = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="string">'count:'</span> + StudentList.list.length);</span><br><span class="line">		prev.call(<span class="literal">null</span>, <span class="built_in">arguments</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> descriptor;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StudentList</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">static</span> list = [<span class="string">'limoer'</span>, <span class="string">'lin'</span>];</span><br><span class="line"></span><br><span class="line">	@showCount</span><br><span class="line">	showNames () &#123;</span><br><span class="line">		<span class="built_in">console</span>.log(StudentList.list.join(<span class="string">' '</span>));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> list = <span class="keyword">new</span> StudentList();</span><br><span class="line">list.showNames(); <span class="comment">// count:2 \n limoer lin</span></span><br></pre></td></tr></table></figure>
-<p>上面的代码给<code>StudentList</code>类的<code>showNames</code>方法添加了打印数量的功能，并且是在不改变原有“类”结构的情况下。</p>
+            <p>在JavaScript中，定时器是一个经常被误用且不被大家所熟识的特性。但在构建应用时其却非常有用。<br>定时器提供了一种让一段代码在一定的时间之后运行的能力。由于JS的单线程特性，其同一时间只能执行一处代码，而定时器跳出了这一性质，以其特有的方式来执行代码。</p>
+<p>在浏览器环境当中，window对象下有两组方法，setTimeOut()/clearTimeOut()以及setInterval()/clearInterval()分别用于设置定时器让其在一段时间后执行/让其停止和每隔一段时间就会执行一次/清除该定时器。<br>比如下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do somethign</span></span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br><span class="line">setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do this code every 1s</span></span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码分别创建了一个一次执行定时器和循环执行的定时器，每隔一秒钟，function就会被执行一遍</p>
+<p>咋一看，setInterval就像周期性执行setTimeout一样，但是他们有很多不同之处。<br>举个栗子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span> <span class="title">repect</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	setTimeOut(repect, <span class="number">100</span>);</span><br><span class="line">&#125;, <span class="number">100</span>);</span><br><span class="line">setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do some thing</span></span><br><span class="line">&#125;, <span class="number">100</span>)</span><br></pre></td></tr></table></figure></p>
+<p>上面两段代码的功能几乎是一样的，但是实际上却不是。setTimeOut()代码中执行前一个回调结束后100毫秒甚至更多，才会执行下一个回调<br>而setInterval()不一样，每隔100毫秒就会尝试执行，不会受到前面回调的影响。那为什么执行一个setTimeOut()执行回调的时间会更长呢？因为js单线程的特性，当计时时间到，回调函数会被放入执行队列排队，并且执行回调是需要时间的，所以执行时间只会大于设置的时间。setInterval()也一样，但有一点，由于其不关注前一个回调执行的情况，如果一直被延迟，那么setInterval()在可用后会无延迟执行。</p>
+<p>好吧，写个栗子证明一下上面的结论：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="built_in">console</span>.time(<span class="string">'测试setTimeOut执行的时间'</span>)</span><br><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.timeEnd(<span class="string">'测试setTimeOut执行的时间'</span>);</span><br><span class="line">&#125;,<span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
 <blockquote>
-<p>说明，在现有的浏览器环境和Node都不能运行上面的代码(暂不支持装饰器)，如果想运行的话，可以借用babel 并且使用相关插件(babel-plugin-transform-decorators-legacy)的前提下进行compile，之后就可以进行了。推荐开发过程中webpack和babel结合使用，效果更佳！</p>
+<p>执行结果为：<br>测试setTimeOut执行的时间: 1004.673ms</p>
 </blockquote>
-<p>好了，关于Decorator简单介绍到此到一段落，更多的相关知识请自行发掘和学习。接下来，是时候了解并使用Mobx了！</p>
-<h3 id="Mobx？想说爱你不容易！"><a href="#Mobx？想说爱你不容易！" class="headerlink" title="Mobx？想说爱你不容易！"></a>Mobx？想说爱你不容易！</h3><p>在文章最开头谈到我在最近的学习开发中使用了Mobx作为状态管理工具，最主要的原因是其相比Redux，学习和快速上手成本的确消了很多，并且它足够简单。但是在后来的开发过程中，虽然其可以没有redux中action，也不存在reducer，更是告别了单一而庞大的store，我们可以定义多个state用于保存状态，让每个状态或者是每个类属性添加注解，让其编程可观察的状态，而为了能够自动的更新值，我们可以通过使用computed这个装饰器或者autorun函数来完成。可是，在使用过程中，定义多少个状态，每个状态的结构又是如何，等等等等，都困扰着我，远没有使用redux来得清晰和直观。这也许是因为我对mobx目前刚好达到基本使用的程度，并没有深入的了解。基于此，接下来，我只谈谈Mobx入门，至于该如何优雅的使用，请自行摸索。</p>
-<h4 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h4><ol>
-<li>可观察的状态</li>
-</ol>
-<p>这也许是Mobx最基础也是最重要的概念了。我们可以使用Mobx提供的<code>observable</code>装饰器，让基本的数据结构(数组、对象、原始值等)变成可观察的。使用的方式如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> TimeState = observable(&#123;</span><br><span class="line">	currentTime: <span class="built_in">Date</span>.now()</span><br><span class="line">&#125;)</span><br><span class="line">TimeState.set(<span class="string">"currentTime"</span>, <span class="keyword">new</span> <span class="built_in">Date</span>().toString());</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	@observable list = [<span class="string">'limoer'</span>, <span class="string">'lin'</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> state = <span class="keyword">new</span> AppState();</span><br><span class="line"><span class="built_in">console</span>.log(state.list.length); <span class="comment">// &gt; 2</span></span><br></pre></td></tr></table></figure>
-<p>好了，最简单的例子就是这样，我们使用ES5和ES6 decorator的方式分别创建了两个state，第一个state我们适应装饰器让一个对象(Map)变得可观察，而第二个我们则是对一个“类”属性(为一个数组)进行了修饰，让其变成可观察的。</p>
-<p>这里值得注意的是，如果一个数据结构变得可观察，那么其类型也会发生改变，例如我们让一个数据变得可观察，此时其已经变成了一个 <code>Observable Array</code>， 这是一种Mobx定义的数据结构，拥有其独特的API，此时使用<code>Array.isArray(state.list)</code>讲返回false，因为<code>Observable Array</code> 并不是一种数组类型。</p>
-<p>好了，当看到这里，你是否有这样一个疑问：让一个数据结构变得可观察，其作用到底在哪里呢？其实很简单，我们都知道Mobx是React的小伙伴，其目的是在于替换React本身的<code>state</code>，我们都知道对于React而言，如果一旦state发生改变，就将导致页面更新并且重新渲染，基于此，让数据结构变得可观察，其目的是在于当被观察的数据发生改变，React也能做出相应的更新和重绘操作等，并且，这样的重绘是经过Mobx优化的，只进行必要的重绘来增加性能！</p>
-<ol start="2">
-<li>可计算值</li>
-</ol>
-<p>可计算值是通过现有状态和其它可计算值派生出来的值。这很好理解，我们在使用React的时候，往往要通过state衍生出很多的值，例如如果state的一部分是一个数组，那么我们通过衍生得到的数组长度就是一个计算值，并且在Mobx中，一旦可观察的state或者其他computed value 发生改变，可计算值就会重新计算。其实，在实际的React项目中，我们在很多地方都使用到了计算值。</p>
-<p>还是上面<code>AppState</code>的例子，现在我们给其增加一个计算值，</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	@observable list = [<span class="string">'limoer'</span>, <span class="string">'lin'</span>];</span><br><span class="line">	@computed get count() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.list.length;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> state = <span class="keyword">new</span> AppState();</span><br><span class="line"><span class="built_in">console</span>.log(state.count); <span class="comment">// &gt; 2</span></span><br><span class="line">state.list.push(<span class="string">'lindo'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(state.count); <span class="comment">// &gt; 3</span></span><br></pre></td></tr></table></figure>
-<p><code>count</code>是一个计算值，一旦list发生变化，其就会自动重新计算，可以保证，<code>count</code>的值每次都是最新的，并且都是等于list数组的长度。</p>
-<ol start="3">
-<li>autorun</li>
-</ol>
-<p>其作用和函数名一样好理解，其会自动执行；<code>autorun</code>其本身是一个响应式函数，其使用到的依赖关系state/computed value等一旦发生改变，其就会自动执行一次，效果和计算值类似，但是计算值和<code>autorun</code>的应用场景是不一样的，<code>computed value</code>通常会产生一个新值而<code>autorun</code>达到某种目的而不产生新值，例如生成日志，处理网络请求等。<br>还是上面的例子，我们继续扩展：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	<span class="comment">// ...省略前面的代码</span></span><br><span class="line">	<span class="keyword">let</span> logcount = autorun(<span class="function"><span class="params">()</span> =&gt;</span> &#123;<span class="built_in">console</span>.log(<span class="string">'count: '</span> + <span class="keyword">this</span>.count)&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里我们在<code>autorun</code>中使用了<code>computed value</code>， 一旦发生<code>count</code>改变，就会自动打印出新的<code>count</code>值；当然，初始化state实例对象的时候，就会先执行一次。</p>
-<ol start="4">
-<li>action</li>
-</ol>
-<p>动作是用来修改状态的。并且只应该对修改状态的函数使用<code>action</code>，要使用动作很简单，使用<code>@action</code>修饰一个函数或者使用<code>action(fn)</code>，把要修饰的函数作为参数即可。继续上面的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppState</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 省略上面的代码</span></span><br><span class="line">	@action.bound</span><br><span class="line">	addOne(name) &#123;</span><br><span class="line">		<span class="keyword">this</span>.list.push(name);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 或者</span></span><br><span class="line">	@action</span><br><span class="line">	addOne = <span class="function">(<span class="params">name</span>) =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.list.push(name);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面我们定义了一个函数，用于向列表中添加一个姓名。请注意，ES6 class的写法无法自动绑定到对象，所以使用<a href="mailto:`@action.bound" target="_blank" rel="noopener">`@action.bound</a>` 或者是使用ES6中引入的箭头函数(推荐)。</p>
-<h4 id="与React使用"><a href="#与React使用" class="headerlink" title="与React使用"></a>与React使用</h4><ol start="5">
-<li>observer<br><code>observer</code>是由<code>mobx-react</code>包(需独立安装)提供的用于让组件变成响应式组件的decorator。官方文档中写到：它用 <code>mobx.autorun</code> 包装了组件的 <code>render</code> 函数以确保任何组件渲染中使用的数据变化时都可以强制刷新组件。</li>
-</ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; Component &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; render &#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="comment">// 其余依赖省略</span></span><br><span class="line">@observer</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NameList</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">	addUser = <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">		e.preventDefault();</span><br><span class="line">		<span class="keyword">if</span>(<span class="keyword">this</span>.uname.value)&#123;</span><br><span class="line">			<span class="keyword">this</span>.props.appstate.addOne(<span class="keyword">this</span>.uname.value);</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="built_in">console</span>.log(<span class="string">'must input user name!'</span>);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line">			&lt;ul&gt;</span><br><span class="line">				&#123;</span><br><span class="line">					this.props.appstate.list.map((index, name) =&gt; &#123;</span><br><span class="line">						return &lt;li key=&#123;index + 10&#125;&gt;&#123;name&#125;&lt;/li&gt;</span><br><span class="line">					&#125;)</span><br><span class="line">				&#125;</span><br><span class="line"><span class="xml">			<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span></span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;p&gt;当前用户人数：&#123;this.props.appstate.count&#125;&lt;/p&gt;</span><br><span class="line">				&lt;label for="uname"&gt;姓名&lt;/label&gt;</span><br><span class="line">				&lt;input type="text" name="uname" ref=&#123;(ref) =&gt; this.uname = ref&#125;/&gt;</span><br><span class="line">				&lt;button onClick=&#123;this.addUser&#125;&gt;+&lt;/button&gt;</span><br><span class="line">			&lt;/div&gt;</span><br><span class="line"><span class="xml">		<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">	&#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line">render(&lt;NameList appstate=&#123;appstate&#125; /&gt;, document.getElementById('app'));</span><br></pre></td></tr></table></figure>
-<p>上面是一个响应式组件的例子，结合了上面定义的状态，我们可以查看所有的姓名、数量，并且可以通过点击按钮来改变state。其实<code>observer</code>对非响应式组件仍然有效，同样是上面的例子：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> List = observer(<span class="function">(<span class="params">&#123;appstate&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span></span><br><span class="line"><span class="xml">		appstate.list.map((index, name) =&gt; &#123;</span></span><br><span class="line"><span class="xml">			return <span class="tag">&lt;<span class="name">li</span> <span class="attr">key</span>=<span class="string">&#123;index</span> + <span class="attr">19</span>&#125;&gt;</span>&#123;name&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span></span><br><span class="line"><span class="xml">		&#125;)</span></span><br><span class="line"><span class="xml">	<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>好了，对于<code>observer</code>的介绍就告一段落，更多的Mobx和React连接的方式，以及Mobx提供的生命钩子函数等相关知识你可以查看官方文档来了解。</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><blockquote>
-<p>自从放了暑假回了家，效率下降特别多，在学校的时候以为回家可以安心学习，到了家才知道一切都变了，该做的事情还没做，还有更多的知识要学习。所以，早早回学校也许是一个不错的选择！所以再过几天，就要启程回学校了，在最后一年里，期待所有的努力都没有白费，期待一个新(好)的开始！</p>
-</blockquote>
+<p>关于setInterval()的演示和清除定时器的演示这里就不做了。</p>
 
         
         </div>
@@ -310,7 +540,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="cjzl6nbzw001mtkj60xzg8qvz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/11/06/JS定时器知多少/" data-id="ck00osj7o0004acj66p4mrfrd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -378,7 +608,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/08/02/从decorator到Mobx/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/08/02/从decorator到Mobx/">评论</a>
+        <a href="http://yoursite.com/2016/11/06/JS定时器知多少/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/11/06/JS定时器知多少/">评论</a>
     
 
         </footer>
@@ -388,7 +618,7 @@
 
 
 
-    <article id="post-响应式布局的那些事" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-浅谈JS闭包" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -396,7 +626,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/07/31/响应式布局的那些事/">响应式布局的那些事</a>
+            <a class="article-title" href="/2016/10/21/浅谈JS闭包/">浅谈JS闭包</a>
         </h1>
     
 
@@ -405,8 +635,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/07/31/响应式布局的那些事/">
-            <time datetime="2017-07-31T10:16:53.000Z" itemprop="datePublished">2017-07-31</time>
+        <a href="/2016/10/21/浅谈JS闭包/">
+            <time datetime="2016-10-21T12:58:29.000Z" itemprop="datePublished">2016-10-21</time>
         </a>
     </div>
 
@@ -415,7 +645,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/CSS/">CSS</a>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
     </div>
 
                     </div>
@@ -426,32 +656,28 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <blockquote>
-<p>响应式设计在如今的web开发过程中已经是必不可少，它可以针对不同的设备环境对页面进行调整，并且可以在PC端和移动端达到很好效果的情况下，不用开发多套页面，可以提升开发速度，可维护性打打增强。</p>
-</blockquote>
-<h3 id="响应式布局"><a href="#响应式布局" class="headerlink" title="响应式布局"></a>响应式布局</h3><p>响应式布局的一种实现方式的原理是使用CSS3新引入的Media Query来调整元素在不同分辨率下的显示效果，并且通过JavaScript进行交互。总结起来，响应式布局有以下几个需要注意的点：</p>
-<ol>
-<li>设置Viewport</li>
-</ol>
-<p>我们知道，在移动设备中，页面被放置在虚拟的窗口中，这个窗口也称作视口(Viewport),对于未进行移动端适配或者是未进行响应式设计的页面，往往页面的宽高都会大于移动设备的宽高，所以为了能够在移动设备上进行页面交互，缩放是不可避免的，但是频繁的放大缩小带来的浏览体验肯定不会好。所以，在响应式设计的第一步，就是要禁止移动设备的缩放，这很容易实现，我们只需要在html页面中的head元素下添加一个meta标签用于规定禁止缩放就可以了：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0, user-scalable=no, maxinum-scale=1.0"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>使用Media Query</li>
-</ol>
-<p>媒介查询才是响应式布局的关键所在，我们使用Media Query 来实现在不同尺寸下使用不同的样式。Media Query的规则有很多，例如<code>@media screen and (max-width: 980px){...}</code>就表示了在980px下的屏幕下使用在此定义的各种样式，同样还有<code>min-width</code>、<code>orientation(设备方向)</code>等属性，我们需要按需进行设置。</p>
-<ol start="3">
-<li>使用JavaScript</li>
-</ol>
-<p>如果能做到上面的两点，在一般情况下，响应式布局是可以实现的。但是如果在布局的过程中需要改变交互，那么JavaScript久必须派上用场了。例如一个菜单栏，在十分小的屏幕下需要折叠，那么就需要用到JavaScript。</p>
-<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><p>上面是我能够想到的响应式布局的一些要点，在实际学习过程中，我并没有在一些项目中使用相应式设计的方式(貌似很悲哀…)。在目前移动为先的时代，为移动端做更好的优化是不可避免的，无论是使用重新写一套移动端页面，还是使用响应式布局，或者使用其他的例如Flex Box来进行布局。作为一个工作在浏览器端的🐒，这都是我们必须具备的素质。</p>
-<p>好了，写一个简单的小例子吧。如果你从未接触过响应式布局，那么希望接下来的code会帮助你更快地了解并应用它。</p>
-<p>我们来写一个菜单栏，其HTML结构‍如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"nav"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">ul</span> <span class="attr">id</span>=<span class="string">"nav-list"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"home"</span>&gt;</span>Home<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"topic"</span>&gt;</span>Topic<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"today"</span>&gt;</span>Today<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"about"</span>&gt;</span>About<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"concat"</span>&gt;</span>Concat<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>CSS如下：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">* &#123;</span><br><span class="line">	<span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">	<span class="attribute">padding</span>: <span class="number">0</span>;	</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav</span> &#123;</span><br><span class="line">	<span class="attribute">position</span>: relative;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span> &#123;</span><br><span class="line">	<span class="attribute">list-style</span>: none;</span><br><span class="line">	<span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">	<span class="attribute">width</span>: <span class="number">20%</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">	<span class="attribute">display</span>: block;</span><br><span class="line">	<span class="attribute">text-align</span>: center;</span><br><span class="line">	<span class="attribute">text-decoration</span>: none;</span><br><span class="line">	<span class="attribute">color</span>: <span class="number">#FFF</span>;</span><br><span class="line">	<span class="attribute">line-height</span>: <span class="number">4em</span>;</span><br><span class="line">	<span class="attribute">font-size</span>: <span class="number">1.4em</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(1)</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">	<span class="attribute">background-color</span>: <span class="number">#bcbcbc</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(2)</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">	...</span><br><span class="line">	<span class="comment">/*添加背景色*/</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(1)</span> <span class="selector-tag">a</span><span class="selector-pseudo">:hover</span> &#123;</span><br><span class="line">	<span class="attribute">background-color</span>: <span class="built_in">rgba</span>(188, 188, 188, .8);</span><br><span class="line">	<span class="comment">/*添加鼠标移上去的样式*/</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(1)</span> <span class="selector-tag">a</span><span class="selector-pseudo">::before</span> &#123;</span><br><span class="line">	<span class="attribute">content</span>: <span class="string">''</span></span><br><span class="line">	<span class="comment">/*使用伪类来添加图标字体等*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>现在，我们来为屏幕宽度小于768px写一个样式：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">media</span> screen and (max-width: <span class="number">768px</span>) &#123;</span><br><span class="line">	<span class="selector-tag">ul</span> <span class="selector-tag">li</span> <span class="selector-tag">a</span><span class="selector-pseudo">::before</span> &#123;</span><br><span class="line">		<span class="attribute">font-size</span>: <span class="number">20px</span>;</span><br><span class="line">		<span class="attribute">line-height</span>: <span class="number">60px</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="selector-tag">ul</span> <span class="selector-tag">li</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">		<span class="attribute">font-size</span>: <span class="number">0</span>;</span><br><span class="line">		<span class="attribute">height</span>: <span class="number">60px</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">		上面的的样式指明了再768px宽度及以下，我们设置a标签的font-size为0，不显示字体。</span></span><br><span class="line"><span class="comment">		设置伪元素所在的图标字体的行高等于a标签的宽度，使其垂直居中。</span></span><br><span class="line"><span class="comment">		通过上面的简单设置，我们在小于768px跨度的屏幕下，对于该菜单就只能看到图标了。</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>接着，我们可以为更窄的屏幕设置折叠菜单，我们通过css来绘制折菜单，使用JS来显示和隐藏。具体的实现这里就不贴出来了。</p>
-<p>ok，到此为止，我们已经写好了一个响应式菜单栏了(虽然…)。</p>
+            <h2 id="变量的作用域"><a href="#变量的作用域" class="headerlink" title="变量的作用域"></a>变量的作用域</h2><p>了解JS的人都知道，在ES6之前JavaScript中只有函数作用域和全局作用域，而没有块级作用域(try…catch是一个例外)。该怎么理解这句话呢？我们先来看一个例子:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;<span class="number">5</span>; i++)&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">`i=<span class="subst">$&#123;i&#125;</span>`</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(i) <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
+<p>当运行完一个for循环后，i=4。由于JS中不存在块级作用域，所以这里在for循环中申明的变量i是一个全局变量，因此可以在外部访问到。<br>现在我们来看下一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">sayHello</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="string">`hello <span class="subst">$&#123;name&#125;</span>`</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	sayHello();</span><br><span class="line">&#125;</span><br><span class="line">init(); <span class="comment">// hello limoer</span></span><br><span class="line"><span class="built_in">console</span>.log(name); <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure></p>
+<p>这里我们定义了一个函数，函数中申明了一个局部变量<code>name</code>，并且在函数内部定义了一个内部函数<code>sayHello</code>，这个函数只能在函数init内使用，然而<code>sayHello</code>并没有自己的局部变量，但是其可以访问到函数外部的变量，即其父级函数的name变量</p>
+<p>通过上面的两个例子可以清楚的知道，变量的作用域完全是由它在源代码中的位置决定的，并且嵌套的函数也可以访问其外层作用域中的变量。</p>
+<h2 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h2><p>闭包和变量的作用域息息相关。现在我们来修改上面的这个例子</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">sayHello</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="string">`hello <span class="subst">$&#123;name&#125;</span>`</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> sayHello</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> sayHelloFunc = init();</span><br><span class="line">sayHello(); <span class="comment">// hello limoer</span></span><br></pre></td></tr></table></figure>
+<p>注意修改的地方，我们这次是直接返回这个内部函数，然后在外部执行这个函数。<br>但是，通常来说，当函数一旦运行完成，其局部变量就不可用了，在这里是当执行了<code>var sayHelloFunc = init();</code>后name应该不可用了。但是实际运行情况是成功访问到了<code>name</code>这个属性。</p>
+<p>原因是因为这里sayHelloFunc已经成为了一个闭包。它由两部分组成，返回的函数本身以及创建该函数的环境。<br>而所谓的环境是由闭包在创建时其作用域内的变量组成的。对于上面的这个例子，这里的变量就是指的<code>name</code></p>
+<p>再看一个闭包的例子<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addSome</span>(<span class="params">num</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">y</span>)</span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(num + y)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> add10 = addSome(<span class="number">10</span>);</span><br><span class="line"><span class="keyword">var</span> add1 = addSome(<span class="number">1</span>);</span><br><span class="line">add10(<span class="number">1</span>); <span class="comment">// 11</span></span><br><span class="line">add1(<span class="number">10</span>); <span class="comment">// 11</span></span><br></pre></td></tr></table></figure></p>
+<p>对于上面的这个例子，addSome()做为一个函数工厂产生了两个闭包，它们共享了函数的定义，但是却又保存了不同的环境。</p>
+<h2 id="闭包的应用"><a href="#闭包的应用" class="headerlink" title="闭包的应用"></a>闭包的应用</h2><p>通过上面的描述，知道闭包其实就是将函数和其作用环境相互关联起来，达到保存变量的目的。</p>
+<p>把上面的例子稍微改一下，我们可以把它用到实践中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">	&lt;title&gt;<span class="xml"><span class="tag">&lt;/<span class="name">title</span>&gt;</span></span></span><br><span class="line">&lt;<span class="regexp">/head&gt;</span></span><br><span class="line"><span class="regexp">&lt;body&gt;</span></span><br><span class="line"><span class="regexp">	&lt;button id="toBlue"&gt;切换背景为蓝色&lt;/</span>button&gt;</span><br><span class="line">	&lt;button id=<span class="string">"toYello"</span>&gt;切换背景为黄色&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">	&lt;button id="toGreen"&gt;切换背景成绿色&lt;/</span>button&gt;</span><br><span class="line">	&lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">		<span class="function"><span class="keyword">function</span> <span class="title">changeBgColorTo</span>(<span class="params">type</span>)</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">				<span class="built_in">document</span>.body.style.backgroundColor = type;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line">		<span class="keyword">var</span> toBlue = changeBgColorTo(<span class="string">'blue'</span>);</span><br><span class="line">		<span class="keyword">var</span> toYellow = changeBgColorTo(<span class="string">'yellow'</span>);</span><br><span class="line">		<span class="keyword">var</span> toGreen = changeBgColorTo(<span class="string">'green'</span>);</span><br><span class="line">		<span class="built_in">document</span>.getElementsById(<span class="string">'toBlue'</span>).addEventListener(<span class="string">'click'</span>, toBlue);</span><br><span class="line">		<span class="built_in">document</span>.getElementsById(<span class="string">'toYellow'</span>).addEventListener(<span class="string">'click'</span>, toYello);</span><br><span class="line">		<span class="built_in">document</span>.getElementsById(<span class="string">'toGreen'</span>).addEventListener(<span class="string">'click'</span>, toGreen);</span><br><span class="line">	&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line">&lt;<span class="regexp">/html&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的例子展示了如何使用闭包来定义公共函数，来减少代码的冗余。</p>
+<h2 id="一个常见的错误，使用闭包来解决"><a href="#一个常见的错误，使用闭包来解决" class="headerlink" title="一个常见的错误，使用闭包来解决"></a>一个常见的错误，使用闭包来解决</h2><p>直接贴代码吧：<br>html:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;p id=<span class="string">"help"</span>&gt;Helpful notes will appear here&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">&lt;p&gt;E-mail: &lt;input type="text" id="email" name="email"&gt;&lt;/</span>p&gt;</span><br><span class="line">&lt;p&gt;Name: <span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">id</span>=<span class="string">"name"</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line">&lt;p&gt;Age: <span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">id</span>=<span class="string">"age"</span> <span class="attr">name</span>=<span class="string">"age"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>js:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showHelp</span>(<span class="params">help</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'help'</span>).innerHTML = help;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setupHelp</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> helpText = [</span><br><span class="line">      &#123;<span class="string">'id'</span>: <span class="string">'email'</span>, <span class="string">'help'</span>: <span class="string">'Your e-mail address'</span>&#125;,</span><br><span class="line">      &#123;<span class="string">'id'</span>: <span class="string">'name'</span>, <span class="string">'help'</span>: <span class="string">'Your full name'</span>&#125;,</span><br><span class="line">      &#123;<span class="string">'id'</span>: <span class="string">'age'</span>, <span class="string">'help'</span>: <span class="string">'Your age (you must be over 16)'</span>&#125;</span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; helpText.length; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> item = helpText[i];</span><br><span class="line">    <span class="built_in">document</span>.getElementById(item.id).onfocus = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      showHelp(item.help);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">setupHelp();</span><br></pre></td></tr></table></figure>
+<p>上面的代码是我们实际开发过程中非常常见的错误。我们使用循环来给每一个输入框绑定一个事件，从而实现当聚焦到不同的输入框是产生不同的输出。<br>但是，上面的代码显然不能完成这样的工作，因为当循环完成后，此时item已经指向了helpText的最后一项，而给onfocus绑定的是一个匿名函数，当聚焦到某一个输入框时，执行<code>showHelp(item.help)</code>而item早已是<code>helpText</code>中的最后一项了，所以造成了错误.</p>
+<p>知道错误后，我们就知道改怎样修改了。我们需要保存运行时的环境，返回一个闭包。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setupHelp</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"> 		<span class="keyword">var</span> helpText = [</span><br><span class="line">     		&#123;<span class="string">'id'</span>: <span class="string">'email'</span>, <span class="string">'help'</span>: <span class="string">'Your e-mail address'</span>&#125;,</span><br><span class="line">     		&#123;<span class="string">'id'</span>: <span class="string">'name'</span>, <span class="string">'help'</span>: <span class="string">'Your full name'</span>&#125;,</span><br><span class="line">     		&#123;<span class="string">'id'</span>: <span class="string">'age'</span>, <span class="string">'help'</span>: <span class="string">'Your age (you must be over 16)'</span>&#125;</span><br><span class="line">   	];</span><br><span class="line"></span><br><span class="line"> 		<span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; helpText.length; i++) &#123;</span><br><span class="line">   		<span class="keyword">var</span> item = helpText[i];</span><br><span class="line">   		<span class="built_in">document</span>.getElementById(item.id).onfocus = (<span class="function"><span class="keyword">function</span>(<span class="params">help</span>) </span>&#123;</span><br><span class="line">     			<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">     				showHelp(help)</span><br><span class="line">     			&#125;</span><br><span class="line">   		&#125;)(item.help);</span><br><span class="line"> 		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>好了，简单的对于闭包的介绍就到这里了！<br>想更系统的学习JS点击<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript" target="_blank" rel="noopener">这里</a></p>
 
         
         </div>
@@ -462,7 +688,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="cjzl6nc0c002ftkj6tp2l7br7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/21/浅谈JS闭包/" data-id="ck00osj9h0021acj6ehrkkws6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -530,7 +756,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/07/31/响应式布局的那些事/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/07/31/响应式布局的那些事/">评论</a>
+        <a href="http://yoursite.com/2016/10/21/浅谈JS闭包/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/10/21/浅谈JS闭包/">评论</a>
     
 
         </footer>
@@ -540,7 +766,7 @@
 
 
 
-    <article id="post-孩子" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-踩过React表单的坑后有感" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -548,7 +774,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/07/25/孩子/">孩子</a>
+            <a class="article-title" href="/2016/10/13/踩过React表单的坑后有感/">踩过React表单的坑后有感</a>
         </h1>
     
 
@@ -557,145 +783,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/07/25/孩子/">
-            <time datetime="2017-07-24T23:14:01.000Z" itemprop="datePublished">2017-07-25</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>对于大多数家庭来说，孩子就是未来、是未来的希望和精神寄托；我们的父母总是不予余力的帮助我们的成长；可是当一个孩子成为家庭的负担呢？看看下面这个家庭的故事(这是一个真实的故事)。</p>
-</blockquote>
-<h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>2017年7月23日，我从济南出发回家“享受”也许是学生时代的最后一个暑假，同往常的匆忙不一样，这一次来到火车站才离火车发车还有1小时，一切都有条不紊的进行，取票、进站、候车…除了在检票的时候闸机不能识别我的车票外、上车、找到座位、驶离济南。故事当然发生在火车上，我的邻座–一位高大的面黄精瘦的头花花白的中年妇女。</p>
-<p>为了度过12小时的车程，我一般会准备两部电影用于消遣，食物则是两瓶纯水一个大面包和少许便捷的水果。和往常一样，我在整一上午的时间看完了一部电影，此时已经到了午饭点，火车上的人都开始拿起自己带的食物开始吃起来。我从我的书包拿出大面包，开始啃起来，对两口面包一口水的节奏。我邻座的那位中年妇女也吃面包，可是连水都不要，对，也许她就没带水。出于此，我把书包里剩下的一瓶水给了她，她起先推诿不好意思接受，后来我告诉她我还有她才收下。后来的一段时间，我们有过一段时间的交流，而这故事就包含在短暂的交流中。</p>
-<h3 id="侧脸"><a href="#侧脸" class="headerlink" title="侧脸"></a>侧脸</h3><p>经过短暂的聊天，我知道了她来自湖北恩施州，地地道道的农民，来到济南照顾自己生病的孩子。一开始，我并没有问她孩子的具体情况。我打量着她，个头估摸着超过175CM，而身体廋弱得像竹竿，估摸着和自己父母相近的年龄，头发却花白。一眼望过去，正好是侧脸，廋高的颧骨、满脸的雀斑、偏黑的肤色，哇，是经历过怎样事情的人才会在这样的年龄变成这样一个样子。</p>
-<p>这个时候，她打了一个电话，我一直在旁听她说话，可是方言的确让人很难懂，唯一知道的就是打给她女儿的。时间很短，更多的像是嘱咐，她挂了电话。看我一副饶有兴致的样子，她给我讲了她打给的是自己的13岁女儿，正在济南住院治疗。她随后的话让我觉得十分震惊：女儿从5岁开始开始患病治疗，直到现在已经治疗了8年，得的是世界罕见的baihua病(这里真的记不住了，根据她的病情描述大概是一种血液病)，中国第一例！8年花掉了超过100万元。如今女孩病情恶化，医院不再收取任何费用，开始进行实验性治疗。她每一个月济南待半个月，回家半个月，连往返车费都是医院帮忙。说完这些，我分明看到她眼角产生着泪花。其实此时不仅仅是我对此时感兴趣，旁边前后排的都有在关注她说的，有人问她这么些年有没有得到社会帮助，她说当地电视台报道了这件事，收到了部分爱心捐助，但是绝大部分的治疗费用还是自己承担。还有人问为什么选择在济南治疗，她说只有那个主治医生能够稍微有效，所以那个医生在哪她们就跟着去哪。当然，还有其他问题，她都一一述说。期间她给我们看了她小孩的照片，看起来就像那种天生聪慧的孩子，可是因为病情没有上过学，不然这个年龄应该是一名初中生了吧。</p>
-<p>这样的聊天持续到直到所有发问的人都沉默不语，恰好也快到她下车的站点了。我给她说，我在济南上学，我给她留个电话，如果需要任何我帮忙的，打电话给我。她匆匆忙忙的存下我的号码，拖着好大的行李箱，下车了。那拖着行李箱的背影，突然让我想起了我的母亲(/哭)。</p>
-<h3 id="每个人的母亲和作为孩子的我们"><a href="#每个人的母亲和作为孩子的我们" class="headerlink" title="每个人的母亲和作为孩子的我们"></a>每个人的母亲和作为孩子的我们</h3><p>在接下来3个小时的剩余车程中，我回想了我和母亲的一切回忆，由近及远。早上上车时，远在千里之外的母亲挂念着自己的儿子是否能够乘上火车；回家前一天，又千叮呤万嘱咐一定要带够食物；在学校的每个星期，短暂的通话过程中的叮嘱…还有最初母亲反对我去北方读书，送别抹眼泪的情景也是历历在目。时间一晃，那么些年过去了，母亲越来越老，我越来越成熟；母亲越来越唠叨，我越发能够理解。想起小时候，经常和母亲吵架，甚至伤了母亲的心。到后来高中远离父母，到大学更是相隔千里，见到她的时间从一年几次到现在一年一次，从以前因不想见到母亲想要离家出走，到现在即使回到家乡想见母亲一面，母亲却说，太远太热太折腾坚决不让我来。这就是我的母亲，而我是母亲的孩子。</p>
-<p>我是从我家乡中为数不多走出的大学生，这一点让母亲十分骄傲。当别人问起孩子，母亲总会告诉他们孩子在XX大学上学，可能对大部分家乡人来说，XX大学如何，985，211这些是什么，他们都不在意，也不知道其中的含义。作为孩子的自己，我有幸能够在这样一个家庭中长大，虽然家庭不算特别贫苦，但是所有的环境都是父母通过自己的劳动带来的。我敬佩我的父母，也期待能早日独挡一面。从小到大，我的事情都是由我做主，大到选择大学选择专业，小到家庭琐事，父母从不干涉的我的决定，最多就是提提建议，并且从任何方面支持我。前段时间我放弃了去企业实习的机会，选择留在学校补修课程等待秋招，父母第一时间支持我，这让我很感动。我想，还有什么理由不努力呢！</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>记得很多个第一次，但是最有感触的莫非第一次在济南生病，母亲得知我生病的消息从早到晚都很焦虑，反而自己生病了。后来的几年，我很少生病，但是只要我生病，我就会去第一时间就医，并且不告诉母亲。到此结束，共勉！</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/07/25/孩子/" data-id="cjzl6nc0p0035tkj6yrdximu3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/07/25/孩子/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/07/25/孩子/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Demo-Canvas-with-React" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/05/27/Demo-Canvas-with-React/">Demo--Canvas with React</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/05/27/Demo-Canvas-with-React/">
-            <time datetime="2017-05-27T12:34:19.000Z" itemprop="datePublished">2017-05-27</time>
+        <a href="/2016/10/13/踩过React表单的坑后有感/">
+            <time datetime="2016-10-13T11:20:49.000Z" itemprop="datePublished">2016-10-13</time>
         </a>
     </div>
 
@@ -716,64 +805,43 @@
         
             
             <blockquote>
-<p>一个使用Canvas处理图片的Demo，使用React + webpack + Redux 的技术栈，非常适合初学者，希望你喜欢！</p>
+<p>如题所示，最近捣鼓React表单踩坑了，才捣鼓没多少时日，心就变浮躁了，开始看不下去文档，也不谷歌百度直接开码，然后就是各种报错，越报错心越急越得不到解决心情越差，好不容易静下心来搜集资料准备搞定表单，这里先记下来，以备不时只需！</p>
 </blockquote>
-<h3 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h3><p>学习canvas已经有一阵子了，忙完了计组课设，考完了数据挖掘，终于有时间来做一点小Demo来巩固自己所学的知识了。就像上面介绍的那样，这是一个使用Canvas进行图片处理的Demo，其可以选择本地图片，改变其R G B 以及透明度，然后可以选择保存到本地。并且为了重温很久没碰的React，前端使用了React，使用Redux进行数据的管理(虽然简单到没必要使用),并且使用了css modules 以便直接在组件中使用css。当然这一切都是在使用webpack进行编译打包的情况下。</p>
-<p>这个Demo十分简单，特别适合React初学者食用，相信会对你的React学习有所帮助！</p>
-<h3 id="如何运行"><a href="#如何运行" class="headerlink" title="如何运行"></a>如何运行</h3><ol>
-<li>从我的<a href="https://github.com/xiaomoer/sample-canvas-with-react" target="_blank" rel="noopener">github</a>上clone到本地;</li>
-<li>进入Demo根目录, 执行npm init 安装依赖;</li>
-<li>安装完毕后，执行 npm run build 进行构建;</li>
-<li>在Chrome浏览器(下载功能只能在Chrome中使用，所以…)中打开index.html。</li>
+<h2 id="踩过的坑…"><a href="#踩过的坑…" class="headerlink" title="踩过的坑…"></a>踩过的坑…</h2><p>直接开写吧：</p>
+<p>input标签忘记闭合导致报错</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> SimpleComp = React.createClass(&#123;</span><br><span class="line">	render()&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">placeholder</span>=<span class="string">"随便输入点什么吧！"</span>&gt;</span></span></span><br><span class="line"><span class="xml">	&#125;</span></span><br><span class="line"><span class="xml">&#125;);</span></span><br><span class="line"><span class="xml">ReactDOM.render(<span class="tag">&lt;<span class="name">SimpleComp</span> /&gt;</span>, document.body)</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>运行上面的这段代码，发现并页面渲染异常，打开浏览器console一看，下面的出现了错误，并且是下面这样的:</p>
+</blockquote>
+<p><img src="https://d17oy1vhnax1f7.cloudfront.net/items/2v0Y33291e1E240k0k0J/Image%202016-10-13%20at%207.35.27%20%E4%B8%8B%E5%8D%88.png?v=0ba59abc" alt="报错图片"></p>
+<blockquote>
+<p>清清楚楚明明白白，标签并没有闭合，并且直指9行行最后渲染出了问题，然后我就一直找一直找，没错误啊，可始终还是报错<br>最后经过各种尝试才知道，input标签要强制闭合的，不然就会转换错误<br>知道真相的我眼泪掉下来，原来是这么回事啊，平时html写得飞起，细节这些什么的，都没注意哎！<br>再有，控制台上打印的异常和错误可千万别轻信，以前已经在这个被坑过了</p>
+</blockquote>
+<h2 id="受控与不受控"><a href="#受控与不受控" class="headerlink" title="受控与不受控"></a>受控与不受控</h2><blockquote>
+<p>有过React基础的童鞋都知道，React内部通过props和state来传递属性和状态，其中属性经由组件外属性传入，作用于组件后无法改变<br>state 产生于组件内部， 通过setState()来改变状态，每一次改变状态，组件将会被重绘<br>对于表单来说，props和state用得都很频繁，所以在这里提及一下</p>
+</blockquote>
+<p>先来看非受控组件吧，顾名思义就是组件的状态不受控制，从代码上体现出来的就是，一个input不含有value属性<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> NotControlComp = React.createClass(&#123;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">defaultValue</span>=<span class="string">&#123;this.props.placeholder&#125;/</span>&gt;</span></span></span><br><span class="line"><span class="xml">	&#125;</span></span><br><span class="line"><span class="xml">&#125;);</span></span><br><span class="line">ReactDOM.render(&lt;NotControlComp placeholder='随便输入点什么吧！' /&gt;, document.body)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>上面的一段代码定义了一个非受控的input，接受用户的输入而改变状态<br>注意：这里使用到的defaultValue属性作用类似于placeholder属性</p>
+</blockquote>
+<p>好吧，事实上我们使用非受控组件的情况比较多，我们会监听input的onChange时间，通过state来更新状态<br>下面是一个简单的获取用户输入的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ExampleComp = React.createClass(&#123;</span><br><span class="line">	getDefaultProps()&#123;</span><br><span class="line">		<span class="keyword">return</span>&#123;<span class="attr">placeholder</span>: <span class="string">'输入吧'</span>&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	getInitialState()&#123;</span><br><span class="line">		<span class="keyword">return</span>&#123;</span><br><span class="line">			val: <span class="string">''</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	handleChange(e)&#123;</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;<span class="attr">val</span>: e.target.value&#125;)</span><br><span class="line">	&#125;,</span><br><span class="line">	render()&#123;</span><br><span class="line">		<span class="keyword">return</span>(</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;input type=<span class="string">"text"</span> defaultValue=&#123;<span class="keyword">this</span>.props.val&#125; onChange=&#123;<span class="keyword">this</span>.handleChange&#125;/&gt;</span><br><span class="line">				&lt;p&gt;你输入了：&#123;<span class="keyword">this</span>.state.val&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">ExampleComp</span> <span class="attr">placeholder</span>=<span class="string">'随便输入点什么吧!'</span> /&gt;</span>, document.body)</span></span><br></pre></td></tr></table></figure></p>
+<p>那么受控组件就很显而易见了，受控的input定义了一个value属性，并且value部位null<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ControlComp = React.createClass(&#123;</span><br><span class="line">	render()&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">value</span>=<span class="string">"不要尝试修改这个值啦！"</span> /&gt;</span></span></span><br><span class="line"><span class="xml">	&#125;</span></span><br><span class="line"><span class="xml">&#125;);</span></span><br><span class="line"><span class="xml">ReactDOM.render(<span class="tag">&lt;<span class="name">ControlComp</span> /&gt;</span>, document.getElementById('app'))</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>好了，最简单的受控组件就写好了，当你尝试去修改表单中的值的时候，发现根本无法修改<br>这点明显和我们平时写html不一样，同样的input标签在html中就可以修改但是到了react中就没办法修改了，想过原因吗？<br>官方文档中给出了答案： 不比HTML，React组件必须在任何时间点呈现视图的状态而不仅仅是在初始化的时候， 好好理解！</p>
+</blockquote>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><ol>
+<li><p>不要通过添加子节点的方式给<code>&lt;textarea&gt;</code>添加内容，应该使用defaultValue或者value属性,避免产生歧义，因为JSX本身就是javascript</p>
+</li>
+<li><p>你可以通过selected属性来选中一个下拉栏， 但是为了组件的可操作性，请使用value 或者 defaultValue来代替就像这样：</p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> SelectComp = React.createClass(&#123;</span><br><span class="line">	render()&#123;</span><br><span class="line">		<span class="keyword">return</span>(</span><br><span class="line">			&lt;select value=<span class="string">'B'</span>&gt;</span><br><span class="line">				&lt;option value=<span class="string">'A'</span>&gt;A&lt;<span class="regexp">/option&gt;</span></span><br><span class="line"><span class="regexp">				&lt;option value='B'&gt;A&lt;/</span>option&gt;</span><br><span class="line">				&lt;option value=<span class="string">'C'</span>&gt;A&lt;<span class="regexp">/option&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>select&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">SelectComp</span> /&gt;</span>, document.body)</span></span><br></pre></td></tr></table></figure>
+<p> 想要非受控组件的话，就使用defaultValue属性好了<br> 当然了，可以通过传入一个数组来达到多选的目的, 前提是给select添加<code>multiple={true}</code>就可以了</p>
+</li>
 </ol>
-<p>至此，你可以体验这个简单的Demo了。</p>
-<h3 id="像什么"><a href="#像什么" class="headerlink" title="像什么"></a>像什么</h3><p>如果你觉得在你的机器上run很麻烦，或者你只是想看看长得怎么样。</p>
-<p>在浏览器器中打开，是这个样子的：</p>
-<p><img src="http://olro3ke8a.bkt.clouddn.com/init.png" alt="初始化效果"></p>
-<p>我承认的确很简单，简单到显得简陋了！接下来你可以选左下角的选择文件按钮来选择任何一张图片，比如我选择了一张图片后:</p>
-<p><img src="http://olro3ke8a.bkt.clouddn.com/init_pic.png" alt="初始化图片"></p>
-<p>任何被选中的图片都会被居中显示，宽高都会适应600*400的图片操作区域。现在，可以对图片进行操作了：</p>
-<p><img src="http://olro3ke8a.bkt.clouddn.com/after.png" alt="处理后"></p>
-<p>我们选择对图片的R、G、B、以及透明度进行调整，实时调整的效果将会在左侧的图片区域实时显示出来。</p>
-<p>第四步，点击图片区下的按钮，就可以吧处理过的图片下载到本地了，我们打开下载后的图片和处理的图片进行对比，就像这样：<br><img src="http://olro3ke8a.bkt.clouddn.com/save.png" alt="保存与对比"></p>
-<p>至此，我已经演示完了所有的功能。</p>
-<h3 id="不足"><a href="#不足" class="headerlink" title="不足"></a>不足</h3><p>如果你细心一点的话，你会发现这个Demo还有很多问题：</p>
-<ol>
-<li>我们导入任何宽高的图片，其都会被自适应到框中，所以处理后的图片品质会下降。</li>
-<li>保存图片只能在Chrome浏览器中进行，已测试在Firfox中无法使用这个功能。</li>
-<li>右侧的工具栏在选择新图片后不会被初始化。</li>
-<li>功能单一。</li>
-<li>界面简陋</li>
-<li>…</li>
-</ol>
-<h3 id="你需要注意的是"><a href="#你需要注意的是" class="headerlink" title="你需要注意的是"></a>你需要注意的是</h3><p>如果你想学习React和canvas，那么我希望我的这个Demo会对你有所帮助，这里提几个需要注意的点，这些点也是我在开发过程中遇到的问题：</p>
-<ol>
-<li>如何使用input file来选择一张图片并绘制到canvas中。</li>
-<li>如何保存图片。</li>
-<li>图片在React中绘制的时机。</li>
-<li>如何使用redux进行数据管理，特别是如何使用带参数的action。</li>
-<li>你所关注的。</li>
-</ol>
-<h3 id="未来"><a href="#未来" class="headerlink" title="未来"></a>未来</h3><p>这虽然是一个很简单的Demo，但是我会在此基础上进行继续跟进，现在能想到的是解决上面提到的不足，比如设置两种模式，处理图片品质下降的问题；兼容主流浏览器；增添新功能；修改工具栏的状态初始化的bug；以及其它我以后能够想到并且我能够实现的。</p>
-<p>以及…我目前有想法开发一个可交互的视频编辑器，有兴趣的同学可以关注下咯！</p>
-<h3 id="写到后面"><a href="#写到后面" class="headerlink" title="写到后面"></a>写到后面</h3><p>还有不到3个小时我就21岁了，想想前面走过的20年，尤其是上大学的三年来，感慨颇多。谢天谢地，就算无论如何，我都完好无损的度过了。接下来的一岁中，我将面临人生中一个个重大的转折点，实习、毕业、工作、走向社会。从小到大，我对我所有的事情做出选择，接下来，也不例外。我做好准备了，并且一直在准备着！</p>
-<p>共勉！</p>
-<h3 id="新！"><a href="#新！" class="headerlink" title="新！"></a>新！</h3><p>5.28日 </p>
-<ol>
-<li>解决了再次选择图片工具栏初始化的问题；</li>
-<li>工具栏的调节精度下沉到0.01；</li>
-<li>修改页面细节。</li>
-</ol>
-<p>现在看起来长这样！<br><img src="http://olro3ke8a.bkt.clouddn.com/new.png" alt="新的页面"></p>
-<p>6.3日</p>
-<ol>
-<li>同样的功能，不同的界面和实现方式，采用react但是去除redux使用state进行状态管理；</li>
-<li>操作更加主流和人性化；</li>
-<li>已知BUG，下载某些图片的时候可能会失败，暂不知原因。</li>
-</ol>
-<p>新版地址：<a href="https://github.com/xiaomoer/picture-editor-with-canvas" target="_blank" rel="noopener">https://github.com/xiaomoer/picture-editor-with-canvas</a></p>
-<p>看起来是这样的：<br><img src="http://olro3ke8a.bkt.clouddn.com/%E5%88%9D%E5%A7%8B%E6%95%88%E6%9E%9C.png" alt=""><br>还有这样：<br><img src="http://olro3ke8a.bkt.clouddn.com/style.png" alt=""></p>
-<p>加油！</p>
+<p>看到这里，也许有人心里还有疑问，受控的组件既然不能修改那到底该怎么用？<br>对于这个问题，请看下面：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ControlComp = React.createClass(&#123;</span><br><span class="line">	getInitialState()&#123;</span><br><span class="line">		<span class="keyword">return</span>&#123;<span class="attr">value</span>: <span class="number">0</span>&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	handleClick(e)&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;<span class="attr">value</span>: <span class="keyword">this</span>.state.value + <span class="number">1</span>&#125;)</span><br><span class="line">	&#125;,</span><br><span class="line">	render()&#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;input type=<span class="string">"text"</span> value=&#123;<span class="keyword">this</span>.state.value&#125; /&gt;</span><br><span class="line">				&lt;button onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;+<span class="xml"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span> </span><br><span class="line">			&lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">		)</span></span><br><span class="line"><span class="regexp">	&#125;</span></span><br><span class="line"><span class="regexp">&#125;);</span></span><br><span class="line"><span class="regexp">ReactDOM.render(&lt;ControlComp /</span>&gt;, <span class="built_in">document</span>.body)</span><br></pre></td></tr></table></figure></p>
+<p>好了，我们添加了一个button来控制受控组件的值，当然还有很多方式，比如我们可以给受控组件添加一个onChange事件监听</p>
+<blockquote>
+<p>好了，React表单的基本知识就说到这里，感谢那些曾经让我烦躁无比的坑！</p>
+</blockquote>
 
         
         </div>
@@ -784,7 +852,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="cjzl6nby70001tkj6unrlmzri" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/13/踩过React表单的坑后有感/" data-id="ck00osj9k0025acj60nxcwm99" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -852,7 +920,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/">评论</a>
+        <a href="http://yoursite.com/2016/10/13/踩过React表单的坑后有感/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/10/13/踩过React表单的坑后有感/">评论</a>
     
 
         </footer>
@@ -862,7 +930,7 @@
 
 
 
-    <article id="post-初识-requestAnimationFrame" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-在React中使用mixin" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -870,7 +938,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/05/12/初识-requestAnimationFrame/">初识 requestAnimationFrame</a>
+            <a class="article-title" href="/2016/10/12/在React中使用mixin/">在React中使用mixin</a>
         </h1>
     
 
@@ -879,8 +947,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/05/12/初识-requestAnimationFrame/">
-            <time datetime="2017-05-12T10:22:39.000Z" itemprop="datePublished">2017-05-12</time>
+        <a href="/2016/10/12/在React中使用mixin/">
+            <time datetime="2016-10-12T11:31:58.000Z" itemprop="datePublished">2016-10-12</time>
         </a>
     </div>
 
@@ -889,7 +957,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+        <a class="tag-link" href="/tags/React/">React</a>
     </div>
 
                     </div>
@@ -900,21 +968,38 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <blockquote>
-<p>事情的起因是这样的，前段时间面试的时候面试官问我会canvas不，作为一名未来的前端猿，我只有过一点了解，后来居然收到了offer，当然在闲暇之余是要学习一下canvas，并且在学习过程中首次接触到了本文的主角<code>requestAnimationFrame</code>。</p>
+            <h2 id="mixin到底为何方神圣？"><a href="#mixin到底为何方神圣？" class="headerlink" title="mixin到底为何方神圣？"></a>mixin到底为何方神圣？</h2><p>mixin被理解为‘混入’的意思，<br>我们知道，如果你经常使用某一段相同的代码的时候，你会把它进行抽象，封装成类或者function，<br>‘混入’也一样，它可以解决代码段重复的问题。</p>
+<h2 id="jade中的Mixins"><a href="#jade中的Mixins" class="headerlink" title="jade中的Mixins"></a>jade中的Mixins</h2><blockquote>
+<p>jade(pug)是一个高性能的模版引擎，它使用javascript实现，并提供给Node使用.<br>我在使用Jade模版引擎接触到了Mixin, 下面给出一个例子理解下</p>
 </blockquote>
-<h3 id="web中实现动画"><a href="#web中实现动画" class="headerlink" title="web中实现动画"></a>web中实现动画</h3><p>老实说，如果有人问我如何在web开发中实现动画，我第一时间想到的就是使用定时器<code>setTimeout()</code>或者<code>setTimeInterval()</code>来实现。其实实现的方式远远不止这一种，在CSS3的时代，我们实现动画有了更多的选择，比如使用关键帧动画，使用<code>transition</code>，我们也可以在<code>canvas</code>上绘图来实现动画；当然，还有<code>requestAnimationFrame</code>。</p>
-<p>使用<code>setTimeout()/setInterval()</code>实现的方式很简单，我前面有一篇文章就简要介绍了JS中的定时器。使用这种方式实现动画其实是有其性能瓶颈的，例如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">animation</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// do something</span></span><br><span class="line">    setTimeout(animation, <span class="number">1000</span>/<span class="number">60</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面我们以60帧/秒的速度执行动画，但是如果浏览器不是60帧/秒，就会掉帧；并且由于JS单线程的特点，所有不能保证每一次执行回调都是<code>1000/60</code>毫秒；还有，当窗口处于非激活状态的时候，它同样可能会执行。</p>
-<p>其实很好理解，作为定时器，<code>setTimeout/setInterval</code>并不是专门做动画的，存在各种各样的问题也是很好接受的，但是当我们认识到这种实现动画的方式的各种缺点时，我们也许会考虑另一种动画的实现方式，而<code>requestAnimationFrame</code>是一种更好的方案。</p>
-<h3 id="初识-requestAnimationFrame"><a href="#初识-requestAnimationFrame" class="headerlink" title="初识 requestAnimationFrame"></a>初识 requestAnimationFrame</h3><blockquote>
-<p>当我们执行window.requestAnimationFrame(callback)的时候，浏览器会在下次重绘的时候执行回调函数，它会告诉浏览器马上就要执行动画了，而callback则是用于更新动画。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mixin box(styles)</span><br><span class="line">           .conponent</span><br><span class="line">               -each style <span class="keyword">in</span> styles</span><br><span class="line">                   .squire</span><br><span class="line">                       -<span class="keyword">var</span> x = styles.indexOf(style) + <span class="number">1</span>;</span><br><span class="line">                       a(href='/users/' + x + '/list') #&#123;style&#125;</span><br><span class="line">   .container</span><br><span class="line">   	mixin([<span class="string">'lin'</span>, <span class="string">'limoer'</span>])</span><br><span class="line">   .links</span><br><span class="line">   	mixin([<span class="string">'parents'</span>, <span class="string">'classmates'</span>, <span class="string">'others'</span>])</span><br></pre></td></tr></table></figure>
+<p>你可以无视jade的语法，如果你想学习jade，点<a href="https://segmentfault.com/a/1190000000357534#articleHeader0" target="_blank" rel="noopener">这里</a></p>
+<blockquote>
+<p>首先我使用mixin 关键字申明了一个带参数mixin结构，然后依据传入的参数生成了很多url<br>这个mixin 结构可以在这个模版文件中使用，通过不同的参数来生成url<br>从上面可以看出，mixin的确可以解决代码重复的问题</p>
 </blockquote>
-<p><code>requestAnimationFrame</code>使用起来很简单，通过递归不断来执行回调来更新画面从而让画面动起来，我们甚至不需为其指定动画执行的时间和帧率。其优点是：1）从名字上就可以看出这是一个专门用于实现动画的API，优化是自然少不了的；2）其如果处于非激活状态，会自动暂停执行，有效节省了CPU资源。</p>
-<h3 id="小实例"><a href="#小实例" class="headerlink" title="小实例"></a>小实例</h3><p>我们在做动画的时候，有时希望背景移动起来，结合目前正在学习的canvas，我们可以很轻易的做到这点.</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> j = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">let</span> image = <span class="built_in">document</span>.querySelectorAll(<span class="string">'img'</span>)[<span class="number">0</span>];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">moveBackground</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height);</span><br><span class="line">  ctx.translate(<span class="number">10</span>, <span class="number">0</span>);</span><br><span class="line">  ctx.drawImage(image, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">  j++;</span><br><span class="line">  <span class="keyword">if</span>(j &lt; <span class="number">20</span>)&#123;</span><br><span class="line">    requestAnimationFrame(moveBackground);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> moveBtn  = <span class="built_in">document</span>.getElementById(<span class="string">'move'</span>);</span><br><span class="line">moveBtn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;</span><br><span class="line">  e.preventDefault();</span><br><span class="line">  requestAnimationFrame(moveBackground);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>上面我们点击button的时候，开始执行动画，通过不断的坐标变换和清除重绘，达到背景图片向右移的效果。</p>
-<p>最后，请注意，不是所有浏览器都支持该方法，所以你可能需要一个polyfill，关于如何实现这个polyfill，网络上的资源比较多了，这里就不在赘述。</p>
+<h2 id="React中的Mixin"><a href="#React中的Mixin" class="headerlink" title="React中的Mixin"></a>React中的Mixin</h2><blockquote>
+<p>首先来写一个例子</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> TimerComp = React.createClass(&#123;</span><br><span class="line">	getInitialState: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> &#123;<span class="attr">secondsElapsed</span>: <span class="number">0</span>&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	tick: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.stateState(&#123;<span class="attr">secondsElapsed</span>: <span class="keyword">this</span>.state.secondsElapsed + <span class="number">1</span>&#125;)</span><br><span class="line">	&#125;,</span><br><span class="line">	componentDidMount: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.interval = setInterval(<span class="keyword">this</span>.tick, <span class="number">1000</span>)</span><br><span class="line">	&#125;,</span><br><span class="line">	componentWillUnmount: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		clearInterval(<span class="keyword">this</span>.interval)</span><br><span class="line">	&#125;,</span><br><span class="line">	render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;p&gt;Seconds Elapse &#123;<span class="keyword">this</span>.state.secondsElapsed&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>简单的说一下，这里定义了一个定时器组件，会随着时间的增加来自动计时<br>但是一个应用需要多个计时器呢？我们第一时间想到了组件的嵌套，但是组件的嵌套不但会增加组件的复杂程度<br>而且，想要修改计时器也是比较困难的<br>好了，解决代码复用的问题，我们可以使用Mixin， 让其混入进其他组件就好了</p>
+</blockquote>
+<blockquote>
+<p>码起，还是计时器的例子！</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> MixinTimerComp = React.createClass(&#123;</span><br><span class="line">	mixins: [MixinInterval(<span class="number">1000</span>)],</span><br><span class="line">	getInitialState: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> &#123;<span class="attr">secondsElapsed</span>: <span class="number">0</span>&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	onTick: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;<span class="attr">secondsElapsed</span>: <span class="keyword">this</span>.state.secondsElapsed + <span class="number">1</span>&#125;)</span><br><span class="line">	&#125;,</span><br><span class="line">	render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div&gt;</span><br><span class="line">				&lt;p&gt;Seconds Elapse &#123;<span class="keyword">this</span>.state.secondsElapsed&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这里我们使用了mixins属性，把自定义的MixinInterval对象混入了Timer组件</p>
+</blockquote>
+<p>来看看MixinInterval的实现：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> MixinInterval: <span class="function"><span class="keyword">function</span>(<span class="params">interval</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &#123;</span><br><span class="line">		componentDidMount() &#123;</span><br><span class="line">			<span class="keyword">this</span>.__interval = setInterval(<span class="keyword">this</span>.onTick, interval)</span><br><span class="line">		&#125;,</span><br><span class="line">		componentWillUnmount() &#123;</span><br><span class="line">			clearInterval(<span class="keyword">this</span>.__interval)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>就这样实现了一个最简单的问题，和最前面的例子做对比，我们发现，只是把组件中一些代码独立出来成为一个mixin对象<br>但这样做无疑是解决了代码重用的问题，当我们想定义另一个计时器时候，我们只需混入这个mixin代码<br>而不必关心混入的计时处理对象是怎么实现的</p>
+</blockquote>
+<blockquote>
+<p>mixin 实现起来非常简单，React也支持多个mixin的混入(在mixins赋值为一个mixin对象数组)<br>但有一个问题需要注意，在mixin中尝试覆盖state中定义的键的话，React会抛出错误</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">React.createClass(&#123;</span><br><span class="line">	mixins: [&#123;</span><br><span class="line">		getInitialState()&#123;</span><br><span class="line">			<span class="keyword">return</span> &#123;<span class="attr">cover</span>: <span class="number">1</span>&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;],</span><br><span class="line">	getInitialState()&#123;</span><br><span class="line">		<span class="keyword">return</span> &#123;<span class="attr">cover</span>: <span class="number">2</span>&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 错误，尝试覆盖cover属性</span></span><br></pre></td></tr></table></figure>
 
         
         </div>
@@ -925,7 +1010,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="cjzl6nc080029tkj607b5d9uh" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/12/在React中使用mixin/" data-id="ck00osj98001iacj6fme0wylt" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -993,7 +1078,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/">评论</a>
+        <a href="http://yoursite.com/2016/10/12/在React中使用mixin/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/10/12/在React中使用mixin/">评论</a>
     
 
         </footer>
@@ -1003,7 +1088,7 @@
 
 
 
-    <article id="post-实用的JavaScript技巧、经验总结" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-React学习之JSX" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -1011,7 +1096,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/04/21/实用的JavaScript技巧、经验总结/">实用的JavaScript技巧、经验总结</a>
+            <a class="article-title" href="/2016/10/11/React学习之JSX/">React学习之JSX</a>
         </h1>
     
 
@@ -1020,8 +1105,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/04/21/实用的JavaScript技巧、经验总结/">
-            <time datetime="2017-04-21T06:00:42.000Z" itemprop="datePublished">2017-04-21</time>
+        <a href="/2016/10/11/React学习之JSX/">
+            <time datetime="2016-10-11T07:39:27.000Z" itemprop="datePublished">2016-10-11</time>
         </a>
     </div>
 
@@ -1030,7 +1115,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+        <a class="tag-link" href="/tags/React/">React</a>
     </div>
 
                     </div>
@@ -1041,483 +1126,43 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <ol>
-<li><p>避免给一个未申明变量赋值，因为这会直接创建一个全局变量。</p>
-</li>
-<li><p>总是使用 ‘===’ 而不是 ‘==’，’===’会直接比较，而’==’必要时会进行类型转换等造成错误。</p>
-</li>
-<li><p>使用typeof instanceof 应当小心。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typeof</span> <span class="literal">null</span> <span class="comment">// object</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">A</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"><span class="keyword">new</span> A() <span class="keyword">instanceof</span> A <span class="comment">// true</span></span><br><span class="line"><span class="keyword">new</span> A() <span class="keyword">instanceof</span> <span class="built_in">Object</span> <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>arguments 对象转换成一个数组</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Array</span>.ptototype.slice.call(<span class="built_in">arguments</span>);</span><br><span class="line"><span class="built_in">Array</span>.from(<span class="built_in">arguments</span>) <span class="comment">//ES6</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>验证一个参数是否是数组</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Array</span>.prototype.toString.call(a) === <span class="string">'[object Array]'</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>取得一个数组中最大值与最小值</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Math</span>.max.apply(<span class="built_in">Math</span>, arr);</span><br><span class="line"><span class="built_in">Math</span>.min.apply(<span class="built_in">Math</span>, arr);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>使用splice删除数组中某一个/一些元素，而不是使用delete，如果使用delete的话，相当于只是把原值变为undefined</p>
-</li>
-<li><p>使用for .. of来遍历数组，使用for .. in 要避免遍历到原型上面的可枚举属性，使用hasOwnProperty()来检测</p>
-</li>
-<li><p>不要扩展Object.prototype，因为这会给所有(?)对象增加属性/方法，从而产生很多意想不到的行为和错误！</p>
-</li>
-<li><p>对于一个构造函数，总是使用 new进行构造函数调用，否则默认返回空(对象)。</p>
-</li>
-<li><p>arguments.callee() 可执行当前函数，不推荐使用。</p>
-</li>
-<li><p>认识 ‘+’运算符， 对于对象而言，会转换成字符串，对于其他运算符则会尝试转成数字。</p>
-</li>
-<li><p>在使用if语句是，如果需要在条件中赋值，需要加上括号：<br><code>`</code>javascript<br>if((x = y)){<br>// do something<br>}<br>并且结果是否为真取决于y的真假。</p>
-</li>
-<li><p>判断一个数是否为NAN使用 x !== x,为true则该变量为NAN(NAN不等于自身)</p>
-</li>
-</ol>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="cjzl6nc0g002ntkj6qxgdkpq9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-在express中使用cookie" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/03/16/在express中使用cookie/">在Express中使用Cookie</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/03/16/在express中使用cookie/">
-            <time datetime="2017-03-16T08:11:42.000Z" itemprop="datePublished">2017-03-16</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Node-js/">Node.js</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说<code>cookie</code>到底是什么。</p>
+            <h2 id="什么是JSX？"><a href="#什么是JSX？" class="headerlink" title="什么是JSX？"></a>什么是JSX？</h2><blockquote>
+<p>简单点说，JSX是对javascript的扩展，语法类似于XML，但JSX不是一门新的语言，<br>确切来说只是语法糖，每一个XML都会被响应的转换工具转换成纯的javascript代码。<br>在使用React时，你没有必要使用JSX来构建组件，但是推荐使用JSX，因为这样可以让组件的结构<br>和组件之间的关系看起来更清晰。</p>
 </blockquote>
-<h3 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h3><p>Cookie是服务器保存在浏览器中的一段小(一般而言size&lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信息。</p>
-<p>在浏览器中我们只需要使用<code>document.cookie</code>来得到当前页面所属的cookie。请注意，返回的cookie是以字符串形式存在的，不同的key-value之间通过’;’来分割，所以如果你想对齐进行进一步操作，需要相应的处理。</p>
-<p>这里需要注意的是，<code>document.cookie</code>属性是可写的，这就意味着你可以手动添加cookie，使用<code>document.cookie=&quot;name=value&quot;</code>的形式。注意，这里是添加，而不产生覆盖。</p>
-<p>好了，关于cookie的属性的具体含义和用法，大家可以自行去了解。</p>
-<h3 id="我的问题"><a href="#我的问题" class="headerlink" title="我的问题"></a>我的问题</h3><p>我在使用服务器端使用cookie的时候出现了问题，出现这样问题的原因很简单，首先我对cookie存在错误的理解，请务必注意，cookie是服务器发送给客户端，而客户端在发起请求的时候携带cookie而已。在正确认识cookie之后，并且成功的将cookie发送到浏览器过后，问题又来了，我在请求的时候，cookie却不能发送到服务端。我使用的是下面一段代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'/login?'</span>+stringify_data, &#123;</span><br><span class="line">        method: <span class="string">'GET'</span></span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> res.json();</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(json.status);</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'oh ! error!'</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里我使用了fetch API，在能够正确的发送请求的情况下，服务器无法读取到相应的cookie信息，同样在chrome开发者工具中查看请求头也发现请求并没有携带cookie信息。我想着一定是fetch API的问题，所以我赶快写了一个使用Ajax的请求，很显然，能够正确的发起携带cookie的请求。好吧，写到现在，我想的确是fetch API的问题了，阅读文档发现fetch API发送的请求默认是不带cookie的，必须手动设置(无论是出于什么样的考虑，但还是觉得坑)！好吧，问题迎刃而解，我们只需要在fetch函数第二个参数设置<code>credentials: &#39;include&#39;</code>就可以发送cookie了/无奈！</p>
-<h3 id="在express中使用cookie"><a href="#在express中使用cookie" class="headerlink" title="在express中使用cookie"></a>在express中使用cookie</h3><p>在express中使用cookie是一件十分惬意的事情，因为如果你使用<code>cookie-parser</code>中间件的话，那么我们只需要使用<code>res.cookie(name, value[,options])</code>就可以设置cookie了，关于options相关的参数可以自行学习！</p>
-<p>如果想删除cookie，也很简单，使用<code>res.clearCookie(name)</code>就可以啦。</p>
-<p>当然如果想获取请求头发过来的cookie，我们只需要使用<code>req.cookies</code>就可以了，这里返回的是一个JS对象，我们直接可以使用<code>name</code>来读取值，从而做进一步的操作。</p>
-<p>在使用了<code>cookie-parser</code>中间件过后，在服务端操作cookie已经足够简单，并且<code>cookie-parser</code>不但提供了非签名使用的方式，还提供了签名的使用方式，具体使用是在使用中间件的时候添加一个secret，<code>app.use(cookieParser(&#39;secret&#39;))</code>即可，当然，在获取cookie的时候使用 <code>req.signedCookies</code>属性就好了。</p>
-<p>好了，如果你不想使用<code>cookie-parser</code>，我们也能够通过<code>req.headers.cookies</code>(感到罪恶所以不推荐/无奈)访问到cookie，如果想写cookie的话，使用<code>res.setHeader(name, value)</code>(再次感到罪恶)或者<code>res.writeHead(status[,options])</code>就可以了…</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>一般情况下，文章末尾，我总会写一点鸡汤/无奈，这次也不例外。距离写上一篇博客已经过了很久了，起初有两篇想写的文章，一篇是在RN中使用Navigator，另外一篇则是介绍我自己正在学习的几种分类算法。可是当创建好文件准备开工时，我因为写一篇文章可能需要2-3个小时(我速度慢)或者是因为真的动笔写的时候反而觉得没什么要说的就放弃了。然后一段时间过后，或许是因为忙，或许是因为懒，或许是因为浮躁，就是没有去实践，没有去巩固，而把一切都抛之脑后，然后把前面学习到的忘得一干二净！</p>
-<p>嗯，这的确的真实的！仅此而已！</p>
-<p>END</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="cjzl6nc0f002ltkj6zqh2qws4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/03/16/在express中使用cookie/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/03/16/在express中使用cookie/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-兑水的心灵鸡汤" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/28/兑水的心灵鸡汤/">兑水的心灵鸡汤</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/28/兑水的心灵鸡汤/">
-            <time datetime="2017-02-28T13:02:27.000Z" itemprop="datePublished">2017-02-28</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/心灵记事/">心灵记事</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>好久不逛简书！</p>
-<p>记不住曾经是以什么方式登录过简书，在我把QQ，微信，手机号，微博都试了一遍过后，我终于登录上去了。随便翻了翻首页，第一篇文章就是《心灵鸡汤是怎么忽悠我们的？》。匆忙看完，尚在回味之中，突然发现自己曾经也是一个鸡汤高手，生产过数十篇鸡汤软文，然后着急翻看，发现果真如此！</p>
-<p>总结下来，我熬的心灵鸡汤大概有这样的特点：写自己的故事，还算完美的结局，极高的迷惑性，不认真看或者不了解我的人根本意识不到他们已经喝了我的鸡汤。</p>
-<p>丑小鸭都能变成白天鹅，所以一切都会变好的。可实际上，丑小鸭之所以能够成为白天鹅，并不仅仅是因为它努力，勤奋，而是他的父母本身就是白天鹅。</p>
-<p>爱笑的女孩子运气都不会太差。可实际上，如果一个女孩运气一直不好，她怎么可能笑得出来？</p>
-<p>刚刚看完自己三年前的一篇鸡汤文，讲述的是一个不起眼的男孩的成长历程。这个故事就像丑小鸭的故事那样，那个男孩通过不懈的努力最终成为佼佼者。当然那个男孩不是我自己，而我的真实情况却是，整个高中三年，我因上课期间逃到校外上网不下10次，每个星期天唯一的半天假期我大都在网吧度过；由于我对手机的痴狂，我甚至一个月会换好几个手机；篮球水平也没有那么好。而至于我最终为什么能够考上大学，这个我真的不知道，也许我真有过刻苦和努力的那段时光吧。</p>
-<p>我开始揣摩我当时的心理，可是依然没有任何头绪。我猜，我写文章的时候从来没想过让别人看见，我在给自己炖鸡汤，然后自己大口大口的喝下去。当刚刚喝完的时候可能我很解气，顿时觉得神清气爽有精神，可一段时间过后，我又感到烦躁无比，因为我又要面对摆在眼前那么真切的问题，我最终从自己幻想的那个世界中爬出来，面对强烈的反差，消极和怠慢丛生，然后开始耽误，一天，一周，一年，一辈子…</p>
-<p>我继续看文章，有几篇是在我在外校做交流生的时候写的。不知道能不能算鸡汤文吧，但至少还是有一股鸡汤味。然后我又发现了一个共性，所有的文章都是我在遇到问题踌躇满怀的时候写的，比如刚来到陌生校园而找不到上课教室过后，和室友闹了小矛盾过后，离别的时候。这又能说明什么问题呢？当我开始把心中所有的烦躁和愤怒写出来过后，我的确好了很多，因为在构思一篇文章的时候，我出奇的冷静。当文章写完，消极和愤怒开始消退，短时间内信心爆棚，此时鸡汤的功效正在起作用；一段时间过后，我又开始烦躁，负能量急速增长，我想，我似乎得了鸡汤依赖症。所以不断的熬鸡汤，不断的喝自己熬的鸡汤，已经成为了我的常态。</p>
-<p>做菜也许是我为数不过get到的技能，所以文章的最后讲讲我认为的好的熬鸡汤的方式。</p>
-<p>材料：4-6个月母鸡，腌制萝卜整只多只，当归若干，枸杞少量，鲜竹笋数只，姜蒜，料酒，食盐若干。<br>步骤：</p>
-<ol>
-<li>在剔除多余的胸脯肉和鸡腿肉过后，切成小块洗净；</li>
-<li>加入食盐，料酒搅拌均匀静置半小时；</li>
-<li>使用60度热水清洗干净，放锅里炒干水汽备用(可适当加入油和盐)；</li>
-<li>加入适当清水，片状的姜，整只蒜，以及大块的腌制萝卜，大火煮开；</li>
-<li>倒入鸡肉，枸杞，小火炖上1小时；</li>
-<li>加入切好的竹笋，再小火炖上1小时，鸡汤就可以出锅了，如果觉得不够鲜，还可以加入适当鸡精调味。</li>
-<li>热腾腾的鸡汤，享用吧！</li>
-</ol>
-<p>曾经有人给我说过，做程序员写代码要开心，不然就不要写了。我想说，鸡汤要好好做，不然还不如不做。</p>
-<p>共勉！</p>
-<p>END</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/" data-id="cjzl6nc0e002jtkj6hyo9kzdt" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/28/兑水的心灵鸡汤/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Flex弹性布局" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/22/Flex弹性布局/">Flex弹性布局</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/22/Flex弹性布局/">
-            <time datetime="2017-02-22T08:09:48.000Z" itemprop="datePublished">2017-02-22</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/CSS/">CSS</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>说起布局，我脑子里一下就想到了DIV+CSS布局，毕竟曾经被那么多写着DIV+CSS网页开发的书籍洗过脑，然后到现在还不怎么会用这种大众的布局方式。当然了，其实页面还有其它的一些布局方式，比如表格布局，框架布局这样已经逐渐被淘汰的布局方式，也有今天的主角–一颗冉冉上升的新星，弹性盒子布局。</p>
+<p>好了，开始使用JSX吧！</p>
+<blockquote>
+<p>首先我们分别使用JSX和纯js来渲染一个组件</p>
 </blockquote>
-<p>Flex是Flexible Box的简称，我们这里把其翻译为弹性布局，至于为什么不叫“灵活的盒子布局”。额，这个问题也许会在读完本篇文章找到答案。好吧，正式开始。</p>
-<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>flex是display的一个属性，当然对于行内元素还有一个叫做flex-inline的属性，这里我们不多说，但是要注意的是，一旦对一个元素的display属性设为flex，那么它的子元素就不能使用“浮动(float)”这个神奇的属性，而这个元素将会一跃成为容器(container)，而其的子元素将会成为项目。好吧，先从容器说起。</p>
-<p>一旦把一个元素的display属性设置成为’flex’，这个元素就成为一个<code>容器</code>，<code>容器</code>有几个比较重要的属性，学习和掌握这几个属性是学习弹性布局的关键。它们分别是：</p>
-<ol>
-<li>flex-direction: 决定子元素(项目)的排列方向。</li>
-<li>justify-content: 指定子元素在主轴上的对齐方式。</li>
-<li>flex-wrap: 指定多行显示以及显示形式。</li>
-<li>align-items: 决定项目在交叉轴上的对齐方式。</li>
-<li>align-content: 定义项目在多轴线上的对齐方式。</li>
-</ol>
-<p>好吧，大概就是这几个了，我们注意到在上面解释的时候提到了<code>主轴</code>和<code>交叉轴</code>，这里我先简单解释一下：对于这个概念，我们可以很简单的在一个容器上画一个十字坐标轴，如果我们设置flex-direction为row(行)，那么横坐标就为主轴，纵坐标就是交叉轴，这里要注意坐标轴的指向，因为同样有一个属性为<code>row-reverse</code>，此时主轴的方向指向和设置为<code>row</code>的相反方向。</p>
-<h3 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h3><p>作为容器的子元素，项目同样有几个重要的属性：</p>
-<ol>
-<li>order: 控制项目的排列，默认为0，值越小则越靠前。</li>
-<li>flex-grow: 用于定义Flex项目的放大比例，默认为0，即使存在剩余空间，也不放大。</li>
-<li>flex-shrink: 用于定义Flex项目的缩小比例，默认为1，即空间不足，Flex项目将等比缩小。</li>
-<li>align-self: 允许单个Flex项目有不同于其他Flex项目的对齐方式。</li>
-</ol>
-<h3 id="然后"><a href="#然后" class="headerlink" title="然后"></a>然后</h3><p>我并不会把每一个属性具体来讲，因为这样的文章在网络上的确太多了。我正在学习RN，所以在这里就写一个界面，其中的布局将会采用弹性布局，中途我会对布局进行简单的分析，以加深理解。<br>当写到这里的时候我就开始布局这个简单的页面，然后到现在才布局好，时间用了那么长，感觉像是过了一年…好了，不多说了，最终的界面如下图所示。<br><img src="http://olro3ke8a.bkt.clouddn.com/images/hexoSimulator%20Screen%20Shot%2022%20Feb%202017,%209.38.36%20PM.png" width="300px" height="500px"><br>其实我也不知道自己写了啥，还是勉为其难的就叫其“登录页面”吧，现在我来分析一下这个页面哪些元素是容器和项目(当然都是项目啦)，又在什么地方使用了什么属性。</p>
-<p>页面整体采用了弹性布局，所以从整体来看我们一定使用了flex-direction属性，并且其值是<code>column</code>，所以这里的主轴一定是Y轴并且是方向向上。并且我们能够观察到，页面上所有的元素都是居中的，我们于是想到了在交叉轴上的对齐方式是: align-items: ‘center’，而其主轴上的对齐方式则是默认的justify-content: ‘flex-start’。</p>
-<p>接下来来看两个不明显的，页面上有两个输入框，每个输入框其实都是一个<code>View</code>组件包裹，那么在这个组件内部，我们仍然使用了弹性布局(竖轴为主轴)，为了让输入框上下居中，这里必须让justify-content: ‘center’；紧接着最后一行有两个按钮，这两个按钮同样在一个<code>View</code>组件中，并且这个<code>View</code>也是弹性布局，并且一定要设置flex-direction: ‘row’才能让这两个按钮排列在一行。我们同样可以给每个按钮赋予不同的order值，让其进行排序。</p>
-<p>总结一下：<br>我们是用弹性布局完成了一个基本页面的布局(虽然这真的很丑陋)，在这个简单的布局中我们使用到的属性并不多，但是的确比使用css+div布局来得更快，尤其是垂直上的居中，css是比较难以实现的。这里我们一共有四个容器，分别是最外层容器，每一个输入框外层容器，按钮组外层容器，当然，这里面所有的元素都能称为项目，这里就不在多说。</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>说了这么多，那么我对flex布局的态度到底是什么？一句话总结，学习它，了解它，使用它。弹性布局我在刚开始学习React的时候就有了解过，过了也快半年了吧，当时看着阮一峰老师的文章，感觉怎么都不明白，然后渐渐抛之脑后。直到学期开始，我开始学习RN，再一次接触到Flex布局，才想起来画一些时间去了解，然后试着使用，最后再让自己记忆下来。相比第一次我接触Flex布局，我做出了改变，而这种改变是在时间并不充裕的情况下，弥足珍贵的。希望自己能够加油，也希望和我有同样压力的同学加油！</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 使用JSX</span></span><br><span class="line">ReactDOM.render(</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;h2&gt;使用了JSX语法糖&lt;<span class="regexp">/h2&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>div&gt;,</span><br><span class="line">    <span class="built_in">document</span>.body</span><br><span class="line">)</span><br><span class="line"><span class="comment">// 不使用jsx</span></span><br><span class="line">ReactDOM.render(</span><br><span class="line">    React.createElement(<span class="string">'div'</span>, <span class="literal">null</span>,</span><br><span class="line">        React.createElement(<span class="string">'h1'</span>, <span class="literal">null</span>, <span class="string">'不使用jsx'</span>)</span><br><span class="line">    ),</span><br><span class="line">    <span class="built_in">document</span>.body</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h2 id="html标签和React组件"><a href="#html标签和React组件" class="headerlink" title="html标签和React组件"></a>html标签和React组件</h2><blockquote>
+<p>ReactDOM.render()可以渲染html标签，也可以渲染React组件，但是这里有一些命名上的规范</p>
+</blockquote>
+<p>html标签使用<em>首字母小写</em>的方式，但使用首字母大写也能够正常加载</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> renderDiv = &lt;div&gt;这是一个标签&lt;/div&gt;</span><br><span class="line">ReactDOM.render(renderDiv, <span class="built_in">document</span>.body)</span><br></pre></td></tr></table></figure>
+<p>React组件使用首字母大写的方式</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> RenderComp = React.createClass(&#123;</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span>: &lt;div&gt;这是一个组件&lt;/div&gt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(&lt;RenderComp /&gt;, document.body)</span><br></pre></td></tr></table></figure>
+<p>经过测试，发现如果使用首字母小写的方式，将不会正常渲染组件，也不会报错, 当然你也可以这样写:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> RenderComp = React.createClass(&#123;</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span>: &lt;div&gt;这是一个组件&lt;/div&gt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> renderComp = &lt;RenderComp /&gt;</span><br><span class="line">ReactDOM.render(renderComp, document.body)</span><br></pre></td></tr></table></figure>
+<h2 id="js表达式"><a href="#js表达式" class="headerlink" title="js表达式"></a>js表达式</h2><blockquote>
+<p>当我们想要在React中使用js变量或者是表达式时候,使用{}来进行包裹，不能够出现””,否则会被当作字符串。</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> SampleComp = React.createClass(&#123;</span><br><span class="line">    getInitialState: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            iscls: <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            <span class="comment">// 表达式</span></span><br><span class="line">            &lt;div className=&#123;<span class="keyword">this</span>.state.iscls ? <span class="string">'cls'</span> : <span class="string">'no_cls'</span>&#125;&gt;</span><br><span class="line">            <span class="comment">// 变量</span></span><br><span class="line">            &lt;h2&gt;&#123;<span class="keyword">this</span>.props.msg&#125;&lt;<span class="regexp">/h2&gt;</span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(&lt;SampleComp msg='学习搬砖中...' /&gt;, document.body)</span><br></pre></td></tr></table></figure>
+<p>这里提示一下，在JSX中，标签的class和for属性分别使用className和htmlFor代替了</p>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><blockquote>
+<p>在给标签添加style属性的时候，应该这样写:</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">style=&#123;&#123;<span class="attr">display</span>: <span class="string">'none'</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>也可以把要应用的样式赋值给一个变量，再使用变量</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> style = &#123;</span><br><span class="line">    color: red,</span><br><span class="line">    display: none</span><br><span class="line">&#125;;</span><br><span class="line">&lt;div style=&#123;style&#125;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>HTML转义，为了防止XSS攻击，React默认是使用转义的,所以当你想使用一些富文本这里就必须注意<br>为了不让其转义，我们可以这样写：</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> mesg = <span class="string">'&lt;h2&gt;这里的字体大小是多少?&lt;/h2&gt;'</span></span><br><span class="line">ReactDOM.render(</span><br><span class="line">    &lt;div dangerouslySetInnerHTML=&#123;&#123;<span class="attr">__html</span>: mesg&#125;&#125;&gt;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;,</span></span><br><span class="line"><span class="regexp">    document.body</span></span><br><span class="line"><span class="regexp">)</span></span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><blockquote>
+<p>刚开始学习React的时候对JSX是生畏的，以为会很难理解。当慢慢的接触React，踩过一些小坑，<br>发现使用JSX是那么好掌握, 它仅仅是语法糖而已，并且转换的规则也很简单</p>
+</blockquote>
 
         
         </div>
@@ -1528,7 +1173,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="cjzl6nbzj000ztkj64l28r74g" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/11/React学习之JSX/" data-id="ck00osj7q0006acj6w541cxew" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1596,7 +1241,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/02/22/Flex弹性布局/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/22/Flex弹性布局/">评论</a>
+        <a href="http://yoursite.com/2016/10/11/React学习之JSX/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/10/11/React学习之JSX/">评论</a>
     
 
         </footer>
@@ -1606,7 +1251,7 @@
 
 
 
-    <article id="post-生成器" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-写在正式学习React之前" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -1614,7 +1259,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/11/生成器/">生成器</a>
+            <a class="article-title" href="/2016/10/10/写在正式学习React之前/">写在正式学习React之前</a>
         </h1>
     
 
@@ -1623,8 +1268,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/02/11/生成器/">
-            <time datetime="2017-02-11T04:10:07.000Z" itemprop="datePublished">2017-02-11</time>
+        <a href="/2016/10/10/写在正式学习React之前/">
+            <time datetime="2016-10-10T10:35:22.000Z" itemprop="datePublished">2016-10-10</time>
         </a>
     </div>
 
@@ -1633,7 +1278,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+        <a class="tag-link" href="/tags/React/">React</a>
     </div>
 
                     </div>
@@ -1644,24 +1289,38 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <blockquote>
-<p>大家对于<em>异步</em>这个词想必都不陌生，看到异步我可能最先想到的就是使用回调，再者我会使用Promise，可是使用回调处理异步控制流是有缺陷的：第一，基于回调的异步方式实在不适合大脑对于任务的思考(这点我深有体会)；第二，存在控制反转的问题。而Promise链提供了我们以顺序的方式处理和表达异步流。而这篇文章的主角生成器(generator)也是一种顺序和看似同步的处理异步的方式，并且它比Promise更加优秀。</p>
+            <p>如果你还不知道大名鼎鼎的ReactJS, 先去<a href="https://facebook.github.io/react/" target="_blank" rel="noopener">这里</a>看看吧</p>
+<blockquote>
+<p>在使用过了诸如BootStrap, Foundation这类的前端框架后，在初识React就被其虚拟DOM和组件化的开发深深的吸引。<br>然后在接下来的几天，我慢慢的对React产生的恐惧，模式转变得太快，让我很不舒服。<br>然后又经过几天玩坏了，我才返现React简直是一股清流，开始爱上它了！</p>
 </blockquote>
-<h3 id="有关函数"><a href="#有关函数" class="headerlink" title="有关函数"></a>有关函数</h3><p>不知道大家有没有这样思考过，一个函数一旦执行，其是否能够中断，我也没有仔细想这个问题，并且当看到这个问题，我会经验判断函数在执行过程中不会中断。到底是否中断，我们先写一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  bar();</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">&#125;</span><br><span class="line">foo(); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
-<p>运行上面这个例子，最终的结果是3，这就意味着，当函数执行完a++后，函数foo从表面上来看被中断了，然后执行了bar函数，最后执行权交给foo，函数返回已经被修改的变量a的值。虽然通过上面的小例子，并且因为JS单线程的特性，我们似乎能够肯定JS是抢占式的，但实际情况是JS并不是抢占式的，虽然函数bar的执行打断了函数foo的执行，但这其实是一种“关联”(参考原型继承)。</p>
-<h3 id="初识生成器"><a href="#初识生成器" class="headerlink" title="初识生成器"></a>初识生成器</h3><p>现在让我们来认识生成器表达式，<br>同样是上面的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  a++;   </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> iter = foo();</span><br><span class="line">iter.next();</span><br><span class="line">bar();</span><br><span class="line">iter.next(); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
-<p>分析一下：<br>首先我们创建了一个生成器foo(注意*)，该函数里面多了一个yield，有过python经验的大概知道这是干什么的。然后创建了一个函数bar；再来看执行，这里var iter = foo()并没有执行生成器foo，而是构建了一个迭代器，然后使用next方法启动了迭代器foo，并且在碰到yield停止执行，此时已经执行了x++，然后执行函数bar，执行完后，x经过两轮自增，此时x的值为3；最后我们调用next方法，从上一次中断处继续执行，并且没有碰到yield表达式，一直执行到函数结束，打印变量x的值为3。</p>
-<p>现在我们来回答什么是生成器，其是一个特殊的函数，在函数声明的时候函数名前面包含一个”*“，并且能够多次启动和暂停。好了，我认为仅此而已。</p>
-<h3 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h3><p>为了把生成器运用到异步流程控制中，我们还需要更深层次的了解生成器。</p>
-<h4 id="生成器仍然是一种函数"><a href="#生成器仍然是一种函数" class="headerlink" title="生成器仍然是一种函数"></a>生成器仍然是一种函数</h4><p>既然说生成器其本质上还是一种函数，所以其仍然具备函数最基本的特性，能够传递参数，也能返回值。我们不妨写一个例子测试一下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">test</span>(<span class="params">a, b</span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span>;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = test(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">it.next();</span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure></p>
-<p>其实生成器和普通函数的一个很大区别是在运行期间，它不会直接运行，而是创建了一个迭代器，然后每调用迭代器的next方法，便向下执行直到到碰到yield或者执行完成暂停。而我们注意到调用next方法返回的其实是一个对象，其包含一个value属性，如果生成器返回值的话，那么该属性的值就为生成器返回的值。总的来说，生成器的运行到目前为止完全是依托迭代器。</p>
-<p>好了，继续。</p>
-<p>继续来看例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params">a, b</span>)</span>&#123;</span><br><span class="line">  a++;</span><br><span class="line">  <span class="keyword">yield</span> a;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line"><span class="keyword">var</span> mid = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(mid.value); <span class="comment">// 2</span></span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.next); <span class="comment">// 4</span></span><br></pre></td></tr></table></figure></p>
-<p>这个例子想表达的就是对于生成器而言，yield表达式总会返回一个值，而我们可以通过迭代器next方法生成的对象来得到。</p>
-<p>继续来看一个更复杂的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params">a</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> b = a + (<span class="keyword">yield</span> <span class="string">'ok return!'</span>);</span><br><span class="line">  <span class="keyword">return</span> b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">var</span> res = it.next();</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// ok return!</span></span><br><span class="line">res = it.next(<span class="number">2</span>);</span><br><span class="line"><span class="built_in">console</span>.log(res.value); <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
-<p>这个例子向我们展示了生成器是如何双向传递消息的，yield表达式可以发出消息响应next(…)的调用，而next(…)可以向暂停的yield表达式发送值。</p>
-<h4 id="多个迭代器"><a href="#多个迭代器" class="headerlink" title="多个迭代器"></a>多个迭代器</h4><p>一个生成器的多个实例可以并发执行，并且可以彼此交互。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">gen</span>(<span class="params">a</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> b = a + (<span class="keyword">yield</span>)</span><br><span class="line">  <span class="keyword">return</span> b</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it1 = gen(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">var</span> it2 = gen(<span class="number">2</span>);</span><br><span class="line">it1.next();</span><br><span class="line"><span class="keyword">var</span> res = it1.next(<span class="number">3</span>).value;</span><br><span class="line">it2.next();</span><br><span class="line"><span class="built_in">console</span>.log(it2.next(res).value); <span class="comment">// 6</span></span><br></pre></td></tr></table></figure></p>
-<p>这个例子想说明的是一个生成器的多个实例可以并发执行，并且是互不干扰的。</p>
+<p>好了，开始使用React吧！</p>
+<h2 id="安装React"><a href="#安装React" class="headerlink" title="安装React"></a>安装React</h2><p>请先安装<a href="https://nodejs.org/en/" target="_blank" rel="noopener">Node</a>和npm</p>
+<p>使用React之前，先来安装一下<a href="https://segmentfault.com/a/1190000000349555" target="_blank" rel="noopener">bower</a>吧</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g bower</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>安装bower后我们来正式的进入React的学习中来</p>
+</blockquote>
+<p>新建一个目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir proj</span><br></pre></td></tr></table></figure>
+<p>使用以下命令来安装React</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ bower install react</span><br></pre></td></tr></table></figure>
+<p>安装完后我们在proj目录下会看见一个bower_components目录,目录里面有一个React目录，ok！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ touch index.html</span><br></pre></td></tr></table></figure>
+<p>使用文本编辑器打开index.html, 开始码起！</p>
+<h2 id="第一个React-helloworld"><a href="#第一个React-helloworld" class="headerlink" title="第一个React helloworld"></a>第一个React helloworld</h2><blockquote>
+<p>引入react.js和react-dom.js（在head,或者body中引入都可以，但是必须在我们开写地方的上面）</p>
+</blockquote>
+<p>就像这样<br><img src="https://d17oy1vhnax1f7.cloudfront.net/items/3x0G1z2L1J3S3O2k1V1l/Image%202016-10-10%20at%209.34.45%20%E4%B8%8B%E5%8D%88.png?v=a8b26e20" alt="引入图片"></p>
+<blockquote>
+<p>接着申明一个script标签</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/babel"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>注意这里的type是<code>text/babel</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> HelloWorldComponent = React.createClass(&#123;</span><br><span class="line">	render: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;div id=<span class="string">"app"</span>&gt;</span><br><span class="line">				&lt;h1&gt;开始学习使用工具搬砖啦！&lt;<span class="regexp">/h1&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>div&gt;</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">HelloWorldComponent</span> /&gt;</span>, document.body)</span></span><br></pre></td></tr></table></figure>
+<p>好了，不出意外的话，我们将会在浏览器中看到<br><img src="https://d17oy1vhnax1f7.cloudfront.net/items/320E0g0c3B2s2P2z1N2l/Image%202016-10-10%20at%2010.14.14%20%E4%B8%8B%E5%8D%88.png?v=b564cf5d" alt="结果图"></p>
+<blockquote>
+<p>好啦，我们的第一个react组件算是开发完成了，这里讲一讲我们到底做了什么<br>首先我们使用了JSX语法，有关JSX的知识会单独的加深了解,但是最基本的规则就是，遇到{}解析成js，遇到‘&lt;’解析成html<br>然后使用了React提供的createClass来创建一个组件类，类名一定要大写，实现了其中一个必须要实现的render方法，返回一个h1标签<br>最后使用ReactDOM.render()渲染到body中去<br>搞定</p>
+</blockquote>
 
         
         </div>
@@ -1672,7 +1331,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="cjzl6nc0x003jtkj6yhhf71vv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2016/10/10/写在正式学习React之前/" data-id="ck00osj93001aacj6jm279moh" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1740,7 +1399,7 @@
 
             
     
-        <a href="http://yoursite.com/2017/02/11/生成器/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/02/11/生成器/">评论</a>
+        <a href="http://yoursite.com/2016/10/10/写在正式学习React之前/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/10/10/写在正式学习React之前/">评论</a>
     
 
         </footer>
@@ -1751,7 +1410,7 @@
 
 
     <nav id="page-nav">
-        <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/5/">下一页 &raquo;</a>
+        <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
     </nav>
 </section>
             
@@ -1764,7 +1423,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">7</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1773,7 +1432,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/周记/">周记</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/晨记/">晨记</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机网络/">计算机网络</a><span class="tag-list-count">2</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1782,7 +1441,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/About/" style="font-size: 10px;">About</a> <a href="/tags/CSS/" style="font-size: 11.43px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 18.57px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 14.29px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/周记/" style="font-size: 17.14px;">周记</a> <a href="/tags/心灵记事/" style="font-size: 15.71px;">心灵记事</a> <a href="/tags/晨记/" style="font-size: 12.86px;">晨记</a> <a href="/tags/杂谈/" style="font-size: 12.86px;">杂谈</a> <a href="/tags/计算机网络/" style="font-size: 11.43px;">计算机网络</a>
+            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 
