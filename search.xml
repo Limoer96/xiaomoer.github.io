@@ -1746,7 +1746,7 @@
     <entry>
       <title></title>
       <url>http://yoursite.com/about/index.html</url>
-      <content type="html"><![CDATA[<p>Nickname: Limoer</p>
+      <content type="html"><![CDATA[<p>Nickname: Limoer <a href="/chat/index.html">CHAT WITH ME!</a></p>
 <p>Profession: software engineering</p>
 <p>Profile: I’m a student from SDU. I’m focusing on browser side developing. I like the amazing and ridiculous language - JavaScript!</p>
 ]]></content>
