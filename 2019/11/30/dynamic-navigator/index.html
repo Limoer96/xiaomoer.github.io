@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>JS定时器知多少 | Limoer的记事小本</title>
+    <title>React-Navigation实现动态Tab路由 | Limoer的记事小本</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="在JavaScript中，定时器是一个经常被误用且不被大家所熟识的特性。但在构建应用时其却非常有用。定时器提供了一种让一段代码在一定的时间之后运行的能力。由于JS的单线程特性，其同一时间只能执行一处代码，而定时器跳出了这一性质，以其特有的方式来执行代码。 在浏览器环境当中，window对象下有两组方法，setTimeOut()/clearTimeOut()以及setInterval()/clear">
-<meta name="keywords" content="JavaScript">
+    <meta name="description" content="有一个需求：在用户未登录和已经登陆的情况下，需要渲染不同的底部导航菜单，而该导航栏其实是react-navigation-tabs的实例，并且不支持动态导航。  这个是一个很常见的需求，在这个issue下面有很多讨论，针对此需求，也提供了一系列解决方案。 动态导航我们使用createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)来创建ta">
+<meta name="keywords" content="React-Native">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JS定时器知多少">
-<meta property="og:url" content="http://yoursite.com/2016/11/06/JS定时器知多少/index.html">
+<meta property="og:title" content="React-Navigation实现动态Tab路由">
+<meta property="og:url" content="http://yoursite.com/2019/11/30/dynamic-navigator/index.html">
 <meta property="og:site_name" content="Limoer的记事小本">
-<meta property="og:description" content="在JavaScript中，定时器是一个经常被误用且不被大家所熟识的特性。但在构建应用时其却非常有用。定时器提供了一种让一段代码在一定的时间之后运行的能力。由于JS的单线程特性，其同一时间只能执行一处代码，而定时器跳出了这一性质，以其特有的方式来执行代码。 在浏览器环境当中，window对象下有两组方法，setTimeOut()/clearTimeOut()以及setInterval()/clear">
+<meta property="og:description" content="有一个需求：在用户未登录和已经登陆的情况下，需要渲染不同的底部导航菜单，而该导航栏其实是react-navigation-tabs的实例，并且不支持动态导航。  这个是一个很常见的需求，在这个issue下面有很多讨论，针对此需求，也提供了一系列解决方案。 动态导航我们使用createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)来创建ta">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2016-11-06T12:22:46.000Z">
+<meta property="og:updated_time" content="2019-11-30T04:52:27.170Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JS定时器知多少">
-<meta name="twitter:description" content="在JavaScript中，定时器是一个经常被误用且不被大家所熟识的特性。但在构建应用时其却非常有用。定时器提供了一种让一段代码在一定的时间之后运行的能力。由于JS的单线程特性，其同一时间只能执行一处代码，而定时器跳出了这一性质，以其特有的方式来执行代码。 在浏览器环境当中，window对象下有两组方法，setTimeOut()/clearTimeOut()以及setInterval()/clear">
+<meta name="twitter:title" content="React-Navigation实现动态Tab路由">
+<meta name="twitter:description" content="有一个需求：在用户未登录和已经登陆的情况下，需要渲染不同的底部导航菜单，而该导航栏其实是react-navigation-tabs的实例，并且不支持动态导航。  这个是一个很常见的需求，在这个issue下面有很多讨论，针对此需求，也提供了一系列解决方案。 动态导航我们使用createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)来创建ta">
     
 
     
@@ -211,7 +211,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-JS定时器知多少" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-dynamic-navigator" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -219,7 +219,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            JS定时器知多少
+            React-Navigation实现动态Tab路由
         </h1>
     
 
@@ -228,8 +228,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2016/11/06/JS定时器知多少/">
-            <time datetime="2016-11-06T11:36:11.000Z" itemprop="datePublished">2016-11-06</time>
+        <a href="/2019/11/30/dynamic-navigator/">
+            <time datetime="2019-11-30T04:49:36.000Z" itemprop="datePublished">2019-11-30</time>
         </a>
     </div>
 
@@ -238,7 +238,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+        <a class="tag-link" href="/tags/React-Native/">React-Native</a>
     </div>
 
                     </div>
@@ -249,16 +249,30 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p>在JavaScript中，定时器是一个经常被误用且不被大家所熟识的特性。但在构建应用时其却非常有用。<br>定时器提供了一种让一段代码在一定的时间之后运行的能力。由于JS的单线程特性，其同一时间只能执行一处代码，而定时器跳出了这一性质，以其特有的方式来执行代码。</p>
-<p>在浏览器环境当中，window对象下有两组方法，setTimeOut()/clearTimeOut()以及setInterval()/clearInterval()分别用于设置定时器让其在一段时间后执行/让其停止和每隔一段时间就会执行一次/清除该定时器。<br>比如下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do somethign</span></span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br><span class="line">setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do this code every 1s</span></span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
-<p>上面的代码分别创建了一个一次执行定时器和循环执行的定时器，每隔一秒钟，function就会被执行一遍</p>
-<p>咋一看，setInterval就像周期性执行setTimeout一样，但是他们有很多不同之处。<br>举个栗子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span> <span class="title">repect</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	setTimeOut(repect, <span class="number">100</span>);</span><br><span class="line">&#125;, <span class="number">100</span>);</span><br><span class="line">setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">// do some thing</span></span><br><span class="line">&#125;, <span class="number">100</span>)</span><br></pre></td></tr></table></figure></p>
-<p>上面两段代码的功能几乎是一样的，但是实际上却不是。setTimeOut()代码中执行前一个回调结束后100毫秒甚至更多，才会执行下一个回调<br>而setInterval()不一样，每隔100毫秒就会尝试执行，不会受到前面回调的影响。那为什么执行一个setTimeOut()执行回调的时间会更长呢？因为js单线程的特性，当计时时间到，回调函数会被放入执行队列排队，并且执行回调是需要时间的，所以执行时间只会大于设置的时间。setInterval()也一样，但有一点，由于其不关注前一个回调执行的情况，如果一直被延迟，那么setInterval()在可用后会无延迟执行。</p>
-<p>好吧，写个栗子证明一下上面的结论：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="built_in">console</span>.time(<span class="string">'测试setTimeOut执行的时间'</span>)</span><br><span class="line">setTimeOut(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.timeEnd(<span class="string">'测试setTimeOut执行的时间'</span>);</span><br><span class="line">&#125;,<span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
-<blockquote>
-<p>执行结果为：<br>测试setTimeOut执行的时间: 1004.673ms</p>
+            <blockquote>
+<p>有一个需求：在用户未登录和已经登陆的情况下，需要渲染不同的底部导航菜单，而该导航栏其实是<code>react-navigation-tabs</code>的实例，并且不支持动态导航。</p>
 </blockquote>
-<p>关于setInterval()的演示和清除定时器的演示这里就不做了。</p>
+<p>这个是一个很常见的需求，在这个<a href="https://github.com/react-navigation/react-navigation/issues/3945" target="_blank" rel="noopener">issue</a>下面有很多讨论，针对此需求，也提供了一系列解决方案。</p>
+<h3 id="动态导航"><a href="#动态导航" class="headerlink" title="动态导航"></a>动态导航</h3><p>我们使用<code>createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)</code>来创建<code>tab</code>导航，其中<code>RouteConfigs</code>接受一个导航名称和路由的映射对象，一般情况下，<code>RouteConfigs</code>是确定的，比如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tab nav配置</span></span><br><span class="line"><span class="keyword">const</span> RouteConfigs: TabOptions = &#123;</span><br><span class="line">  Home: &#123; <span class="attr">screen</span>: Home &#125;,</span><br><span class="line">  Purchase: &#123; <span class="attr">screen</span>: Purchase &#125;,</span><br><span class="line">  Brand: &#123; <span class="attr">screen</span>: Brand &#125;,</span><br><span class="line">  Sell: &#123; <span class="attr">screen</span>: Sell &#125;,</span><br><span class="line">  Management: &#123; <span class="attr">screen</span>: Management &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 创建底部tab路由</span></span><br><span class="line"><span class="keyword">const</span> BottomTabRoutes = createBottomTabNavigator(RouteConfigs, &#123;</span><br><span class="line">  ...TabNavigatorConfig</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 接入到App路由中</span></span><br><span class="line"><span class="keyword">const</span> AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; <span class="attr">screen</span>: BottomTabRoutes &#125;,</span><br><span class="line">    ...pageRoutes</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><code>createBottomTabNavigator</code>接收<code>RouteConfigs</code>作为参数，返回一个类型为<code>NavigationContainer</code>的值：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// NavigationContainer 类型定义</span></span><br><span class="line">interface NavigationContainer extends React.ComponentClass&lt;NavigationContainerProps NavigationNavigatorProps&lt;any&gt;&gt; &#123;...&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过查看<code>NavigationContainer</code>的定义，可以发现其是一个<code>React</code>组件。所以第一种方式就是自定义一个组件，在该组件中返回<code>NavigationContainer</code>实例即可。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigater</span> <span class="keyword">extends</span> <span class="title">Compoent</span> </span>&#123;</span><br><span class="line">  _genNav() &#123;</span><br><span class="line">    <span class="keyword">let</span> NavConfig = [....]</span><br><span class="line">    <span class="comment">// 对`NavConfig`的一系列的处理</span></span><br><span class="line">    <span class="keyword">return</span> createBottomTabNavigator(NavConfig, &#123; ...otherConfig &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Tabs = <span class="keyword">this</span>._genNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">const AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; screen: DynamicTabNavigator &#125;,</span><br><span class="line">    ...otherRouter</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这种方式在该<a href="https://github.com/react-navigation/react-navigation/issues/3945" target="_blank" rel="noopener">issue</a>被证实是可行的，但是在<code>React Navigation</code><strong><em>3.x</em></strong>版本中报错，显示缺少<code>AppContainer</code>，所以还需要使用<code>createAppContainer</code>创建一个容器。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">render() &#123;</span><br><span class="line">  <span class="keyword">const</span> Tabs = createAppContainer(<span class="keyword">this</span>._genNav())</span><br><span class="line">  <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样动态路由就实现了，并且能够在<strong>绝大部分情况下</strong>使用正常，由于使用<code>createAppContainer</code>创建了一个<em>容器</em>，如果该容器并无法包含所有路由，那么还需要的<code>AppContainer</code>，此时就会导航异常。</p>
+<h3 id="实现二"><a href="#实现二" class="headerlink" title="实现二"></a>实现二</h3><p>继续关注<code>createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)</code>方法，第二个参数<code>TabNavigatorConfig</code>包含一个属性<code>tabBarComponent?: React.ReactType</code>，该属性用于设置<code>tabBar</code>如何显示，该属性设置为一个组件。</p>
+<p>所以机会来了！</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; BottomTabBar &#125; <span class="keyword">from</span> <span class="string">'react-navigation-tabs'</span></span><br><span class="line"><span class="keyword">import</span> &#123; DeviceEventEmitter &#125; <span class="keyword">from</span> <span class="string">'react-native'</span></span><br><span class="line"></span><br><span class="line">interface NavigatorState &#123;</span><br><span class="line">  showBrandPage: boolean</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigator</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">any</span>, <span class="title">NavigatorState</span>&gt; </span>&#123;</span><br><span class="line">  state: NavigatorState = &#123;</span><br><span class="line">    showBrandPage: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  subscribe: any</span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>.subscribe = DeviceEventEmitter.addListener(</span><br><span class="line">      <span class="string">'showBrand'</span>,</span><br><span class="line">      (data: boolean) =&gt; &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123; <span class="attr">showBrandPage</span>: data &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// tslint:disable-next-line: no-unused-expression</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe &amp;&amp; <span class="keyword">this</span>.subscribe.remove()</span><br><span class="line">  &#125;</span><br><span class="line">  _tabNav = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; routes, index &#125; = <span class="keyword">this</span>.props.navigation.state</span><br><span class="line">    <span class="keyword">const</span> finalRoutes = [...routes]</span><br><span class="line">    <span class="keyword">const</span> &#123; showBrandPage &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="comment">// ...一系列的操作</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      state: &#123;</span><br><span class="line">        index: finalRoutes.findIndex(<span class="function"><span class="params">route</span> =&gt;</span> currentRoute.key === route.key),</span><br><span class="line">        routes: finalRoutes</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; navigation, ...restProps &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    <span class="keyword">const</span> tabNavConfig = <span class="keyword">this</span>._tabNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;BottomTabBar &#123;...restProps&#125; navigation=&#123;tabNavConfig&#125; /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default DynamicTabNavigator</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const BottomTabRoutes = createBottomTabNavigator(tabNav, &#123;</span><br><span class="line">  tabBarComponent: DynamicTabNavigator</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>通过<code>eventListener</code>的方式接收路由变更信号，最终渲染<code>BottomTabBar</code>时使用修改过后的配置即可。</p>
+<p>这种方式其实是一种<em>障眼法</em>，我们需要在配置静态Tab路由<code>RouteConfigs</code>时配置所有的Tab路由，在<code>DynamicTabNavigator</code>中通过<code>props</code>注入的<code>navigation.state.routes</code>拿到配置的静态路由，并经过一系列的处理最终得到渲染到<code>BottomTabBar</code>中的路由。需要注意的是，如果最终的路由相比静态路由有调整，那么需要更新<code>index</code>，否则点击路由跳转时会出现错误。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
+<p>针对<code>React Navigation</code>无法支持动态路由的问题，以上给出了两种方案，能够在一定程度解决。</p>
+</blockquote>
+<ol>
+<li>第一种方案按需挂载路由，可以算是“真”动态路由；</li>
+<li>第二种方案从可定制的<code>tabBarComponent</code>入手，不改变路由配置，而是在渲染层进行控制，条件渲染<code>BottomTabBar</code>。</li>
+</ol>
 
         
         </div>
@@ -269,7 +283,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2016/11/06/JS定时器知多少/" data-id="ck3l3mh9t0003jsj6l93at4sm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ck3l3mha3000ajsj6niavzbhb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -337,7 +351,7 @@
 
             
     
-        <a href="http://yoursite.com/2016/11/06/JS定时器知多少/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/11/06/JS定时器知多少/">评论</a>
+        <a href="http://yoursite.com/2019/11/30/dynamic-navigator/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/11/30/dynamic-navigator/">评论</a>
     
 
         </footer>
@@ -346,19 +360,10 @@
         
 <nav id="article-nav">
     
-        <a href="/2016/11/15/使用ES6语法写React/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    使用ES6语法写React
-                
-            </div>
-        </a>
     
-    
-        <a href="/2016/10/21/浅谈JS闭包/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2019/08/21/polyfill/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">浅谈JS闭包</div>
+            <div class="article-nav-title">从@babel/preset-env谈多浏览支持构建</div>
         </a>
     
 </nav>
@@ -445,9 +450,9 @@
     <script>
     var disqus_config = function () {
         
-            this.page.url = 'http://yoursite.com/2016/11/06/JS定时器知多少/';
+            this.page.url = 'http://yoursite.com/2019/11/30/dynamic-navigator/';
         
-        this.page.identifier = 'JS定时器知多少';
+        this.page.identifier = 'dynamic-navigator';
     };
     (function() { 
         var d = document, s = d.createElement('script');  

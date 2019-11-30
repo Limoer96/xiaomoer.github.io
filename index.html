@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                38
+                39
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                9
+                10
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,156 @@
 
             
             <section id="main">
+    <article id="post-dynamic-navigator" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2019/11/30/dynamic-navigator/">React-Navigation实现动态Tab路由</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/11/30/dynamic-navigator/">
+            <time datetime="2019-11-30T04:49:36.000Z" itemprop="datePublished">2019-11-30</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React-Native/">React-Native</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>有一个需求：在用户未登录和已经登陆的情况下，需要渲染不同的底部导航菜单，而该导航栏其实是<code>react-navigation-tabs</code>的实例，并且不支持动态导航。</p>
+</blockquote>
+<p>这个是一个很常见的需求，在这个<a href="https://github.com/react-navigation/react-navigation/issues/3945" target="_blank" rel="noopener">issue</a>下面有很多讨论，针对此需求，也提供了一系列解决方案。</p>
+<h3 id="动态导航"><a href="#动态导航" class="headerlink" title="动态导航"></a>动态导航</h3><p>我们使用<code>createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)</code>来创建<code>tab</code>导航，其中<code>RouteConfigs</code>接受一个导航名称和路由的映射对象，一般情况下，<code>RouteConfigs</code>是确定的，比如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tab nav配置</span></span><br><span class="line"><span class="keyword">const</span> RouteConfigs: TabOptions = &#123;</span><br><span class="line">  Home: &#123; <span class="attr">screen</span>: Home &#125;,</span><br><span class="line">  Purchase: &#123; <span class="attr">screen</span>: Purchase &#125;,</span><br><span class="line">  Brand: &#123; <span class="attr">screen</span>: Brand &#125;,</span><br><span class="line">  Sell: &#123; <span class="attr">screen</span>: Sell &#125;,</span><br><span class="line">  Management: &#123; <span class="attr">screen</span>: Management &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 创建底部tab路由</span></span><br><span class="line"><span class="keyword">const</span> BottomTabRoutes = createBottomTabNavigator(RouteConfigs, &#123;</span><br><span class="line">  ...TabNavigatorConfig</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 接入到App路由中</span></span><br><span class="line"><span class="keyword">const</span> AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; <span class="attr">screen</span>: BottomTabRoutes &#125;,</span><br><span class="line">    ...pageRoutes</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><code>createBottomTabNavigator</code>接收<code>RouteConfigs</code>作为参数，返回一个类型为<code>NavigationContainer</code>的值：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// NavigationContainer 类型定义</span></span><br><span class="line">interface NavigationContainer extends React.ComponentClass&lt;NavigationContainerProps NavigationNavigatorProps&lt;any&gt;&gt; &#123;...&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过查看<code>NavigationContainer</code>的定义，可以发现其是一个<code>React</code>组件。所以第一种方式就是自定义一个组件，在该组件中返回<code>NavigationContainer</code>实例即可。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigater</span> <span class="keyword">extends</span> <span class="title">Compoent</span> </span>&#123;</span><br><span class="line">  _genNav() &#123;</span><br><span class="line">    <span class="keyword">let</span> NavConfig = [....]</span><br><span class="line">    <span class="comment">// 对`NavConfig`的一系列的处理</span></span><br><span class="line">    <span class="keyword">return</span> createBottomTabNavigator(NavConfig, &#123; ...otherConfig &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Tabs = <span class="keyword">this</span>._genNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">const AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; screen: DynamicTabNavigator &#125;,</span><br><span class="line">    ...otherRouter</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这种方式在该<a href="https://github.com/react-navigation/react-navigation/issues/3945" target="_blank" rel="noopener">issue</a>被证实是可行的，但是在<code>React Navigation</code><strong><em>3.x</em></strong>版本中报错，显示缺少<code>AppContainer</code>，所以还需要使用<code>createAppContainer</code>创建一个容器。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">render() &#123;</span><br><span class="line">  <span class="keyword">const</span> Tabs = createAppContainer(<span class="keyword">this</span>._genNav())</span><br><span class="line">  <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样动态路由就实现了，并且能够在<strong>绝大部分情况下</strong>使用正常，由于使用<code>createAppContainer</code>创建了一个<em>容器</em>，如果该容器并无法包含所有路由，那么还需要的<code>AppContainer</code>，此时就会导航异常。</p>
+<h3 id="实现二"><a href="#实现二" class="headerlink" title="实现二"></a>实现二</h3><p>继续关注<code>createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)</code>方法，第二个参数<code>TabNavigatorConfig</code>包含一个属性<code>tabBarComponent?: React.ReactType</code>，该属性用于设置<code>tabBar</code>如何显示，该属性设置为一个组件。</p>
+<p>所以机会来了！</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; BottomTabBar &#125; <span class="keyword">from</span> <span class="string">'react-navigation-tabs'</span></span><br><span class="line"><span class="keyword">import</span> &#123; DeviceEventEmitter &#125; <span class="keyword">from</span> <span class="string">'react-native'</span></span><br><span class="line"></span><br><span class="line">interface NavigatorState &#123;</span><br><span class="line">  showBrandPage: boolean</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigator</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">any</span>, <span class="title">NavigatorState</span>&gt; </span>&#123;</span><br><span class="line">  state: NavigatorState = &#123;</span><br><span class="line">    showBrandPage: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  subscribe: any</span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>.subscribe = DeviceEventEmitter.addListener(</span><br><span class="line">      <span class="string">'showBrand'</span>,</span><br><span class="line">      (data: boolean) =&gt; &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123; <span class="attr">showBrandPage</span>: data &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// tslint:disable-next-line: no-unused-expression</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe &amp;&amp; <span class="keyword">this</span>.subscribe.remove()</span><br><span class="line">  &#125;</span><br><span class="line">  _tabNav = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; routes, index &#125; = <span class="keyword">this</span>.props.navigation.state</span><br><span class="line">    <span class="keyword">const</span> finalRoutes = [...routes]</span><br><span class="line">    <span class="keyword">const</span> &#123; showBrandPage &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="comment">// ...一系列的操作</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      state: &#123;</span><br><span class="line">        index: finalRoutes.findIndex(<span class="function"><span class="params">route</span> =&gt;</span> currentRoute.key === route.key),</span><br><span class="line">        routes: finalRoutes</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; navigation, ...restProps &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    <span class="keyword">const</span> tabNavConfig = <span class="keyword">this</span>._tabNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;BottomTabBar &#123;...restProps&#125; navigation=&#123;tabNavConfig&#125; /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default DynamicTabNavigator</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const BottomTabRoutes = createBottomTabNavigator(tabNav, &#123;</span><br><span class="line">  tabBarComponent: DynamicTabNavigator</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>通过<code>eventListener</code>的方式接收路由变更信号，最终渲染<code>BottomTabBar</code>时使用修改过后的配置即可。</p>
+<p>这种方式其实是一种<em>障眼法</em>，我们需要在配置静态Tab路由<code>RouteConfigs</code>时配置所有的Tab路由，在<code>DynamicTabNavigator</code>中通过<code>props</code>注入的<code>navigation.state.routes</code>拿到配置的静态路由，并经过一系列的处理最终得到渲染到<code>BottomTabBar</code>中的路由。需要注意的是，如果最终的路由相比静态路由有调整，那么需要更新<code>index</code>，否则点击路由跳转时会出现错误。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
+<p>针对<code>React Navigation</code>无法支持动态路由的问题，以上给出了两种方案，能够在一定程度解决。</p>
+</blockquote>
+<ol>
+<li>第一种方案按需挂载路由，可以算是“真”动态路由；</li>
+<li>第二种方案从可定制的<code>tabBarComponent</code>入手，不改变路由配置，而是在渲染层进行控制，条件渲染<code>BottomTabBar</code>。</li>
+</ol>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ck3l3mha3000ajsj6niavzbhb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/11/30/dynamic-navigator/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/11/30/dynamic-navigator/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-polyfill" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -284,7 +434,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ck0kku9mn0018kgj6cf2tzr5t" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ck3l3mhah000pjsj6uurreh3q" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -469,7 +619,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ck0kku9mc000mkgj6l4u1lz1v" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ck3l3mha9000fjsj6wm8gvkex" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -620,7 +770,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ck0kku9ma000jkgj6z5t9ohnn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ck3l3mhad000kjsj6eyygn6wi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -780,7 +930,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ck0kku9n60026kgj6603b2occ" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ck3l3mhak000tjsj6ca9gyrv0" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -941,7 +1091,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ck0kku9m9000hkgj6ewsowerm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ck3l3mham000vjsj65ihmnzen" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1107,7 +1257,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="ck0kku9m5000fkgj6a09dy7qv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="ck3l3mhac000hjsj6g7gptupo" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1280,7 +1430,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="ck0kku9n9002akgj6c14mvzak" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="ck3l3mhbi0028jsj68wuwq1yy" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1526,7 +1676,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ck0kku9mg000tkgj6cfmlo9fj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ck3l3mhb1001jjsj6tw48i7pg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1768,7 +1918,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="ck0kku9mk0011kgj6pc2ybfno" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="ck3l3mhaq0011jsj6rct1u2ws" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1846,162 +1996,6 @@
 
 
 
-    <article id="post-前端路由拦截和http响应拦截" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/05/前端路由拦截和http响应拦截/">前端路由拦截和http响应拦截</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/05/前端路由拦截和http响应拦截/">
-            <time datetime="2018-04-05T05:12:41.000Z" itemprop="datePublished">2018-04-05</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Vue/">Vue</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="问题由来"><a href="#问题由来" class="headerlink" title="问题由来"></a>问题由来</h3><p>最近在制作毕业设计的时候，遇到一个问题，那就是用户的访问控制。简单点来说，就是未登录用户只能访问某些特定的页面、API。最初我的想法是用户登录后返回一个凭证，用户以后的每次http请求都带上该凭证，进行验证，只有验证成功才能继续请求。然后在每个<code>页面</code>进行判断，如果用户是未登录或者凭证失效，则进行相应的提示和路由跳转。刚开始的时候，这个方法是完全可行的，但是在开发过程中，随着业务逻辑变得复杂、页面增多，重复代码太多，这样的方式也许并不合适。</p>
-<h3 id="如何解决"><a href="#如何解决" class="headerlink" title="如何解决"></a>如何解决</h3><p>首先是后端，我使用了<code>jsonwebtoken</code>，用户登录成功都会生成一个具有一定时效的    <code>token</code>，这个token会发回到客户端，并且接下来每次发起http请求，都在http头的<code>authorization</code>字段带上这个<code>token</code>。我这里使用了<a href="https://www.npmjs.com/package/axios" target="_blank" rel="noopener">axios</a>这个http请求库，只需要在拿到<code>token</code>后：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axios.defaults.headers.common.authorization = <span class="string">`Bearer <span class="subst">$&#123;token&#125;</span>`</span>;</span><br></pre></td></tr></table></figure></p>
-<p>就可以了。</p>
-<p>由于在开发过程中涉及到跨域，这里我使用CORS来解决：通过设置一系列<code>Access-Control-Allow-*</code>响应头进行访问控制，上面提到了在请求头的<code>authorization</code>字段中设置token，因此发出的请求都不是简单请求，所以注意在每次发起http请求时，就会自动发起一个<code>OPTIONS</code>请求。</p>
-<p>我服务器端用的是<code>Express</code>框架，我们需要写一个中间件来处理每一个请求。处理逻辑为：针对每个<code>OPTIONS</code>请求，直接放行；对于某些请求，如果在白名单中(例如登录、注册等不需要验证的路由)，放行；对于其他请求，我们拿到其携带的token，并且进行验证，如果验证通过，放行，否则结束请求，返回未授权。具体的代码如下，这里我使用<code>jsonwebtoken</code>这个package，用于生成<code>token</code>和进行<code>token</code>验证。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'methods'</span> ,req.method);</span><br><span class="line">  <span class="keyword">if</span>( req.method === <span class="string">'OPTIONS'</span> ) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'option请求直接通过'</span>);</span><br><span class="line">    next();</span><br><span class="line">  &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 除去某些特定的API，其余的都做token的验证</span></span><br><span class="line">    <span class="keyword">let</span> &#123; path &#125; = req;</span><br><span class="line">    <span class="keyword">if</span>(path === <span class="string">'/api/users/auth'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/auth_vc'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/check_id_validation'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/regist'</span></span><br><span class="line">      || path === <span class="string">'/api/users/send_reset_email'</span></span><br><span class="line">      || path === <span class="string">'/api/users/reset_password'</span></span><br><span class="line">    ) </span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'本次请求不需要验证权限'</span>);</span><br><span class="line">      next();</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> token = req.headers.authorization ? req.headers.authorization.split(<span class="string">' '</span>)[<span class="number">1</span>] : <span class="string">''</span>;</span><br><span class="line">      req.token = token;</span><br><span class="line">      jwt.verify(token, KEY, (err, decoded) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span>(err) &#123;</span><br><span class="line">          res.status(<span class="number">401</span>).json(&#123; <span class="attr">status</span>: <span class="number">3</span>, <span class="attr">error</span>: <span class="string">'用户认证失败'</span>, <span class="attr">data</span>: <span class="string">''</span> &#125;)</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'验证权限通过'</span>);</span><br><span class="line">          req.decoded = decoded;</span><br><span class="line">          next();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>然后是前端，我想如果能像后端拦截每个请求一样，写一个逻辑拦截所有的相应，并进行处理，信号，<code>axios</code>自带拦截器，我们只需要写我们的逻辑就可以了。我的想法是，拦截每一个相应，如果其状态码是<code>401</code>，那么久提示<code>token</code>失效，并且进行路由跳转。<br>以<code>vue-cli</code>构建的应用为例，在<code>main.js</code>中，下面是实现：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.response.use(<span class="function"><span class="params">data</span> =&gt;</span> data, (error) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span>(error.response) &#123;</span><br><span class="line">    <span class="keyword">switch</span>(error.response.status) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">401</span>: &#123;</span><br><span class="line">        localStorage.removeItem(<span class="string">'token'</span>);</span><br><span class="line">        router.replace(&#123;</span><br><span class="line">          path: <span class="string">'/auth'</span>,</span><br><span class="line">          query: &#123;<span class="attr">redirect</span>: router.currentRoute.fullPath&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>值得说明的是，如果我们在某个访问的过程中，<code>token</code>失效，我们需要跳转到登录页面，但是想登录过后再跳转回来，所以这里在进行路由跳转的时候，我设置了一个参数, <code>redirect</code>，表示传入当前的路径，当我们登录成功后，在跳转回来即可。</p>
-<p>最后是路由拦截，这里我使用了<code>vue-router</code>，其实<code>vue-router</code>的路由对象提供一个钩子函数<code>beforeEach</code>，其会在每一次路由跳转之前，执行这个函数，我们就在这里进行路由拦截。原理很简单，使用一个标志位标明每个路由是否需要用户权限，如果需要的话，我们检查保存在本地的凭证，一般存在<code>localStorage</code>中，如果不含凭证就直接跳转到登录页面。</p>
-<p>好了，找到根路由文件，添加：</p>
-<pre><code class="javascript">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span> , next</span>) =&gt;</span> {
-  <span class="keyword">if</span>(to.matched.some(<span class="function"><span class="params">res</span> =&gt;</span> res.meta.requireAuth)) {
-    <span class="keyword">if</span>(localStorage.getItem(<span class="string">'token'</span>)) {
-      next();
-    }<span class="keyword">else</span> {
-      next({
-        path: <span class="string">'/auth'</span>,
-        query: { <span class="attr">redirect</span>: to.fullPath }
-      })
-    }
-  }<span class="keyword">else</span> {
-    next();
-  }
-})
-
-</code></pre>
-<p>这里要注意的是，<code>res.meta.requireAuth</code>是你自己在声明路由的时候自定义的。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>差不多，这算是一个比较好的解决方案了。但是有这样一个情况：如果用户凭证有效期是1小时，那么如果我浏览网页超过一个小时了，凭证还是保存在本地的，当我们进行路由跳转的时候，并没有验证凭证是否失效，所以还是会进行路由跳转。这里不用担心，因为进入进入了一个路由后，一旦发起http请求，<code>token</code>失效，http相应拦截就会生效，进而跳转到登录页面。</p>
-<p>加油！</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="ck0kku9n40021kgj6k8e8z31y" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
@@ -2016,7 +2010,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -2025,7 +2019,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2034,7 +2028,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 

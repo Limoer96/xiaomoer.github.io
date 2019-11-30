@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                38
+                39
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                9
+                10
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,162 @@
 
             
             <section id="main">
+    <article id="post-前端路由拦截和http响应拦截" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/04/05/前端路由拦截和http响应拦截/">前端路由拦截和http响应拦截</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/04/05/前端路由拦截和http响应拦截/">
+            <time datetime="2018-04-05T05:12:41.000Z" itemprop="datePublished">2018-04-05</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Vue/">Vue</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="问题由来"><a href="#问题由来" class="headerlink" title="问题由来"></a>问题由来</h3><p>最近在制作毕业设计的时候，遇到一个问题，那就是用户的访问控制。简单点来说，就是未登录用户只能访问某些特定的页面、API。最初我的想法是用户登录后返回一个凭证，用户以后的每次http请求都带上该凭证，进行验证，只有验证成功才能继续请求。然后在每个<code>页面</code>进行判断，如果用户是未登录或者凭证失效，则进行相应的提示和路由跳转。刚开始的时候，这个方法是完全可行的，但是在开发过程中，随着业务逻辑变得复杂、页面增多，重复代码太多，这样的方式也许并不合适。</p>
+<h3 id="如何解决"><a href="#如何解决" class="headerlink" title="如何解决"></a>如何解决</h3><p>首先是后端，我使用了<code>jsonwebtoken</code>，用户登录成功都会生成一个具有一定时效的    <code>token</code>，这个token会发回到客户端，并且接下来每次发起http请求，都在http头的<code>authorization</code>字段带上这个<code>token</code>。我这里使用了<a href="https://www.npmjs.com/package/axios" target="_blank" rel="noopener">axios</a>这个http请求库，只需要在拿到<code>token</code>后：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axios.defaults.headers.common.authorization = <span class="string">`Bearer <span class="subst">$&#123;token&#125;</span>`</span>;</span><br></pre></td></tr></table></figure></p>
+<p>就可以了。</p>
+<p>由于在开发过程中涉及到跨域，这里我使用CORS来解决：通过设置一系列<code>Access-Control-Allow-*</code>响应头进行访问控制，上面提到了在请求头的<code>authorization</code>字段中设置token，因此发出的请求都不是简单请求，所以注意在每次发起http请求时，就会自动发起一个<code>OPTIONS</code>请求。</p>
+<p>我服务器端用的是<code>Express</code>框架，我们需要写一个中间件来处理每一个请求。处理逻辑为：针对每个<code>OPTIONS</code>请求，直接放行；对于某些请求，如果在白名单中(例如登录、注册等不需要验证的路由)，放行；对于其他请求，我们拿到其携带的token，并且进行验证，如果验证通过，放行，否则结束请求，返回未授权。具体的代码如下，这里我使用<code>jsonwebtoken</code>这个package，用于生成<code>token</code>和进行<code>token</code>验证。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'methods'</span> ,req.method);</span><br><span class="line">  <span class="keyword">if</span>( req.method === <span class="string">'OPTIONS'</span> ) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'option请求直接通过'</span>);</span><br><span class="line">    next();</span><br><span class="line">  &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 除去某些特定的API，其余的都做token的验证</span></span><br><span class="line">    <span class="keyword">let</span> &#123; path &#125; = req;</span><br><span class="line">    <span class="keyword">if</span>(path === <span class="string">'/api/users/auth'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/auth_vc'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/check_id_validation'</span> </span><br><span class="line">      || path === <span class="string">'/api/users/regist'</span></span><br><span class="line">      || path === <span class="string">'/api/users/send_reset_email'</span></span><br><span class="line">      || path === <span class="string">'/api/users/reset_password'</span></span><br><span class="line">    ) </span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'本次请求不需要验证权限'</span>);</span><br><span class="line">      next();</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> token = req.headers.authorization ? req.headers.authorization.split(<span class="string">' '</span>)[<span class="number">1</span>] : <span class="string">''</span>;</span><br><span class="line">      req.token = token;</span><br><span class="line">      jwt.verify(token, KEY, (err, decoded) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span>(err) &#123;</span><br><span class="line">          res.status(<span class="number">401</span>).json(&#123; <span class="attr">status</span>: <span class="number">3</span>, <span class="attr">error</span>: <span class="string">'用户认证失败'</span>, <span class="attr">data</span>: <span class="string">''</span> &#125;)</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'验证权限通过'</span>);</span><br><span class="line">          req.decoded = decoded;</span><br><span class="line">          next();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>然后是前端，我想如果能像后端拦截每个请求一样，写一个逻辑拦截所有的相应，并进行处理，信号，<code>axios</code>自带拦截器，我们只需要写我们的逻辑就可以了。我的想法是，拦截每一个相应，如果其状态码是<code>401</code>，那么久提示<code>token</code>失效，并且进行路由跳转。<br>以<code>vue-cli</code>构建的应用为例，在<code>main.js</code>中，下面是实现：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.response.use(<span class="function"><span class="params">data</span> =&gt;</span> data, (error) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span>(error.response) &#123;</span><br><span class="line">    <span class="keyword">switch</span>(error.response.status) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">401</span>: &#123;</span><br><span class="line">        localStorage.removeItem(<span class="string">'token'</span>);</span><br><span class="line">        router.replace(&#123;</span><br><span class="line">          path: <span class="string">'/auth'</span>,</span><br><span class="line">          query: &#123;<span class="attr">redirect</span>: router.currentRoute.fullPath&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>值得说明的是，如果我们在某个访问的过程中，<code>token</code>失效，我们需要跳转到登录页面，但是想登录过后再跳转回来，所以这里在进行路由跳转的时候，我设置了一个参数, <code>redirect</code>，表示传入当前的路径，当我们登录成功后，在跳转回来即可。</p>
+<p>最后是路由拦截，这里我使用了<code>vue-router</code>，其实<code>vue-router</code>的路由对象提供一个钩子函数<code>beforeEach</code>，其会在每一次路由跳转之前，执行这个函数，我们就在这里进行路由拦截。原理很简单，使用一个标志位标明每个路由是否需要用户权限，如果需要的话，我们检查保存在本地的凭证，一般存在<code>localStorage</code>中，如果不含凭证就直接跳转到登录页面。</p>
+<p>好了，找到根路由文件，添加：</p>
+<pre><code class="javascript">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span> , next</span>) =&gt;</span> {
+  <span class="keyword">if</span>(to.matched.some(<span class="function"><span class="params">res</span> =&gt;</span> res.meta.requireAuth)) {
+    <span class="keyword">if</span>(localStorage.getItem(<span class="string">'token'</span>)) {
+      next();
+    }<span class="keyword">else</span> {
+      next({
+        path: <span class="string">'/auth'</span>,
+        query: { <span class="attr">redirect</span>: to.fullPath }
+      })
+    }
+  }<span class="keyword">else</span> {
+    next();
+  }
+})
+
+</code></pre>
+<p>这里要注意的是，<code>res.meta.requireAuth</code>是你自己在声明路由的时候自定义的。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>差不多，这算是一个比较好的解决方案了。但是有这样一个情况：如果用户凭证有效期是1小时，那么如果我浏览网页超过一个小时了，凭证还是保存在本地的，当我们进行路由跳转的时候，并没有验证凭证是否失效，所以还是会进行路由跳转。这里不用担心，因为进入进入了一个路由后，一旦发起http请求，<code>token</code>失效，http相应拦截就会生效，进而跳转到登录页面。</p>
+<p>加油！</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="ck3l3mhb6001vjsj6hmgjwjve" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-SQL参数化查询" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -274,7 +430,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="ck0kku9m4000dkgj6dekgku1z" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="ck3l3mhaf000mjsj628w2xx1n" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -420,7 +576,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/09/01/使用react-transition-group实现路由切换动画/" data-id="ck0kku9ml0013kgj6paqngzu8" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/09/01/使用react-transition-group实现路由切换动画/" data-id="ck3l3mhba001zjsj6x75437wl" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -561,7 +717,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="ck0kku9mh000wkgj6fa4lm72t" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="ck3l3mhb2001ljsj6soc6z6ad" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -701,7 +857,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="ck0kku9mf000rkgj6htixlu1x" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="ck3l3mhap000zjsj6d0d9625h" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -882,7 +1038,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="ck0kku9mi000ykgj6dw3l8iir" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="ck3l3mhau0019jsj63qf30hm9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1034,7 +1190,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="ck0kku9n2001zkgj62yucyf8p" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="ck3l3mhb3001ojsj6yamlvsxc" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1219,7 +1375,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="ck0kku9lx0005kgj67jqhke95" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="ck3l3mh9o0002jsj6uc9fp1dg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1360,7 +1516,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="ck0kku9mp001akgj6bal2z4ig" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="ck3l3mhav001bjsj65kv74ma3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1520,7 +1676,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="ck0kku9mw001okgj699pbatik" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="ck3l3mhaz001hjsj6bxgyjd53" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1598,149 +1754,6 @@
 
 
 
-    <article id="post-在express中使用cookie" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/03/16/在express中使用cookie/">在Express中使用Cookie</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/03/16/在express中使用cookie/">
-            <time datetime="2017-03-16T08:11:42.000Z" itemprop="datePublished">2017-03-16</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Node-js/">Node.js</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说<code>cookie</code>到底是什么。</p>
-</blockquote>
-<h3 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h3><p>Cookie是服务器保存在浏览器中的一段小(一般而言size&lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信息。</p>
-<p>在浏览器中我们只需要使用<code>document.cookie</code>来得到当前页面所属的cookie。请注意，返回的cookie是以字符串形式存在的，不同的key-value之间通过’;’来分割，所以如果你想对齐进行进一步操作，需要相应的处理。</p>
-<p>这里需要注意的是，<code>document.cookie</code>属性是可写的，这就意味着你可以手动添加cookie，使用<code>document.cookie=&quot;name=value&quot;</code>的形式。注意，这里是添加，而不产生覆盖。</p>
-<p>好了，关于cookie的属性的具体含义和用法，大家可以自行去了解。</p>
-<h3 id="我的问题"><a href="#我的问题" class="headerlink" title="我的问题"></a>我的问题</h3><p>我在使用服务器端使用cookie的时候出现了问题，出现这样问题的原因很简单，首先我对cookie存在错误的理解，请务必注意，cookie是服务器发送给客户端，而客户端在发起请求的时候携带cookie而已。在正确认识cookie之后，并且成功的将cookie发送到浏览器过后，问题又来了，我在请求的时候，cookie却不能发送到服务端。我使用的是下面一段代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'/login?'</span>+stringify_data, &#123;</span><br><span class="line">        method: <span class="string">'GET'</span></span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> res.json();</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(json.status);</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'oh ! error!'</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里我使用了fetch API，在能够正确的发送请求的情况下，服务器无法读取到相应的cookie信息，同样在chrome开发者工具中查看请求头也发现请求并没有携带cookie信息。我想着一定是fetch API的问题，所以我赶快写了一个使用Ajax的请求，很显然，能够正确的发起携带cookie的请求。好吧，写到现在，我想的确是fetch API的问题了，阅读文档发现fetch API发送的请求默认是不带cookie的，必须手动设置(无论是出于什么样的考虑，但还是觉得坑)！好吧，问题迎刃而解，我们只需要在fetch函数第二个参数设置<code>credentials: &#39;include&#39;</code>就可以发送cookie了/无奈！</p>
-<h3 id="在express中使用cookie"><a href="#在express中使用cookie" class="headerlink" title="在express中使用cookie"></a>在express中使用cookie</h3><p>在express中使用cookie是一件十分惬意的事情，因为如果你使用<code>cookie-parser</code>中间件的话，那么我们只需要使用<code>res.cookie(name, value[,options])</code>就可以设置cookie了，关于options相关的参数可以自行学习！</p>
-<p>如果想删除cookie，也很简单，使用<code>res.clearCookie(name)</code>就可以啦。</p>
-<p>当然如果想获取请求头发过来的cookie，我们只需要使用<code>req.cookies</code>就可以了，这里返回的是一个JS对象，我们直接可以使用<code>name</code>来读取值，从而做进一步的操作。</p>
-<p>在使用了<code>cookie-parser</code>中间件过后，在服务端操作cookie已经足够简单，并且<code>cookie-parser</code>不但提供了非签名使用的方式，还提供了签名的使用方式，具体使用是在使用中间件的时候添加一个secret，<code>app.use(cookieParser(&#39;secret&#39;))</code>即可，当然，在获取cookie的时候使用 <code>req.signedCookies</code>属性就好了。</p>
-<p>好了，如果你不想使用<code>cookie-parser</code>，我们也能够通过<code>req.headers.cookies</code>(感到罪恶所以不推荐/无奈)访问到cookie，如果想写cookie的话，使用<code>res.setHeader(name, value)</code>(再次感到罪恶)或者<code>res.writeHead(status[,options])</code>就可以了…</p>
-<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>一般情况下，文章末尾，我总会写一点鸡汤/无奈，这次也不例外。距离写上一篇博客已经过了很久了，起初有两篇想写的文章，一篇是在RN中使用Navigator，另外一篇则是介绍我自己正在学习的几种分类算法。可是当创建好文件准备开工时，我因为写一篇文章可能需要2-3个小时(我速度慢)或者是因为真的动笔写的时候反而觉得没什么要说的就放弃了。然后一段时间过后，或许是因为忙，或许是因为懒，或许是因为浮躁，就是没有去实践，没有去巩固，而把一切都抛之脑后，然后把前面学习到的忘得一干二净！</p>
-<p>嗯，这的确的真实的！仅此而已！</p>
-<p>END</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="ck0kku9mu001jkgj6t8ynkq0c" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/03/16/在express中使用cookie/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/03/16/在express中使用cookie/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">下一页 &raquo;</a>
     </nav>
@@ -1755,7 +1768,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1764,7 +1777,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1773,7 +1786,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 

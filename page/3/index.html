@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                38
+                39
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                9
+                10
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,149 @@
 
             
             <section id="main">
+    <article id="post-在express中使用cookie" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/03/16/在express中使用cookie/">在Express中使用Cookie</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/03/16/在express中使用cookie/">
+            <time datetime="2017-03-16T08:11:42.000Z" itemprop="datePublished">2017-03-16</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Node-js/">Node.js</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>文章来自于我在express框架上使用cookie引发的一些问题，但在具体介绍cookie以及如何正确的使用cookie之前，我觉得我有必要说一说<code>cookie</code>到底是什么。</p>
+</blockquote>
+<h3 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h3><p>Cookie是服务器保存在浏览器中的一段小(一般而言size&lt;4KB)的文本信息，而浏览器每次想服务器发出请求，就会携带上这段信息。Cookie一般包含了key、value、到期时间、所属域名、所属路径等信息。</p>
+<p>在浏览器中我们只需要使用<code>document.cookie</code>来得到当前页面所属的cookie。请注意，返回的cookie是以字符串形式存在的，不同的key-value之间通过’;’来分割，所以如果你想对齐进行进一步操作，需要相应的处理。</p>
+<p>这里需要注意的是，<code>document.cookie</code>属性是可写的，这就意味着你可以手动添加cookie，使用<code>document.cookie=&quot;name=value&quot;</code>的形式。注意，这里是添加，而不产生覆盖。</p>
+<p>好了，关于cookie的属性的具体含义和用法，大家可以自行去了解。</p>
+<h3 id="我的问题"><a href="#我的问题" class="headerlink" title="我的问题"></a>我的问题</h3><p>我在使用服务器端使用cookie的时候出现了问题，出现这样问题的原因很简单，首先我对cookie存在错误的理解，请务必注意，cookie是服务器发送给客户端，而客户端在发起请求的时候携带cookie而已。在正确认识cookie之后，并且成功的将cookie发送到浏览器过后，问题又来了，我在请求的时候，cookie却不能发送到服务端。我使用的是下面一段代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'/login?'</span>+stringify_data, &#123;</span><br><span class="line">        method: <span class="string">'GET'</span></span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> res.json();</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(json.status);</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'oh ! error!'</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里我使用了fetch API，在能够正确的发送请求的情况下，服务器无法读取到相应的cookie信息，同样在chrome开发者工具中查看请求头也发现请求并没有携带cookie信息。我想着一定是fetch API的问题，所以我赶快写了一个使用Ajax的请求，很显然，能够正确的发起携带cookie的请求。好吧，写到现在，我想的确是fetch API的问题了，阅读文档发现fetch API发送的请求默认是不带cookie的，必须手动设置(无论是出于什么样的考虑，但还是觉得坑)！好吧，问题迎刃而解，我们只需要在fetch函数第二个参数设置<code>credentials: &#39;include&#39;</code>就可以发送cookie了/无奈！</p>
+<h3 id="在express中使用cookie"><a href="#在express中使用cookie" class="headerlink" title="在express中使用cookie"></a>在express中使用cookie</h3><p>在express中使用cookie是一件十分惬意的事情，因为如果你使用<code>cookie-parser</code>中间件的话，那么我们只需要使用<code>res.cookie(name, value[,options])</code>就可以设置cookie了，关于options相关的参数可以自行学习！</p>
+<p>如果想删除cookie，也很简单，使用<code>res.clearCookie(name)</code>就可以啦。</p>
+<p>当然如果想获取请求头发过来的cookie，我们只需要使用<code>req.cookies</code>就可以了，这里返回的是一个JS对象，我们直接可以使用<code>name</code>来读取值，从而做进一步的操作。</p>
+<p>在使用了<code>cookie-parser</code>中间件过后，在服务端操作cookie已经足够简单，并且<code>cookie-parser</code>不但提供了非签名使用的方式，还提供了签名的使用方式，具体使用是在使用中间件的时候添加一个secret，<code>app.use(cookieParser(&#39;secret&#39;))</code>即可，当然，在获取cookie的时候使用 <code>req.signedCookies</code>属性就好了。</p>
+<p>好了，如果你不想使用<code>cookie-parser</code>，我们也能够通过<code>req.headers.cookies</code>(感到罪恶所以不推荐/无奈)访问到cookie，如果想写cookie的话，使用<code>res.setHeader(name, value)</code>(再次感到罪恶)或者<code>res.writeHead(status[,options])</code>就可以了…</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>一般情况下，文章末尾，我总会写一点鸡汤/无奈，这次也不例外。距离写上一篇博客已经过了很久了，起初有两篇想写的文章，一篇是在RN中使用Navigator，另外一篇则是介绍我自己正在学习的几种分类算法。可是当创建好文件准备开工时，我因为写一篇文章可能需要2-3个小时(我速度慢)或者是因为真的动笔写的时候反而觉得没什么要说的就放弃了。然后一段时间过后，或许是因为忙，或许是因为懒，或许是因为浮躁，就是没有去实践，没有去巩固，而把一切都抛之脑后，然后把前面学习到的忘得一干二净！</p>
+<p>嗯，这的确的真实的！仅此而已！</p>
+<p>END</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="ck3l3mhb4001qjsj6nzkszbol" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/03/16/在express中使用cookie/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/03/16/在express中使用cookie/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-Flex弹性布局" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -281,7 +424,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="ck0kku9lq0001kgj6dcxkn9em" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="ck3l3mhai000rjsj6m2ods8bo" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -425,7 +568,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="ck0kku9n0001vkgj62h8eu7x8" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="ck3l3mhbe0026jsj6qmwl0dr1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -583,7 +726,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="ck0kku9lu0003kgj6e7fa12er" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="ck3l3mha6000cjsj6sneclzkd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -729,7 +872,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="ck0kku9md000okgj6po6fi0qx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="ck3l3mhas0016jsj68t1e0scx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -875,7 +1018,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="ck0kku9my001skgj6hw2l9haw" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="ck3l3mhb5001sjsj6whyco6mz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1017,7 +1160,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="ck0kku9ly0006kgj6jgxgmk24" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="ck3l3mh9z0005jsj6htfehdsb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1161,7 +1304,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="ck0kku9n80028kgj6dfq9jaum" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="ck3l3mhbc0024jsj6gi2dkc85" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1308,7 +1451,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/27/理解作用域/" data-id="ck0kku9mx001qkgj6wieu3hey" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/27/理解作用域/" data-id="ck3l3mhb8001xjsj6gthc00p6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1447,7 +1590,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/26/我们的世界/" data-id="ck0kku9mv001lkgj6jcati48h" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/26/我们的世界/" data-id="ck3l3mhbk002ajsj6igjczv4k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1525,145 +1668,6 @@
 
 
 
-    <article id="post-React全家桶学习资源汇总" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/12/12/React全家桶学习资源汇总/">React全家桶网络学习资源汇总</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/12/12/React全家桶学习资源汇总/">
-            <time datetime="2016-12-12T10:44:20.000Z" itemprop="datePublished">2016-12-12</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/React/">React</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>不知不觉，学习React时间已经超过三个月了。虽然这几个月断断续续，也算把我所了解的React全家桶学习了一遍，虽然我现在还是什么都不会😂<br>好了，接下来，我会把我学习过程中用到的一些网络资源都整理在这篇文章里面，分享给大家。</p>
-<h2 id="学习react之前"><a href="#学习react之前" class="headerlink" title="学习react之前"></a>学习react之前</h2><p>学习react之前，你最好有js(ES6)的基础，下面是JS学习资料搜集汇总。<br>两本来自于阮一峰大神的开源书籍：<br>JavaScript标准参考教程<a href="http://javascript.ruanyifeng.com/" target="_blank" rel="noopener">这里</a><br>ES6入门指南<a href="http://es6.ruanyifeng.com/" target="_blank" rel="noopener">强烈推荐，看过实体书，ES6入门很实用</a><br>来自廖雪峰的官方网站的JS教程<a href="http://www.liaoxuefeng.com/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000" target="_blank" rel="noopener">特别适合快速入门和新手回顾</a></p>
-<p>JavaScript Promise迷你书<a href="http://liubin.org/promises-book/#introduction" target="_blank" rel="noopener">全面了解Promise的书籍</a><br>深入理解JavaScript系列<a href="http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html" target="_blank" rel="noopener">汤姆大叔翻译，比较全面，值得推荐</a></p>
-<h2 id="react学习"><a href="#react学习" class="headerlink" title="react学习"></a>react学习</h2><p>需要明确的一点的是，学习react最好的方式是阅读官方文档，这里列出一些资源，可作为学习的参考和补充：<br>react入门实例教程<a href="http://www.ruanyifeng.com/blog/2015/03/react.html" target="_blank" rel="noopener">没错，还是来自于阮一峰大神</a><br>Learn React &amp; Webpack by building the Hacker News front page<a href="https://github.com/theJian/build-a-hn-front-page" target="_blank" rel="noopener">强烈推荐，手把手教你构建一个前端页面</a><br>react-组件生命周期详解<a href="http://blog.csdn.net/slandove/article/details/50748473" target="_blank" rel="noopener">当我很混淆的时候，就是看这篇博文弄懂的</a><br>React入门：关于JSX语法<a href="http://www.css88.com/archives/5632" target="_blank" rel="noopener">虽然JSX很好理解，但是还是推荐一篇吧，比较详细了</a><br>React入门<a href="http://zexeo.com/home" target="_blank" rel="noopener">来自则修网的视频教程，一共有两门教程，这一门非常适合入门</a><br>react文档<a href="https://hulufei.gitbooks.io/react-tutorial/content/introduction.html" target="_blank" rel="noopener">中文翻译版本，推荐结合英文文档使用</a></p>
-<h2 id="webpack"><a href="#webpack" class="headerlink" title="webpack"></a>webpack</h2><p>webpack作为一个打包工具，如今已经十分出色。<br>一小时包教会 —— webpack 入门指南<a href="一小时包教会 —— webpack 入门指南">不敢保证一小时能不能教会，但是写得还是很详细，值得一看</a><br>webpack中文文档(类似于官方文档，比较详细的介绍了webpack的方方面面)(<a href="http://webpackdoc.com/" target="_blank" rel="noopener">http://webpackdoc.com/</a>)</p>
-<h2 id="flux-amp-redux"><a href="#flux-amp-redux" class="headerlink" title="flux &amp; redux"></a>flux &amp; redux</h2><p>Flux 架构入门教程<a href="http://www.ruanyifeng.com/blog/2016/01/flux.html" target="_blank" rel="noopener">阮一峰大神目前专注于react啊，什么都有他</a><br>Redux 入门教程<a href="http://www.ruanyifeng.com/blog/2016/09/redux_tutorial_part_one_basic_usages.html" target="_blank" rel="noopener">还是阮一峰的</a><br>Redux Tutorial 中文翻译<a href="https://github.com/xiaomoer/redux-tutorial-cn" target="_blank" rel="noopener">适合没有耐性看完官方文档的同学</a><br>Redux中文文档<a href="http://www.redux.org.cn/" target="_blank" rel="noopener">英文翻译版，适合英语基础较薄弱的同学观看,貌似还可以下载下来</a><br>redux其他学习资源<a href="https://github.com/xiaomoer/awesome-redux" target="_blank" rel="noopener">我fork的</a></p>
-<h2 id="mocha-amp-chai"><a href="#mocha-amp-chai" class="headerlink" title="mocha &amp; chai"></a>mocha &amp; chai</h2><p>测试框架Mocha 实例教程<a href="http://www.ruanyifeng.com/blog/2015/12/a-mocha-tutorial-of-examples.html" target="_blank" rel="noopener">不用我说来自哪里了吧</a><br>官方文档<a href="http://mochajs.org/" target="_blank" rel="noopener">最好的学习教程</a><br>chai<a href="http://chaijs.com/api/" target="_blank" rel="noopener">强大的断言库，学习途径目前只有中文文档</a></p>
-<h2 id="react单元测试-amp-enzyme"><a href="#react单元测试-amp-enzyme" class="headerlink" title="react单元测试 &amp; enzyme"></a>react单元测试 &amp; enzyme</h2><p>React 测试入门教程<a href="http://www.ruanyifeng.com/blog/2016/02/react-testing-tutorial.html" target="_blank" rel="noopener">点这里</a><br>enzyme <a href="https://www.gitbook.com/book/imbubble/enzyme-docs/details" target="_blank" rel="noopener">是用于react单元测试的一个库，类jquery的风格，比官方那一套写起来顺手多了，推荐.</a></p>
-<h2 id="react-router-amp-其他"><a href="#react-router-amp-其他" class="headerlink" title="react-router &amp; 其他"></a>react-router &amp; 其他</h2><p>React Router 是完整的 React 路由解决方案<br>React-Router中文文档<a href="http://react-guide.github.io/react-router-cn/" target="_blank" rel="noopener">看这个就够了</a></p>
-<p>immutable.js是一个数据不可变的一个库，据说结合React可以让性能提升十倍,学习的时候有了解过.<br><a href="https://www.w3ctech.com/topic/1595" target="_blank" rel="noopener">Immutable 详解及 React 中实践</a><br><a href="http://facebook.github.io/immutable-js/docs/" target="_blank" rel="noopener">官方文档</a></p>
-<p>lodash 其实不属于react全家桶成员(虽然我觉得inmutable也不是),但是作为一个高性能和模块化的JS工具库，值得大家去了解和使用<br><a href="http://lodashjs.com/docs/" target="_blank" rel="noopener">中文文档,未翻译完全版本</a></p>
-<h2 id="写在后面"><a href="#写在后面" class="headerlink" title="写在后面"></a>写在后面</h2><p>上面的资料和文档也许可以很容易就能通过baidu或者其他什么的得到，我算是列举了我学习时候参考的资料吧，不一定适合大家，也许有更适合入门的资料只是我没找到而已。上面列举的也并不是react全家桶的所有技术，包括css-module，覆盖率测试这些我也是刚刚才了解，并没有深入的使用，所以我这里就不列出了。在我看来，react发展到现在，已经不能说其只是一个前端框架的view层了，它是一个技术栈，一种解决方案，并且只有使用其全家桶才能发挥出其威力，作为一个前端初学者而言，这个过程并不会太痛苦，因为我们并没有对传统的web开发思维根深蒂固，所以如果你想学习react，不妨放下心中的顾虑，现在就开始。</p>
-<p>学习react不难，但是真的想写好react太难了，angular也是，vue也是，所以不要轻易说你学会了它们。我们仅仅是轮子的使用者而已，可我真想哪天我也能成为造轮子的人，加油！</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2016/12/12/React全家桶学习资源汇总/" data-id="ck0kku9m1000akgj6zecohc7q" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2016/12/12/React全家桶学习资源汇总/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2016/12/12/React全家桶学习资源汇总/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
@@ -1678,7 +1682,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1687,7 +1691,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1696,7 +1700,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 
