@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                39
+                40
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,163 @@
 
             
             <section id="main">
+    <article id="post-global-component" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2019/12/19/global-component/">React 实现全局组件</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/12/19/global-component/">
+            <time datetime="2019-12-19T10:04:50.000Z" itemprop="datePublished">2019-12-19</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React/">React</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="React-实现全局组件"><a href="#React-实现全局组件" class="headerlink" title="React 实现全局组件"></a>React 实现全局组件</h3><blockquote>
+<p>有一个这样的需求：用户进入首页时可能会有不同类型的对话框弹出，默认的情况下所有对话框都是打开的，这很影响用户体验。在无法减少对话框的前提下，需要实现一种机制，能够让对话框依次弹出。</p>
+</blockquote>
+<p>在<code>React-Native</code>中，一种不那么好的实现就是使用<code>DeviceEventEmitter</code>(一种类似<code>Node</code>中的事件机制)，并且创建一个容器组件用于管理对话框弹出，关闭。最终把容器组件挂载到页面中即可。</p>
+<p>为了实现这样的需求，除了消息的收发管理，难点还在于如何把<em>容器组件</em>挂载到应用中，由于<code>React-Native</code>中并不存在<code>DOM</code>，所以要采用其它的方式，确保该容器挂载后，整个<code>App</code>使用阶段不会被卸载即可。</p>
+<p>就此打住。</p>
+<blockquote>
+<p>React中实现全局组件的思想与之类似，下面就来实现一个<code>message</code>全局组件。</p>
+</blockquote>
+<p>最终的实现应该是这样使用的：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> message <span class="keyword">from</span> <span class="string">'./message'</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  handleClick = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    message(<span class="string">'这是一条message'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Button</span> <span class="attr">onClick</span>=<span class="string">&#123;this.handleClick&#125;</span>&gt;</span>点击<span class="tag">&lt;/<span class="name">Button</span>&gt;</span></span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="容器组件"><a href="#容器组件" class="headerlink" title="容器组件"></a>容器组件</h4><p>容器组件用于管理<code>message</code>（提供一系列增删接口），并且渲染到<code>DOM</code>。</p>
+<p>一个简易的容器组件可以是下面这样：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; Component &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'./style.css'</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Message</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  state = &#123;</span><br><span class="line">    messageList: []</span><br><span class="line">  &#125;</span><br><span class="line">  add = <span class="function">(<span class="params">content</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; messageList &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123; <span class="attr">messageList</span>: [content, ...messageList]&#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  remove = <span class="function">(<span class="params">key</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; messageList &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="keyword">const</span> result = messageList.filter(<span class="function"><span class="params">item</span> =&gt;</span> item.key !== key)</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123; <span class="attr">messageList</span>: result &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  clear() &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123; <span class="attr">messageList</span>: [] &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; messageList &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="keyword">const</span> nodes = messageList.map(<span class="function"><span class="params">item</span> =&gt;</span> item.component ? item.component : <span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">"message-item"</span>&gt;</span>&#123;item.content&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>)</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div className=<span class="string">"message-container"</span>&gt;</span><br><span class="line">        &#123; nodes &#125;</span><br><span class="line">      &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面实现的容器组件提供了<code>add</code>/<code>remove</code>/<code>clear</code>三个方法来对<code>message</code>进行管理，并最终渲染当前<code>messageList</code>中所有的消息。</p>
+<p>接下来需要考虑如何把<em>容器组件</em>渲染到<code>DOM</code>，也可以说是把<em>容器组件</em>插入到<code>DOM</code>中。有多种方式可以选择：</p>
+<ol>
+<li><code>ReactDOM.render(element, container[, callback])</code>，这个方法的作用是把<code>React</code>元素渲染到指定的容器中，也是我们最常用的一种渲染到<code>DOM</code>的方法。</li>
+<li><code>ReactDOM.createPortal(child, container)</code>，该方法的作用是<strong>将子节点渲染到存在于父组件以外的 DOM 节点中</strong>，该方法是这样使用的：<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 见：[https://zh-hans.reactjs.org/docs/portals.html]</span></span><br><span class="line">render() &#123;</span><br><span class="line">  <span class="comment">// React 并*没有*创建一个新的 div。它只是把子元素渲染到 `domNode` 中。</span></span><br><span class="line">  <span class="comment">// `domNode` 是一个可以在任何位置的有效 DOM 节点。</span></span><br><span class="line">  <span class="keyword">return</span> ReactDOM.createPortal(</span><br><span class="line">    <span class="keyword">this</span>.props.children,</span><br><span class="line">    domNode</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>既然是全局<code>message</code>组件，那么其一个理想的挂载的地方可以是<code>body</code>或者指定的<code>DOM</code>节点。下面，分别实现以上两种方式。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Message.init = <span class="function"><span class="params">container</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 创建内容容器</span></span><br><span class="line">  <span class="keyword">let</span> root = <span class="built_in">document</span>.createElement(<span class="string">'div'</span>)</span><br><span class="line">  <span class="keyword">if</span> (container) &#123;</span><br><span class="line">    container.appendChild(root)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">document</span>.body.appendChild(root)</span><br><span class="line">  &#125;</span><br><span class="line">  render(<span class="xml"><span class="tag">&lt;<span class="name">Message</span> /&gt;</span>, root)</span></span><br><span class="line"><span class="xml">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>在<code>Message</code>上新增了一个静态函数<code>init</code>，调用该函数就会把<code>Message</code>组件渲染到指定的<code>DOM</code>元素或者是<code>document.body</code>上。</p>
+<p>这里有一个疑问，<code>Message</code>组件中提供了一系列接口来管理<code>message</code>，但通过以上的方式地区把<code>Message</code>组件挂载到<code>DOM</code>上了，却没法暴露接口供外部方法。这里有多种方式，第一种是<code>ReactDOM.render(element, container[, callback])</code>的返回值是其实是组件实例的引用，有了这个引用，外部就可以调用这些接口。这种方式已经不推荐使用，而推荐的方式也就是第二种方式<code>callback ref</code>，我们可以给组件绑定一个回调类型的<code>ref</code>，而这个<code>callback</code>以组件实例作为参数，我们可以通过这种方式来向外部暴露组件实例。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Message.init = <span class="function">(<span class="params">container, callback</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 创建内容容器</span></span><br><span class="line">  <span class="keyword">let</span> root = <span class="built_in">document</span>.createElement(<span class="string">'div'</span>)</span><br><span class="line">  <span class="keyword">if</span> (container) &#123;</span><br><span class="line">    container.appendChild(root)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">document</span>.body.appendChild(root)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// callback</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">ref</span>(<span class="params">message</span>) </span>&#123;</span><br><span class="line">    callback(&#123;</span><br><span class="line">      add(content)&#123;</span><br><span class="line">        message.add(content)</span><br><span class="line">      &#125;,</span><br><span class="line">      remove(key) &#123;</span><br><span class="line">        message.remove(key)</span><br><span class="line">      &#125;,</span><br><span class="line">      clear() &#123;</span><br><span class="line">        message.clear()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render(<span class="xml"><span class="tag">&lt;<span class="name">Message</span> <span class="attr">ref</span>=<span class="string">&#123;ref&#125;</span> /&gt;</span>, root)</span></span><br><span class="line"><span class="xml">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>我们给<code>init</code>方法增加了一个callback参数，通过这个callback就可以把组件实例暴露到外部中去。在<code>callback ref</code>中，我们调用<code>init</code>传入的<code>callback</code>参数，并把组件实例作为<code>callback</code>的参数，实际上，暴露整个组件实例是非常危险的，因此这里只是暴露了实例的几个外部调用接口。</p>
+<h4 id="外部接口"><a href="#外部接口" class="headerlink" title="外部接口"></a>外部接口</h4><p>接下来实现外部接口，也就是我们外部调用的方法<code>message(content)</code>。实现容器组件的时候，我们实现了一个静态方法<code>Message.init</code>，该方法初始化了一个容器并挂载到<code>DOM</code>，并通过<code>callback</code>的方式对外暴露接口来管理<code>messageList</code>。因此，这个外部调用的方式只需要去实现<code>实现这个callback</code>。例如，我们实现的这个<code>message(content)</code>调用后三秒后就会消失。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Message <span class="keyword">from</span> <span class="string">'./message'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> messageInstance;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> index = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addMessage</span>(<span class="params">content</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> key = <span class="string">`<span class="subst">$&#123;index++&#125;</span>_MESSAGE_UNIQ_KEY`</span></span><br><span class="line">  messageInstance.add(&#123; key, content &#125;)</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    messageInstance.remove(key)</span><br><span class="line">  &#125;, <span class="number">3000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">message</span>(<span class="params">content</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">callback</span>(<span class="params">instance</span>) </span>&#123;</span><br><span class="line">    messageInstance = instance</span><br><span class="line">    addMessage(content)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span>(!messageInstance) &#123;</span><br><span class="line">    Message.init(<span class="literal">null</span>, callback)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    addMessage(content)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> message</span><br></pre></td></tr></table></figure>
+<p>上面的代码通过<code>callback</code>拿到了组件对外的接口并对外缓存<code>messageInstance</code>，针对每条消息生成了一个<code>UNIQUE_KEY</code>用于后续的消息移除。这里需要注意的是，<code>Message</code>只能实例化一次。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>至此，一个全局组件<code>message</code>已经完成了。当然，如果你想要看到更好的效果，还需要对容器和消息本身添加样式。我们还可以自定义消息组件，将接口通过<code>props</code>传入到组件中，更好的管理消息。</p>
+<p><code>React</code>也提供了<code>ReactDOM.unmountComponentAtNode(container)</code>方法来卸载一个组件，当<code>message</code>组件不再需要的时候，最好将它从<code>DOM</code>中移除。</p>
+<p>前面提到过<code>ReactDOM.createPortal(child, container)</code>同样可以将节点渲染到<code>DOM</code>。不多想要这种方式并不是很适合这种场景，因为对外暴露接口是一个难题，这里就不在演示了。</p>
+<p>完。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/12/19/global-component/" data-id="ck4ckdkx9000z30j6hm12n51u" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/12/19/global-component/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/12/19/global-component/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-dynamic-navigator" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -253,13 +410,13 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tab nav配置</span></span><br><span class="line"><span class="keyword">const</span> RouteConfigs: TabOptions = &#123;</span><br><span class="line">  Home: &#123; <span class="attr">screen</span>: Home &#125;,</span><br><span class="line">  Purchase: &#123; <span class="attr">screen</span>: Purchase &#125;,</span><br><span class="line">  Brand: &#123; <span class="attr">screen</span>: Brand &#125;,</span><br><span class="line">  Sell: &#123; <span class="attr">screen</span>: Sell &#125;,</span><br><span class="line">  Management: &#123; <span class="attr">screen</span>: Management &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 创建底部tab路由</span></span><br><span class="line"><span class="keyword">const</span> BottomTabRoutes = createBottomTabNavigator(RouteConfigs, &#123;</span><br><span class="line">  ...TabNavigatorConfig</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 接入到App路由中</span></span><br><span class="line"><span class="keyword">const</span> AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; <span class="attr">screen</span>: BottomTabRoutes &#125;,</span><br><span class="line">    ...pageRoutes</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 <p><code>createBottomTabNavigator</code>接收<code>RouteConfigs</code>作为参数，返回一个类型为<code>NavigationContainer</code>的值：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// NavigationContainer 类型定义</span></span><br><span class="line">interface NavigationContainer extends React.ComponentClass&lt;NavigationContainerProps NavigationNavigatorProps&lt;any&gt;&gt; &#123;...&#125;</span><br></pre></td></tr></table></figure></p>
 <p>通过查看<code>NavigationContainer</code>的定义，可以发现其是一个<code>React</code>组件。所以第一种方式就是自定义一个组件，在该组件中返回<code>NavigationContainer</code>实例即可。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigater</span> <span class="keyword">extends</span> <span class="title">Compoent</span> </span>&#123;</span><br><span class="line">  _genNav() &#123;</span><br><span class="line">    <span class="keyword">let</span> NavConfig = [....]</span><br><span class="line">    <span class="comment">// 对`NavConfig`的一系列的处理</span></span><br><span class="line">    <span class="keyword">return</span> createBottomTabNavigator(NavConfig, &#123; ...otherConfig &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Tabs = <span class="keyword">this</span>._genNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">const AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; screen: DynamicTabNavigator &#125;,</span><br><span class="line">    ...otherRouter</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigater</span> <span class="keyword">extends</span> <span class="title">Compoent</span> </span>&#123;</span><br><span class="line">  _genNav() &#123;</span><br><span class="line">    <span class="keyword">let</span> NavConfig = [....]</span><br><span class="line">    <span class="comment">// 对`NavConfig`的一系列的处理</span></span><br><span class="line">    <span class="keyword">return</span> createBottomTabNavigator(NavConfig, &#123; ...otherConfig &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Tabs = <span class="keyword">this</span>._genNav()</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Tabs</span> /&gt;</span></span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml">const AppNavigator = createStackNavigator(</span></span><br><span class="line"><span class="xml">  &#123;</span></span><br><span class="line"><span class="xml">    TabRouter: &#123; screen: DynamicTabNavigator &#125;,</span></span><br><span class="line"><span class="xml">    ...otherRouter</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">)</span></span><br></pre></td></tr></table></figure>
 <p>这种方式在该<a href="https://github.com/react-navigation/react-navigation/issues/3945" target="_blank" rel="noopener">issue</a>被证实是可行的，但是在<code>React Navigation</code><strong><em>3.x</em></strong>版本中报错，显示缺少<code>AppContainer</code>，所以还需要使用<code>createAppContainer</code>创建一个容器。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">render() &#123;</span><br><span class="line">  <span class="keyword">const</span> Tabs = createAppContainer(<span class="keyword">this</span>._genNav())</span><br><span class="line">  <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">render() &#123;</span><br><span class="line">  <span class="keyword">const</span> Tabs = createAppContainer(<span class="keyword">this</span>._genNav())</span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Tabs</span> /&gt;</span></span></span><br><span class="line"><span class="xml">&#125;</span></span><br></pre></td></tr></table></figure>
 <p>这样动态路由就实现了，并且能够在<strong>绝大部分情况下</strong>使用正常，由于使用<code>createAppContainer</code>创建了一个<em>容器</em>，如果该容器并无法包含所有路由，那么还需要的<code>AppContainer</code>，此时就会导航异常。</p>
 <h3 id="实现二"><a href="#实现二" class="headerlink" title="实现二"></a>实现二</h3><p>继续关注<code>createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)</code>方法，第二个参数<code>TabNavigatorConfig</code>包含一个属性<code>tabBarComponent?: React.ReactType</code>，该属性用于设置<code>tabBar</code>如何显示，该属性设置为一个组件。</p>
 <p>所以机会来了！</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; BottomTabBar &#125; <span class="keyword">from</span> <span class="string">'react-navigation-tabs'</span></span><br><span class="line"><span class="keyword">import</span> &#123; DeviceEventEmitter &#125; <span class="keyword">from</span> <span class="string">'react-native'</span></span><br><span class="line"></span><br><span class="line">interface NavigatorState &#123;</span><br><span class="line">  showBrandPage: boolean</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigator</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">any</span>, <span class="title">NavigatorState</span>&gt; </span>&#123;</span><br><span class="line">  state: NavigatorState = &#123;</span><br><span class="line">    showBrandPage: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  subscribe: any</span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>.subscribe = DeviceEventEmitter.addListener(</span><br><span class="line">      <span class="string">'showBrand'</span>,</span><br><span class="line">      (data: boolean) =&gt; &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123; <span class="attr">showBrandPage</span>: data &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// tslint:disable-next-line: no-unused-expression</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe &amp;&amp; <span class="keyword">this</span>.subscribe.remove()</span><br><span class="line">  &#125;</span><br><span class="line">  _tabNav = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; routes, index &#125; = <span class="keyword">this</span>.props.navigation.state</span><br><span class="line">    <span class="keyword">const</span> finalRoutes = [...routes]</span><br><span class="line">    <span class="keyword">const</span> &#123; showBrandPage &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="comment">// ...一系列的操作</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      state: &#123;</span><br><span class="line">        index: finalRoutes.findIndex(<span class="function"><span class="params">route</span> =&gt;</span> currentRoute.key === route.key),</span><br><span class="line">        routes: finalRoutes</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; navigation, ...restProps &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    <span class="keyword">const</span> tabNavConfig = <span class="keyword">this</span>._tabNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;BottomTabBar &#123;...restProps&#125; navigation=&#123;tabNavConfig&#125; /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default DynamicTabNavigator</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const BottomTabRoutes = createBottomTabNavigator(tabNav, &#123;</span><br><span class="line">  tabBarComponent: DynamicTabNavigator</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; BottomTabBar &#125; <span class="keyword">from</span> <span class="string">'react-navigation-tabs'</span></span><br><span class="line"><span class="keyword">import</span> &#123; DeviceEventEmitter &#125; <span class="keyword">from</span> <span class="string">'react-native'</span></span><br><span class="line"></span><br><span class="line">interface NavigatorState &#123;</span><br><span class="line">  showBrandPage: boolean</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigator</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">any</span>, <span class="title">NavigatorState</span>&gt; </span>&#123;</span><br><span class="line">  state: NavigatorState = &#123;</span><br><span class="line">    showBrandPage: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  subscribe: any</span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>.subscribe = DeviceEventEmitter.addListener(</span><br><span class="line">      <span class="string">'showBrand'</span>,</span><br><span class="line">      (data: boolean) =&gt; &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123; <span class="attr">showBrandPage</span>: data &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// tslint:disable-next-line: no-unused-expression</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe &amp;&amp; <span class="keyword">this</span>.subscribe.remove()</span><br><span class="line">  &#125;</span><br><span class="line">  _tabNav = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; routes, index &#125; = <span class="keyword">this</span>.props.navigation.state</span><br><span class="line">    <span class="keyword">const</span> finalRoutes = [...routes]</span><br><span class="line">    <span class="keyword">const</span> &#123; showBrandPage &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="comment">// ...一系列的操作</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      state: &#123;</span><br><span class="line">        index: finalRoutes.findIndex(<span class="function"><span class="params">route</span> =&gt;</span> currentRoute.key === route.key),</span><br><span class="line">        routes: finalRoutes</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; navigation, ...restProps &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    <span class="keyword">const</span> tabNavConfig = <span class="keyword">this</span>._tabNav()</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">BottomTabBar</span> &#123;<span class="attr">...restProps</span>&#125; <span class="attr">navigation</span>=<span class="string">&#123;tabNavConfig&#125;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml">export default DynamicTabNavigator</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml">const BottomTabRoutes = createBottomTabNavigator(tabNav, &#123;</span></span><br><span class="line"><span class="xml">  tabBarComponent: DynamicTabNavigator</span></span><br><span class="line"><span class="xml">&#125;)</span></span><br></pre></td></tr></table></figure>
 <p>通过<code>eventListener</code>的方式接收路由变更信号，最终渲染<code>BottomTabBar</code>时使用修改过后的配置即可。</p>
 <p>这种方式其实是一种<em>障眼法</em>，我们需要在配置静态Tab路由<code>RouteConfigs</code>时配置所有的Tab路由，在<code>DynamicTabNavigator</code>中通过<code>props</code>注入的<code>navigation.state.routes</code>拿到配置的静态路由，并经过一系列的处理最终得到渲染到<code>BottomTabBar</code>中的路由。需要注意的是，如果最终的路由相比静态路由有调整，那么需要更新<code>index</code>，否则点击路由跳转时会出现错误。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
@@ -279,7 +436,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ck3l3mha3000ajsj6niavzbhb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ck4ckdkrt000j30j6uxbhodl5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -434,7 +591,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ck3l3mhah000pjsj6uurreh3q" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ck4ckdkwz000v30j6p8e8kozn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -619,7 +776,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ck3l3mha9000fjsj6wm8gvkex" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ck4ckdkrq000h30j68sawynqi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -770,7 +927,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ck3l3mhad000kjsj6eyygn6wi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ck4ckdkwx000r30j6u0xzffhl" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -930,7 +1087,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ck3l3mhak000tjsj6ca9gyrv0" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ck4ckdkxa001130j69kmn9zye" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1091,7 +1248,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ck3l3mham000vjsj65ihmnzen" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ck4ckdkwy000t30j6q4kwozo5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1257,7 +1414,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="ck3l3mhac000hjsj6g7gptupo" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="ck4ckdkww000q30j6bpij7noa" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1430,7 +1587,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="ck3l3mhbi0028jsj68wuwq1yy" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="ck4ckdkyk002i30j6ncs4jgsu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1676,7 +1833,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ck3l3mhb1001jjsj6tw48i7pg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ck4ckdkxn001l30j6gli5mxfa" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1754,248 +1911,6 @@
 
 
 
-    <article id="post-webpack-dllplugin" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2019/01/06/webpack-dllplugin/">使用Webpack DllPlugin</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2019/01/06/webpack-dllplugin/">
-            <time datetime="2019-01-06T11:52:32.000Z" itemprop="datePublished">2019-01-06</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Webpack/">Webpack</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h2 id="DllPlugin-简易使用指南"><a href="#DllPlugin-简易使用指南" class="headerlink" title="DllPlugin 简易使用指南"></a>DllPlugin 简易使用指南</h2><ol>
-<li>创建<code>webpack.dll.config.js</code> 用于对特定的模块打包成dll</li>
-<li><code>webpack --config webpack.dll.config.js</code> 生成dll以及其描述文件</li>
-<li>在<code>webpack.common.config.js</code>中使用DllReferencePlugin引入打包好的dll文件。</li>
-<li>打包。此时遇到相应的模块时直接引入而不会重新打包。</li>
-</ol>
-<h3 id="创建webpack-dll-config-js"><a href="#创建webpack-dll-config-js" class="headerlink" title="创建webpack.dll.config.js"></a>创建<code>webpack.dll.config.js</code></h3><blockquote>
-<p>这里以分别打包<code>moment</code>和<code>lodash</code>为例</p>
-</blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: &#123;</span><br><span class="line">    lodash: [<span class="string">'lodash'</span>],</span><br><span class="line">    moment: [<span class="string">'moment'</span>],</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// webpack.dll.config.js</span></span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> config = <span class="built_in">require</span>(<span class="string">'./config'</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: config.entry,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'/static/dll'</span>),</span><br><span class="line">    filename: <span class="string">'[name].dll.js'</span>,</span><br><span class="line">    library: <span class="string">'[name]_library'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.DllPlugin(&#123;</span><br><span class="line">      path: path.join(__dirname, <span class="string">'/static/dll'</span>, <span class="string">'[name]-manifest.json'</span>),</span><br><span class="line">      name: <span class="string">'[name]_library'</span>,</span><br><span class="line">      context: __dirname,</span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>解释：</p>
-<ol>
-<li>推荐把入口配置信息写在单独文件中，易于维护。</li>
-<li>DllPlugin类接受一个配置对象，该对象有三个属性：<code>context</code>(绝对路径), manifest文件中请求上下文；<code>name</code>,暴露的dll函数名；<code>path</code>：manifest文件存放的位置(绝对路径)。</li>
-</ol>
-<h3 id="使用DllReferencePlugin"><a href="#使用DllReferencePlugin" class="headerlink" title="使用DllReferencePlugin"></a>使用DllReferencePlugin</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// webpack.common.config.js</span></span><br><span class="line"><span class="keyword">const</span> config = <span class="built_in">require</span>(<span class="string">'./config'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  ... <span class="comment">// 省略其它配置</span></span><br><span class="line">  plugins: [</span><br><span class="line">    ...Object.keys(dllConfig.entry).map(<span class="function">(<span class="params">name</span>) =&gt;</span> <span class="keyword">new</span> <span class="keyword">new</span> webpack.DllReferencePlugin(&#123;</span><br><span class="line">      context: __dirname,</span><br><span class="line">      manifest: <span class="built_in">require</span>(<span class="string">`./static/dll/<span class="subst">$&#123;name&#125;</span>-manifest.json`</span>),</span><br><span class="line">    &#125;))</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>DllReferencePlugin 接受一个对象用于初始化</p>
-</blockquote>
-<ol>
-<li>context: manifest的上下文(绝对路径)，需和DllPlugin中的context一致</li>
-<li>manifest: manifest文件，使用require引入或指定绝对路径</li>
-</ol>
-<p>可选参数：</p>
-<ol>
-<li>content：模块id的映射，默认为 manifest.content</li>
-<li>name: dll文件的名称，默认为 manifest.name</li>
-<li>scope: dll 内容前缀</li>
-<li>sourceType: dll如何暴露的？amd commonjs2 …</li>
-</ol>
-<p>scope: ‘abc’， 则该dll中的xyz文件可以通过require(‘abc/xyz’)来引用<br>例如在一个dll中打包了<code>lodash</code>和<code>axios</code>两个库，并且指定了<code>{scope: &#39;lib&#39;}</code>，则在需要使用axios的时候使用<code>require(&#39;lib/axios&#39;)</code>即可。</p>
-<h3 id="测试1：把echarts，windui，react及其周边分别抽取成dll文件。"><a href="#测试1：把echarts，windui，react及其周边分别抽取成dll文件。" class="headerlink" title="测试1：把echarts，windui，react及其周边分别抽取成dll文件。"></a>测试1：把<code>echarts</code>，<code>windui</code>，<code>react</code>及其周边分别抽取成dll文件。</h3><p>抽取的dll文件大小分别为：753KB 1603KB，385KB。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">构建方式</th>
-<th style="text-align:right">平均构建时间</th>
-<th style="text-align:right">包大小</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">普通</td>
-<td style="text-align:right">97s</td>
-<td style="text-align:right">4.1MB</td>
-</tr>
-<tr>
-<td style="text-align:left">使用Dll</td>
-<td style="text-align:right">71s</td>
-<td style="text-align:right">2.6MB</td>
-</tr>
-<tr>
-<td style="text-align:left">dll文件</td>
-<td style="text-align:right">24s</td>
-<td style="text-align:right">2.7MB</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>经过对比发现，由于无法使用按需加载，所以整个<code>windui</code>打包的大小差不多为1.6MB，而普通的打包方式<code>windui</code>的大小仅为365KB。</p>
-</blockquote>
-<blockquote>
-<p>在使用<code>windui</code>链接库后生成的打包，发现vendors模块中仍然含有<code>windui</code>，大小为<code>330KB</code>，仅<code>windui</code>中的<code>node_modules</code>文件夹下的<code>rc-trigger</code>和<code>rc-dropdown</code>被重用，因此这里可能重复打包了。</p>
-</blockquote>
-<blockquote>
-<p><code>windui</code>中依赖的<code>rc-*</code>部分模块仍然被打包。</p>
-</blockquote>
-<h3 id="方式二-仅对react相关模块和echarts进行打包"><a href="#方式二-仅对react相关模块和echarts进行打包" class="headerlink" title="方式二 仅对react相关模块和echarts进行打包"></a>方式二 仅对<code>react</code>相关模块和<code>echarts</code>进行打包</h3><p>抽取的两个dll文件的大小为393KB 769KB</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">构建方式</th>
-<th style="text-align:right">平均构建时间</th>
-<th style="text-align:right">包大小</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">普通</td>
-<td style="text-align:right">97s</td>
-<td style="text-align:right">4.1MB</td>
-</tr>
-<tr>
-<td style="text-align:left">使用DLL</td>
-<td style="text-align:right">77s</td>
-<td style="text-align:right">3.08MB</td>
-</tr>
-<tr>
-<td style="text-align:left">dll</td>
-<td style="text-align:right">11s</td>
-<td style="text-align:right">1.16MB</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p><code>windui</code>的大小基本不变，而<code>windui</code>依赖的<code>rc-*</code>系列组件基本没被打包。</p>
-</blockquote>
-<blockquote>
-<p><code>vendors</code>模块从<em>0.61MB</em>到<em>1.67MB</em></p>
-</blockquote>
-<h3 id="使用html-webpack-include-assets-plugin-把dll注入到index-html"><a href="#使用html-webpack-include-assets-plugin-把dll注入到index-html" class="headerlink" title="使用html-webpack-include-assets-plugin 把dll注入到index.html"></a>使用<code>html-webpack-include-assets-plugin</code> 把dll注入到<code>index.html</code></h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> HtmlWebpackIncludeAssetsPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-include-assets-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> dllIntoHtml = <span class="keyword">new</span> HtmlWebpackIncludeAssetsPlugin(&#123;</span><br><span class="line">  assets: [<span class="string">'./static/dll/echarts.dll.js'</span>, <span class="string">'./static/dll/react.dll.js'</span>], <span class="comment">// 需要注入的dll文件路径</span></span><br><span class="line">  append: <span class="literal">false</span>, <span class="comment">// 是否尾注入？push ： unshift</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>因为先构建dll，再进行项目构建，在项目构建过程中会删除整个build目录，所以在构建完后再把<em>dll文件夹</em>拷贝进<em>build/static/</em>。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
-<li><p><code>windui</code>进行dll打包后会因为无法按需加载而导致总大小偏高(且可能会产生冗余)；而不进行的话，包的总大小基本不变。</p>
-</li>
-<li><p>初始时需要加载的chunk从3个变为6个/5个</p>
-</li>
-</ol>
-<h3 id="升级到webpack4-x"><a href="#升级到webpack4-x" class="headerlink" title="升级到webpack4.x"></a>升级到webpack4.x</h3><p>升级到webpak4.x后无论是<code>dll</code>还是最终生成块，都有小幅度的下降。与此同时，构建总时间(dll构建时间+项目build时间)略微减小。</p>
-<h3 id="关于使用已存在的模块直接作为dll文件引入的可能性"><a href="#关于使用已存在的模块直接作为dll文件引入的可能性" class="headerlink" title="关于使用已存在的模块直接作为dll文件引入的可能性"></a>关于使用已存在的模块直接作为dll文件引入的可能性</h3><ol>
-<li>目前无相关方面的实践。</li>
-<li>DllPlugin抽取特定的模块构建dll文件后会生成一个<code>manifest</code>文件。该存储了各个模块的和公共模块的对应关系。<br>该文件会对已经打包成dll的模块中的文件进行描述，会给每个文件指定id，并且该<code>json</code>文件中的<code>name</code>属性对应dll的<code>library</code>。</li>
-<li>在进行项目构建的时候，如需要打包某个模块，会在<code>manifest</code>文件中查找，如果该模块已经存在于dll中，依据manifest中的信息进行链接即可，不必重新打包。</li>
-</ol>
-<p>构建的dll块和使用<code>splitChunk</code>或者直接使用babel打包出来的块不一致。其依赖构建dll时指定的<code>library</code>等，而manifest文件也是和该块一一对应的。所以从理论上，使用其它方式提供dll文件由于构建方式和无法提供<code>manifest</code>文件，在构建过程中并不能被重用。</p>
-<p>PS: 本片文章来自于我在团队内部分享的笔记，任何关于<code>webpack-dll-plugin</code>的理解和使用方式请在该插件的<a href="https://webpack.js.org/plugins/dll-plugin/" target="_blank" rel="noopener">Webpack介绍页查看</a>。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="ck3l3mhaq0011jsj6rct1u2ws" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2019/01/06/webpack-dllplugin/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/01/06/webpack-dllplugin/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
@@ -2010,7 +1925,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -2019,7 +1934,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2028,7 +1943,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 
