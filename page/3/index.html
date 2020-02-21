@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                40
+                41
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                10
+                11
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,147 @@
 
             
             <section id="main">
+    <article id="post-初识-requestAnimationFrame" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/12/初识-requestAnimationFrame/">初识 requestAnimationFrame</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/12/初识-requestAnimationFrame/">
+            <time datetime="2017-05-12T10:22:39.000Z" itemprop="datePublished">2017-05-12</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>事情的起因是这样的，前段时间面试的时候面试官问我会canvas不，作为一名未来的前端猿，我只有过一点了解，后来居然收到了offer，当然在闲暇之余是要学习一下canvas，并且在学习过程中首次接触到了本文的主角<code>requestAnimationFrame</code>。</p>
+</blockquote>
+<h3 id="web中实现动画"><a href="#web中实现动画" class="headerlink" title="web中实现动画"></a>web中实现动画</h3><p>老实说，如果有人问我如何在web开发中实现动画，我第一时间想到的就是使用定时器<code>setTimeout()</code>或者<code>setTimeInterval()</code>来实现。其实实现的方式远远不止这一种，在CSS3的时代，我们实现动画有了更多的选择，比如使用关键帧动画，使用<code>transition</code>，我们也可以在<code>canvas</code>上绘图来实现动画；当然，还有<code>requestAnimationFrame</code>。</p>
+<p>使用<code>setTimeout()/setInterval()</code>实现的方式很简单，我前面有一篇文章就简要介绍了JS中的定时器。使用这种方式实现动画其实是有其性能瓶颈的，例如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">animation</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// do something</span></span><br><span class="line">    setTimeout(animation, <span class="number">1000</span>/<span class="number">60</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面我们以60帧/秒的速度执行动画，但是如果浏览器不是60帧/秒，就会掉帧；并且由于JS单线程的特点，所有不能保证每一次执行回调都是<code>1000/60</code>毫秒；还有，当窗口处于非激活状态的时候，它同样可能会执行。</p>
+<p>其实很好理解，作为定时器，<code>setTimeout/setInterval</code>并不是专门做动画的，存在各种各样的问题也是很好接受的，但是当我们认识到这种实现动画的方式的各种缺点时，我们也许会考虑另一种动画的实现方式，而<code>requestAnimationFrame</code>是一种更好的方案。</p>
+<h3 id="初识-requestAnimationFrame"><a href="#初识-requestAnimationFrame" class="headerlink" title="初识 requestAnimationFrame"></a>初识 requestAnimationFrame</h3><blockquote>
+<p>当我们执行window.requestAnimationFrame(callback)的时候，浏览器会在下次重绘的时候执行回调函数，它会告诉浏览器马上就要执行动画了，而callback则是用于更新动画。</p>
+</blockquote>
+<p><code>requestAnimationFrame</code>使用起来很简单，通过递归不断来执行回调来更新画面从而让画面动起来，我们甚至不需为其指定动画执行的时间和帧率。其优点是：1）从名字上就可以看出这是一个专门用于实现动画的API，优化是自然少不了的；2）其如果处于非激活状态，会自动暂停执行，有效节省了CPU资源。</p>
+<h3 id="小实例"><a href="#小实例" class="headerlink" title="小实例"></a>小实例</h3><p>我们在做动画的时候，有时希望背景移动起来，结合目前正在学习的canvas，我们可以很轻易的做到这点.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> j = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">let</span> image = <span class="built_in">document</span>.querySelectorAll(<span class="string">'img'</span>)[<span class="number">0</span>];</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">moveBackground</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height);</span><br><span class="line">  ctx.translate(<span class="number">10</span>, <span class="number">0</span>);</span><br><span class="line">  ctx.drawImage(image, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">  j++;</span><br><span class="line">  <span class="keyword">if</span>(j &lt; <span class="number">20</span>)&#123;</span><br><span class="line">    requestAnimationFrame(moveBackground);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> moveBtn  = <span class="built_in">document</span>.getElementById(<span class="string">'move'</span>);</span><br><span class="line">moveBtn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;</span><br><span class="line">  e.preventDefault();</span><br><span class="line">  requestAnimationFrame(moveBackground);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面我们点击button的时候，开始执行动画，通过不断的坐标变换和清除重绘，达到背景图片向右移的效果。</p>
+<p>最后，请注意，不是所有浏览器都支持该方法，所以你可能需要一个polyfill，关于如何实现这个polyfill，网络上的资源比较多了，这里就不在赘述。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="ck6w0hzlw001jjkj61u980md2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-实用的JavaScript技巧、经验总结" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -289,7 +430,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="ck4ckdkxq001r30j6wpfwg40b" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="ck6w0hzm1001ujkj63ykdcyit" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -432,7 +573,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="ck4ckdkxt001v30j6hacj8bit" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="ck6w0hzm2001wjkj66x0ujxyp" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -584,7 +725,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="ck4ckdkrh000430j60u47u3k3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="ck6w0hzkg0003jkj6gupf949a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -728,7 +869,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="ck4ckdky4002c30j6zf7vlo3z" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="ck6w0hzmc002ejkj6e0p91gal" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -886,7 +1027,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="ck4ckdkrj000730j6o8kfe713" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="ck6w0hzl8000gjkj6pazpto83" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1032,7 +1173,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="ck4ckdkxd001530j6focwsdl3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="ck6w0hzls001djkj6dkx70fmd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1178,7 +1319,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="ck4ckdkxw002030j6zpnnswfm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="ck6w0hzm60023jkj6s12iej9r" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1320,7 +1461,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="ck4ckdkrl000a30j6rr6gi3f5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="ck6w0hzkj0005jkj62jllx4rk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1464,7 +1605,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="ck4ckdky1002630j6hg1y52fh" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="ck6w0hzma002ajkj67yn8342b" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1542,155 +1683,8 @@
 
 
 
-    <article id="post-理解作用域" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/01/27/理解作用域/">理解作用域</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/01/27/理解作用域/">
-            <time datetime="2017-01-27T05:49:20.000Z" itemprop="datePublished">2017-01-27</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>JS作用域的问题是老生常谈的问题了，我们都知道JS是不存在块级作用域的(ES6以前，try…catch是一个例外)，可是仍然实际编程过程中由于对作用域的理解不够深刻，踩坑无数，苦不堪言，恰逢寒假，又到了充(wan)电(shuai)的时间，所以把学习的重点放在认识JS语言本身上面。参考了资料《你不知道的JavaScript》。</p>
-</blockquote>
-<h3 id="实例为先"><a href="#实例为先" class="headerlink" title="实例为先"></a>实例为先</h3><p>首先，我们以var a = 1;这一个语句为例，看看这个过程JS到底干了什么。</p>
-<p>毫无疑问JS是一门编译型的语言，但它的编译不是提前编译的，编译过程一般发生在语句执行前几个微秒。并且其和其它典型的编译语言一样，编译的步骤是相似的。首先编译器会把语句进行分词，分成单个的代码块，这些代码块被称为词法单元；接下来编译器会把词法单元流转换成一个由元素逐级嵌套所组成的代表了程序语法结构的树，这棵树被称为”抽象语法树AST”；最后一步，代码生成，该过程会把AST转换成可执行代码(机器指令)。</p>
-<p>当然，JS的编译过程不会如此简单，其也会包含性能优化等。但这些所有的工作都在执行前几个微秒的时间内完成，并且立即执行它。</p>
-<p>在正式的开始了解作用域之前，我们首先认识一下代码在执行时所需要的工具。</p>
-<ol>
-<li>引擎：负责代码编译到执行过程</li>
-<li>编译器：负责词法分析和可执行代码的生成等</li>
-<li>作用域：负责收集并维护由所有声明的标识符(变量)组成的一列查询，并实施一套非常严格的规则，确定当前执行的代码对这些标识符的访问权限</li>
-</ol>
-<p>现在开始对var a = 1的执行进行分解：</p>
-<p>首先编译器会把这段程序分成词法单元，并且构建AST，当遇到var a的时候，首选编译器会询问作用域，是否已经已经有一个同名的变量存在于这个作用域集合中，如果存在则忽略该语句，否则在该作用域申明一个变量，命名为a；接下来，编译器会为引擎生成可执行代码，用于处理a=1这个赋值操作，引擎会询问当前的作用域是否存在一个名字为a的变量，如果存在，则使用这个变量，否则继续操作。最终，如果找到变量a，则给其赋值为1，否则将抛出错误。</p>
-<p>总结：在对变量赋值时会存在两个步骤：首先编译器会在作用域中生成一个变量；然后引擎在运行时查找该变量，如果存在就赋值，否则抛出错误。</p>
-<h3 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h3><p>1.嵌套作用域：作用域嵌套这个概念是很好理解的，当一个块嵌套在另一个块或函数中的时候，就会发生作用域的嵌套。当在当前作用域无法找到某个变量的时候，引擎就会在外层的嵌套作用域中寻找，知道抵达到最外层作用域或者找到了该变量为止。</p>
-<p>考虑以下代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params">b</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a + b)</span><br><span class="line">&#125;</span><br><span class="line">add(<span class="number">2</span>) <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
-<p>对变量a的查找是无法在add函数内部完成的，所以引擎会向上层作用域中查找，并且在外层作用域中找到。</p>
-<h3 id="LHS-amp-amp-RHS"><a href="#LHS-amp-amp-RHS" class="headerlink" title="LHS &amp;&amp; RHS"></a>LHS &amp;&amp; RHS</h3><p>引擎查找变量时常用的两种查找方式，这里需要注意的，如果执行右侧查找，无法找到该变量则会抛出引用错误。而进行左侧查找的时候，如果不成功，则会<strong>自动</strong>的隐式创建一个全局变量(都是在非严格模式下)</p>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>简单来说，作用域就是一系列的规则，这套规则用于管理引擎如何在当前作用域以及嵌套的<strong>子域</strong>中根据标识(zhi)符名称进行变量的查找。</p>
-<p>下一篇，将深入的学习<em>词法作用域</em></p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/01/27/理解作用域/" data-id="ck4ckdkxx002130j6z32ucl0b" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/01/27/理解作用域/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/01/27/理解作用域/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
-        <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
+        <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
 </section>
             
@@ -1703,7 +1697,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1712,7 +1706,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1721,7 +1715,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 
@@ -1750,7 +1744,7 @@
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2019 Limoer<br>
+            &copy; 2020 Limoer<br>
             Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
         </div>
     </div>

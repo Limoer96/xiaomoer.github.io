@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Battery Status API 以及useBattery | Limoer的记事小本</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Battery Status API提供了系统层级的电池信息(电量/充电信息等)，并且在这些状态改变的时候提供了一系列的eventListener。  有了这些信息，我们可以对应用进行优化。例如：  用户使用电池供电，想要达到好的续航效果，我们可以降低对资源的使用。 用户电量低，我们可以先对用户操作和数据进行缓存，避免数据丢失。 持续收集用户数据，进行用户群体分析。 ……   兼容性 Batte">
+<meta name="keywords" content="HTML5 API">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Battery Status API 以及useBattery">
+<meta property="og:url" content="http://yoursite.com/2020/02/21/use-battery/index.html">
+<meta property="og:site_name" content="Limoer的记事小本">
+<meta property="og:description" content="Battery Status API提供了系统层级的电池信息(电量/充电信息等)，并且在这些状态改变的时候提供了一系列的eventListener。  有了这些信息，我们可以对应用进行优化。例如：  用户使用电池供电，想要达到好的续航效果，我们可以降低对资源的使用。 用户电量低，我们可以先对用户操作和数据进行缓存，避免数据丢失。 持续收集用户数据，进行用户群体分析。 ……   兼容性 Batte">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-21T10:08:42.674Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Battery Status API 以及useBattery">
+<meta name="twitter:description" content="Battery Status API提供了系统层级的电池信息(电量/充电信息等)，并且在这些状态改变的时候提供了一系列的eventListener。  有了这些信息，我们可以对应用进行优化。例如：  用户使用电池供电，想要达到好的续航效果，我们可以降低对资源的使用。 用户电量低，我们可以先对用户操作和数据进行缓存，避免数据丢失。 持续收集用户数据，进行用户群体分析。 ……   兼容性 Batte">
+    
+
+    
+        <link rel="alternate" href="/" title="Limoer的记事小本" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                
+                <span class="site-title">Limoer的记事小本</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/62.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/62.png" />
+            <h2 id="name">Limoer</h2>
+            <h3 id="title">A student from SDU, focusing on browser side developing.</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Jinan, China</span>
+            <a id="follow" target="_blank" href="http://weibo.com/u/2994244652?refer_flag=1001030101_">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                41
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/xiaomoer/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-use-battery" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Battery Status API 以及useBattery
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2020/02/21/use-battery/">
+            <time datetime="2020-02-21T07:50:32.000Z" itemprop="datePublished">2020-02-21</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/HTML5-API/">HTML5 API</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p><strong>Battery Status API</strong>提供了系统层级的电池信息(电量/充电信息等)，并且在这些状态改变的时候提供了一系列的<code>eventListener</code>。</p>
+</blockquote>
+<p>有了这些信息，我们可以对应用进行优化。例如：</p>
+<ul>
+<li>用户使用电池供电，想要达到好的续航效果，我们可以降低对资源的使用。</li>
+<li>用户电量低，我们可以先对用户操作和数据进行缓存，避免数据丢失。</li>
+<li>持续收集用户数据，进行用户群体分析。</li>
+<li>……</li>
+</ul>
+<blockquote>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Battery_Status_API" target="_blank" rel="noopener">兼容性</a> <strong>Battery Status API</strong>的支持度有限，目前只有<em>Chrome</em>和<em>Opera</em>以及<em>Android webview</em>支持度是比较好的，并且官方并不推荐使用该功能，未来或被移除。</p>
+</blockquote>
+<h3 id="navigator-getBattery"><a href="#navigator-getBattery" class="headerlink" title="navigator.getBattery"></a><code>navigator.getBattery</code></h3><p><code>getBattery</code>返回一个<code>Promise</code>对象，<code>resolve</code>后返回一个<code>battery</code>对象，该对象包含了<code>{ charging, chargingTime, dischargingTime, level }</code>分别表示是否在充电，充电时长，剩余可用时间，电池电量。例如，<code>{
+  &quot;charging&quot;: true,
+  &quot;level&quot;: 1,
+  &quot;chargingTime&quot;: 0,
+  &quot;dischargingTime&quot;: null
+}</code>。</p>
+<p>除此之外，<code>battery</code>对象还包含了4个<code>eventlistener</code>(<code>chargingchange</code>/<code>chargingtimechange</code>/<code>dischargingtimechange</code>/<code>levelchange</code>)，用于监听4个属性的改变。</p>
+<p>下面来写一个例子，获取某一时刻的系统电量信息:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">getBattery</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> nav = navigator</span><br><span class="line">  <span class="keyword">if</span> (!nav || <span class="keyword">typeof</span> nav.getBattery !== <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> battery  = <span class="keyword">await</span> navigator.getBattery()</span><br><span class="line">  <span class="built_in">console</span>.log(battery.level)</span><br><span class="line">  <span class="keyword">return</span> battery</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">getBattery()</span><br><span class="line">  .then(<span class="function"><span class="params">battery</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// do something</span></span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="useBattery"><a href="#useBattery" class="headerlink" title="useBattery"></a>useBattery</h3><blockquote>
+<p>如果我们要在<code>React</code>中使用<code>Battery Status API</code>，我们仍然可以向上面一样，也可以配合上<code>React hooks</code>来实现一个<code>useBattery</code> hook。</p>
+</blockquote>
+<p>在开始写这个钩子之前，我们先理一下，由于获取电量信息是一个异步的过程，所以这个钩子除了返回上面提到的4个电量信息属性以外，还需要额外的一个属性用于记录数据是否获取完毕。</p>
+<p>判断浏览器兼容性只需要判断<code>navigator</code>对象是否包含<code>getBattery</code>函数即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> isSupported = navigator &amp;&amp; <span class="keyword">typeof</span> navigator.getBattery === <span class="string">'function'</span></span><br></pre></td></tr></table></figure>
+<p>获取某一时刻电量信息的<code>hook</code>如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; useState, useEffect &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> isSupported = navigator &amp;&amp; <span class="keyword">typeof</span> navigator.getBattery === <span class="string">'function'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">useBattery</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(!isSupported) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> [state, setState] = useState(&#123; <span class="attr">fetching</span>: <span class="literal">true</span> &#125;)</span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    navigator.getBattery()</span><br><span class="line">      .then(<span class="function"><span class="params">battery</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> newState = &#123;</span><br><span class="line">          fetching: <span class="literal">false</span>,</span><br><span class="line">          charging: battery.charging,</span><br><span class="line">          level: battery.level,</span><br><span class="line">          dischargingTime: battery.dischargingTime,</span><br><span class="line">          chargingTime: battery.chargingTime,</span><br><span class="line">        &#125;</span><br><span class="line">        setState(newState)</span><br><span class="line">      &#125;)</span><br><span class="line">  &#125;, [])</span><br><span class="line">  <span class="keyword">return</span> state</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在某些情况下，我们可能并不仅仅需要某一时刻的电量信息，显然这一版本的<code>useBattery</code>并不能满足需要。我们需要监听<code>eventListeners</code>，并且在改变后变更状态。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; useState, useEffect &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> isSupported = navigator &amp;&amp; <span class="keyword">typeof</span> navigator.getBattery === <span class="string">'function'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123; isEqual &#125; <span class="keyword">from</span> <span class="string">'lodash'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> bat;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">useBattery</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(!isSupported) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> [state, setState] = useState(&#123; <span class="attr">fetching</span>: <span class="literal">true</span> &#125;)</span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">dealChange</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> newState = &#123;</span><br><span class="line">        fetching: <span class="literal">false</span>,</span><br><span class="line">        charging: battery.charging,</span><br><span class="line">        level: battery.level,</span><br><span class="line">        dischargingTime: battery.dischargingTime,</span><br><span class="line">        chargingTime: battery.chargingTime,</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (!isEqual(state, newState)) &#123;</span><br><span class="line">        setState(newState)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    navigator.getBattery()</span><br><span class="line">      .then(<span class="function"><span class="params">battery</span> =&gt;</span> &#123;</span><br><span class="line">        bat = battery</span><br><span class="line">        dealChange()</span><br><span class="line">        bat.addEventListener(<span class="string">'chargingchange'</span>, dealChange)</span><br><span class="line">        bat.addEventListener(<span class="string">'chargingtimechange'</span>, dealChange)</span><br><span class="line">        bat.addEventListener(<span class="string">'dischargingtimechange'</span>, dealChange)</span><br><span class="line">        bat.addEventListener(<span class="string">'levelchange'</span>, dealChange)</span><br><span class="line">        <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">          bat.removeEventListener(<span class="string">'chargingchange'</span>, dealChange)</span><br><span class="line">          bat.removeEventListener(<span class="string">'chargingtimechange'</span>, dealChange)</span><br><span class="line">          bat.removeEventListener(<span class="string">'dischargingtimechange'</span>, dealChange)</span><br><span class="line">          bat.removeEventListener(<span class="string">'levelchange'</span>, dealChange)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">  &#125;, [])</span><br><span class="line">  <span class="keyword">return</span> state</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面版本的<code>useBattery</code>已经比较完善了，针对每个属性都添加了<code>eventHandler</code>，当属性改变时获取新的state，并通过比较决定是否应用更改。</p>
+<p><code>useEffect</code>第一个参数如果返回一个函数，那么将在<code>unmount</code>的时候执行，所以，上面的代码进行了<code>removeEventListener</code>。</p>
+<h3 id="尾巴"><a href="#尾巴" class="headerlink" title="尾巴"></a>尾巴</h3><p>最近两周本该是上班的时间，由于疫情，我不得不在家待岗。起初的一周，睡睡懒觉， 看会儿NBA，再玩玩游戏，一天就浑浑噩噩的过了。可当游戏也玩得无聊了，懒觉也睡够了，我才发现我是真的没什么事做了，这种日子过得真的很难受！</p>
+<p>今天给好久没打开过的<code>Mac</code>充电，翻翻上学时的记忆，无论是文档，代码，邮件…思绪回到六七年前，高中时代的自己，就是因为我对智能手机的狂热追求，我才选择了如今的职业。除此之外，还有一层不变的对游戏的热爱。我喜欢玩游戏，也曾想过做游戏，在上海的那一段日子，我畏畏缩缩的迈出过第一步(想法/剧本)，后来也不了了之。</p>
+<p>是时候重新出发，在未来的很长一段时间里，想要摸索着迈出第二步。</p>
+<p>完。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2020/02/21/use-battery/" data-id="ck6w0hzli000tjkj6x5qnou5j" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2020/02/21/use-battery/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2020/02/21/use-battery/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2019/12/19/global-component/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">React 实现全局组件</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://smithyang.cn">smithyang</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2020 Limoer<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'http://yoursite.com/2020/02/21/use-battery/';
+        
+        this.page.identifier = 'use-battery';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'limoer' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
