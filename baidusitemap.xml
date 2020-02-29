@@ -4,6 +4,23 @@
 
     
   <url>
+    <loc>http://yoursite.com/2020/02/29/compiler-apis/</loc>
+    <lastmod>2020-02-29T04:55:16.845Z</lastmod>
+    <data>
+        <display>
+        <title>使用TypeScript Compiler APIs</title>
+        <pubTime>2020-02-29T04:53:02.000Z</pubTime>
+        
+        <tag>TypeScript AST</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://yoursite.com/2020/02/21/use-battery/</loc>
     <lastmod>2020-02-21T10:08:42.674Z</lastmod>
     <data>

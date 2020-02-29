@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                41
+                42
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                11
+                12
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,179 @@
 
             
             <section id="main">
+    <article id="post-老项目Webpack构建优化" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2019/06/01/老项目Webpack构建优化/">老项目Webpack构建优化</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/06/01/老项目Webpack构建优化/">
+            <time datetime="2019-06-01T14:34:56.000Z" itemprop="datePublished">2019-06-01</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Webpack/">Webpack</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>最近在接手一个项目的时候，由于其开发已经一年有余，整个项目使用了<code>create-react-app</code>脚手架，<em>Webpack</em>版本停留在3.x，<em>React</em>版本15.x，并且在线上使用效果并不好，首页加载缓慢。对于这样一个典型的<strong>老项目</strong>，进行构建优化。</p>
+<blockquote>
+<p>在<code>webpack 3.x</code>之前的构建中，该项目使用<code>CommonChunkPlugin</code>对特定的<code>package</code>进行了抽取，例如<code>react</code>、图表库、组件库，其余使用到的<code>package</code>和业务代码被打包在了一起，<em>Gzip</em>过后差不多<code>1MB</code>。通过分析可以得知，分离出的第三方库和业务代码存在重复打包的情况，并且页面初始加载并不需要用到图标库，而组件库只使用到了部分组件却被完全打包了。</p>
+</blockquote>
+<h3 id="升级Webpack"><a href="#升级Webpack" class="headerlink" title="升级Webpack"></a>升级Webpack</h3><p>由于使用的是<code>create-react-app</code>脚手架，其自带了<code>react-scripts</code>作为<code>webpack</code>的配置，本项目使用的是老版本脚手架生成，<em>Webpack</em>版本是<code>3.x</code>。分析后，在不更新脚手架的前提下，直接升级<em>Webpack</em>，可以使用<code>splitChunk</code>进行代码分隔，配合新版本的<em>React</em>的<code>lazy &amp; Suspense</code>，可不引入三方库的情况下实现按需加载。</p>
+<p>升级<em>Webpack</em>比较容易，直接升级最新版的<code>react-scripts</code>即可（注意不是<code>react-script</code>）。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add --exact react-scripts@2.1.1</span><br></pre></td></tr></table></figure></p>
+<p>安装完后<code>yarn start</code>运行项目，不出意外会有报错提示，因为某些<code>react-scripts</code>依赖的库版本过低，此时只要删除<code>yarn.lock</code>和<code>package-lock.json</code>和<code>node_modules</code>，并且运行<code>yarn install</code>重新安装依赖即可。</p>
+<p>安装完成后，不出意外项目可以正常运行了，此时<em>Webpack</em>已升级。</p>
+<h3 id="代码分隔"><a href="#代码分隔" class="headerlink" title="代码分隔"></a>代码分隔</h3><ol>
+<li><p>考虑到初次构建的时候仅仅分离部分第三方库导致第三方包和业务代码之间存在代码冗余，在新构建的版本中，需要对公用代码进行抽取，这样可以直接避免冗余。具体的<code>splitChunk</code>配置这里不再列出，抽取完成后例如<code>lodash</code>、<code>moment</code>这样的公共库被抽取到了公共包中，构建完成后生成了三个包：业务代码及未抽取的第三方包、特定的第三方包、公共代码包，构建体积明显减少。</p>
+</li>
+<li><p>由于业务的特殊性，首页并不包含任何图表，因此不需要加载图表库，并且图表库打包完成后大小为<code>700KB</code>（未Gzip），因此考虑使用基于路由的按需加载来去除首页不需要加载的资源。</p>
+</li>
+<li><p>进行代码分隔依赖于运行时加载，也就是<code>import()</code>，这是一个<code>ES</code>提案，目前还未标准化(<em>babel</em>已实现)。不同于<code>import</code>语法在预编译时链接代码，<code>import()</code>可以在运行时异步加载资源。而<em>Webpack</em>在解析到这种语法的时候，就会自动的进行代码分隔。</p>
+</li>
+<li><p>目前<em>React</em>懒加载的方案有很多，比如<code>react-loadable</code>，但由于新版的<em>React</em>已经支持了代码分隔，就没必要引入额外的库。<code>React.lazy</code>函数能够让你像处理常规组件一样处理懒加载组件。该函数接收一个函数作为参数，这个函数必须使用到<code>import()</code>动态加载组件，<code>import()</code>返回一个<code>Promise</code>，在<code>resolve</code>后返回这个React组件。<code>Suspense</code>是一个组件，其主要的作用是在懒加载块没有加载完成时使用占位组件进行UI 的优雅降级。</p>
+</li>
+<li><p>经过分析，基于路由的分隔可能最适合本项目。涉及到图表库的三个页面使用懒加载进行代码分隔，其余页面打包在一起，并且完全分离第三方库和业务代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; lazy, Suspense &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; render &#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="keyword">import</span> Loading <span class="keyword">from</span> <span class="string">'@/components/loading'</span></span><br><span class="line"><span class="keyword">const</span> ChartPage = lazy(<span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="comment">/* webpackChunkName: "detail" */</span><span class="string">'@/views/chartPage'</span>));</span><br><span class="line"><span class="keyword">const</span> App = <span class="function"><span class="params">()</span> =&gt;</span> (</span><br><span class="line">  &lt;Router&gt;</span><br><span class="line">    &lt;Suspense fallback=&#123;Loading&#125;&gt;</span><br><span class="line">      &lt;Switch&gt;</span><br><span class="line">        &lt;Route path=<span class="string">'/detail'</span> component=&#123;ChartPage&#125; /&gt;</span><br><span class="line">        ...</span><br><span class="line">      &lt;<span class="regexp">/Switch&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>Suspense&gt;</span><br><span class="line">  &lt;<span class="regexp">/Router&gt;</span></span><br><span class="line"><span class="regexp">);</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>直接运行<code>yarn start</code>，观察打包结果，发现已经按照路由进行了分隔，在总打包大小基本不变的情况下，初始加载的包只有<code>230KB</code>，减少了一大半。</p>
+<ol start="6">
+<li>观察打包结果，发现公共包的命名是<code>0.hash.chunk.js</code>，对于已经在注释中指定了<code>webpackChunkName</code>，这显然是不正常的，可能是<code>react-scripts</code>默认分隔策略的问题。为了修复这个命名问题并且进一步分隔<code>runtime chunk</code>，对<code>splitChunk</code>进行少量的配置。<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SplitCodeConfig = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'all'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">'runtime'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>只需要进行简单的配置，设置<code>splitChunks</code>的<code>chunks</code>为<code>all</code>, <em>Webpack</em>就会使用默认的规则进行打包：抽取公共包，抽取<code>node_modules</code>第三方包等等，具体见<em>Webpack</em>官网 -&gt; <em>文档</em> -&gt; <em>代码分离</em>。</p>
+<p>至此，项目构建已经完成，构建的包可以直接用于生产换环境。</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><ol>
+<li><p>在项目中使用到的组件库包含近百个通用组件和业务组件，但是项目中只使用到了十余个，并且通过观察打包结果，可以看到未被使用到的组件也被打包进来了，这显然不合理。针对这个问题，我们可以查看对应组件库的按需加载方案，并且在<em>Webpack</em>进行相应的配置即可。这里由于使用的是内部开发的组件库，就不在举例。</p>
+</li>
+<li><p>除了使用的组件库，我们需要找到所有能够按需加载却在项目中没有使用的第三方库。例如我要使用<code>lodash</code>的<code>debounce</code>函数进行防抖，我在项目中是这样使用的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="keyword">from</span> <span class="string">'lodash'</span>;</span><br><span class="line"><span class="built_in">window</span>.onscroll = _.debounce(handler);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在构建的时候，整个<code>lodash</code>会被打包，如果只需要打包<code>debounce</code>函数，在<code>import</code>的时候直接<code>import debounce from &#39;lodash/debounce&#39;</code>即可。</p>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li><p>为了直观的查看构建结果，推荐使用<code>webpack-bundle-analyzer</code>插件，它会在构建完成后打开一个页面，该页面可以看到每个<code>bundle</code>的打包情况。使用也很简单:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> BundleAnalyzerPlugin = <span class="built_in">require</span>(<span class="string">'webpack-bundle-analyzer'</span>).BundleAnalyzerPlugin;</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> BundleAnalyzerPlugin(),</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果想测试<code>Gzip</code>后的文件大小，在<code>webpack-dev-server</code>的配置项中添加<code>compress: true</code>即可。但如果查看生产环境下构建的<code>Gzip</code>包大小，可以使用<code>compression-webpack-plugin</code>插件，该插件会在构建完成后生成对应<code>bundle</code>的<code>Gzip</code>包。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> CompressionPlugin = <span class="built_in">require</span>(<span class="string">'compression-webpack-plugin'</span>);</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CompressionPlugin(&#123; <span class="attr">threshold</span>: <span class="number">8192</span> &#125;), <span class="comment">// 只有大于8KB的资源才压缩</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在一般的情况下开启<code>Gzip</code>只需要设置生产服务器即可，并不需要在构建时生成<code>Gzip</code>包，但如果每次请求时再<code>Gzip</code>无疑会加大服务器的负担，因此事先准备好<code>gzip</code>包，服务器不必压缩而是直接返回，这不失为一个好的选择。</p>
+<p>开启<code>Gzip</code>会极大的减小传输体积，但无论是压缩还是解压都需要大量的运算，对于某些较小的资源，使用<code>Gzip</code>可能反而会降低性能，因此建议只对较大的资源进行<code>Gzip</code>压缩，而较小的资源直接传输。</p>
+<p>完。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="ck774scbu002kh0j6o3gancfw" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/06/01/老项目Webpack构建优化/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-webpack-in-thinking" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -375,7 +548,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ck6w0hzlv001hjkj6v76c0s8t" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ck774scbg001uh0j60lo0so6e" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -617,7 +790,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="ck6w0hzlo0015jkj6n68254v3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="ck774scb50019h0j60lvo2xrf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -773,7 +946,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="ck6w0hzm50021jkj6kd6iwild" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="ck774scbk0021h0j612lppbqx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -918,7 +1091,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="ck6w0hzlb000jjkj66yk197hs" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="ck774scaq000kh0j6pjrn4s0c" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1064,7 +1237,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/09/01/使用react-transition-group实现路由切换动画/" data-id="ck6w0hzlq0019jkj6h5k5q0di" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/09/01/使用react-transition-group实现路由切换动画/" data-id="ck774scb7001eh0j6h4sn2jdu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1205,7 +1378,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="ck6w0hzlr001bjkj69v7zhm11" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="ck774scbd001oh0j6t8hr6pn1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1345,7 +1518,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="ck6w0hzlk000xjkj6549qkar9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="ck774scb10012h0j6q989k7vb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1526,7 +1699,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="ck6w0hzlz001qjkj6yppiclu1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="ck774scb9001gh0j6p54onsto" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1678,7 +1851,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="ck6w0hzm0001sjkj6eq14x48p" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="ck774scbh001wh0j6n9zcksda" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1756,191 +1929,6 @@
 
 
 
-    <article id="post-Demo-Canvas-with-React" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/05/27/Demo-Canvas-with-React/">Demo--Canvas with React</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/05/27/Demo-Canvas-with-React/">
-            <time datetime="2017-05-27T12:34:19.000Z" itemprop="datePublished">2017-05-27</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/React/">React</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>一个使用Canvas处理图片的Demo，使用React + webpack + Redux 的技术栈，非常适合初学者，希望你喜欢！</p>
-</blockquote>
-<h3 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h3><p>学习canvas已经有一阵子了，忙完了计组课设，考完了数据挖掘，终于有时间来做一点小Demo来巩固自己所学的知识了。就像上面介绍的那样，这是一个使用Canvas进行图片处理的Demo，其可以选择本地图片，改变其R G B 以及透明度，然后可以选择保存到本地。并且为了重温很久没碰的React，前端使用了React，使用Redux进行数据的管理(虽然简单到没必要使用),并且使用了css modules 以便直接在组件中使用css。当然这一切都是在使用webpack进行编译打包的情况下。</p>
-<p>这个Demo十分简单，特别适合React初学者食用，相信会对你的React学习有所帮助！</p>
-<h3 id="如何运行"><a href="#如何运行" class="headerlink" title="如何运行"></a>如何运行</h3><ol>
-<li>从我的<a href="https://github.com/xiaomoer/sample-canvas-with-react" target="_blank" rel="noopener">github</a>上clone到本地;</li>
-<li>进入Demo根目录, 执行npm init 安装依赖;</li>
-<li>安装完毕后，执行 npm run build 进行构建;</li>
-<li>在Chrome浏览器(下载功能只能在Chrome中使用，所以…)中打开index.html。</li>
-</ol>
-<p>至此，你可以体验这个简单的Demo了。</p>
-<h3 id="像什么"><a href="#像什么" class="headerlink" title="像什么"></a>像什么</h3><p>如果你觉得在你的机器上run很麻烦，或者你只是想看看长得怎么样。</p>
-<p>在浏览器器中打开，是这个样子的：</p>
-<p><img src="http://olro3ke8a.bkt.clouddn.com/init.png" alt="初始化效果"></p>
-<p>我承认的确很简单，简单到显得简陋了！接下来你可以选左下角的选择文件按钮来选择任何一张图片，比如我选择了一张图片后:</p>
-<p><img src="http://olro3ke8a.bkt.clouddn.com/init_pic.png" alt="初始化图片"></p>
-<p>任何被选中的图片都会被居中显示，宽高都会适应600*400的图片操作区域。现在，可以对图片进行操作了：</p>
-<p><img src="http://olro3ke8a.bkt.clouddn.com/after.png" alt="处理后"></p>
-<p>我们选择对图片的R、G、B、以及透明度进行调整，实时调整的效果将会在左侧的图片区域实时显示出来。</p>
-<p>第四步，点击图片区下的按钮，就可以吧处理过的图片下载到本地了，我们打开下载后的图片和处理的图片进行对比，就像这样：<br><img src="http://olro3ke8a.bkt.clouddn.com/save.png" alt="保存与对比"></p>
-<p>至此，我已经演示完了所有的功能。</p>
-<h3 id="不足"><a href="#不足" class="headerlink" title="不足"></a>不足</h3><p>如果你细心一点的话，你会发现这个Demo还有很多问题：</p>
-<ol>
-<li>我们导入任何宽高的图片，其都会被自适应到框中，所以处理后的图片品质会下降。</li>
-<li>保存图片只能在Chrome浏览器中进行，已测试在Firfox中无法使用这个功能。</li>
-<li>右侧的工具栏在选择新图片后不会被初始化。</li>
-<li>功能单一。</li>
-<li>界面简陋</li>
-<li>…</li>
-</ol>
-<h3 id="你需要注意的是"><a href="#你需要注意的是" class="headerlink" title="你需要注意的是"></a>你需要注意的是</h3><p>如果你想学习React和canvas，那么我希望我的这个Demo会对你有所帮助，这里提几个需要注意的点，这些点也是我在开发过程中遇到的问题：</p>
-<ol>
-<li>如何使用input file来选择一张图片并绘制到canvas中。</li>
-<li>如何保存图片。</li>
-<li>图片在React中绘制的时机。</li>
-<li>如何使用redux进行数据管理，特别是如何使用带参数的action。</li>
-<li>你所关注的。</li>
-</ol>
-<h3 id="未来"><a href="#未来" class="headerlink" title="未来"></a>未来</h3><p>这虽然是一个很简单的Demo，但是我会在此基础上进行继续跟进，现在能想到的是解决上面提到的不足，比如设置两种模式，处理图片品质下降的问题；兼容主流浏览器；增添新功能；修改工具栏的状态初始化的bug；以及其它我以后能够想到并且我能够实现的。</p>
-<p>以及…我目前有想法开发一个可交互的视频编辑器，有兴趣的同学可以关注下咯！</p>
-<h3 id="写到后面"><a href="#写到后面" class="headerlink" title="写到后面"></a>写到后面</h3><p>还有不到3个小时我就21岁了，想想前面走过的20年，尤其是上大学的三年来，感慨颇多。谢天谢地，就算无论如何，我都完好无损的度过了。接下来的一岁中，我将面临人生中一个个重大的转折点，实习、毕业、工作、走向社会。从小到大，我对我所有的事情做出选择，接下来，也不例外。我做好准备了，并且一直在准备着！</p>
-<p>共勉！</p>
-<h3 id="新！"><a href="#新！" class="headerlink" title="新！"></a>新！</h3><p>5.28日 </p>
-<ol>
-<li>解决了再次选择图片工具栏初始化的问题；</li>
-<li>工具栏的调节精度下沉到0.01；</li>
-<li>修改页面细节。</li>
-</ol>
-<p>现在看起来长这样！<br><img src="http://olro3ke8a.bkt.clouddn.com/new.png" alt="新的页面"></p>
-<p>6.3日</p>
-<ol>
-<li>同样的功能，不同的界面和实现方式，采用react但是去除redux使用state进行状态管理；</li>
-<li>操作更加主流和人性化；</li>
-<li>已知BUG，下载某些图片的时候可能会失败，暂不知原因。</li>
-</ol>
-<p>新版地址：<a href="https://github.com/xiaomoer/picture-editor-with-canvas" target="_blank" rel="noopener">https://github.com/xiaomoer/picture-editor-with-canvas</a></p>
-<p>看起来是这样的：<br><img src="http://olro3ke8a.bkt.clouddn.com/%E5%88%9D%E5%A7%8B%E6%95%88%E6%9E%9C.png" alt=""><br>还有这样：<br><img src="http://olro3ke8a.bkt.clouddn.com/style.png" alt=""></p>
-<p>加油！</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="ck6w0hzkd0002jkj6tjbfqk7b" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">下一页 &raquo;</a>
     </nav>
@@ -1955,7 +1943,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1964,7 +1952,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript-AST/">TypeScript AST</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1973,7 +1961,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/TypeScript-AST/" style="font-size: 10px;">TypeScript AST</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 

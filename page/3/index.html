@@ -154,11 +154,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                41
+                42
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                11
+                12
                 <span>标签</span>
             </div>
         </div>
@@ -207,6 +207,191 @@
 
             
             <section id="main">
+    <article id="post-Demo-Canvas-with-React" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/27/Demo-Canvas-with-React/">Demo--Canvas with React</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/27/Demo-Canvas-with-React/">
+            <time datetime="2017-05-27T12:34:19.000Z" itemprop="datePublished">2017-05-27</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React/">React</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>一个使用Canvas处理图片的Demo，使用React + webpack + Redux 的技术栈，非常适合初学者，希望你喜欢！</p>
+</blockquote>
+<h3 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h3><p>学习canvas已经有一阵子了，忙完了计组课设，考完了数据挖掘，终于有时间来做一点小Demo来巩固自己所学的知识了。就像上面介绍的那样，这是一个使用Canvas进行图片处理的Demo，其可以选择本地图片，改变其R G B 以及透明度，然后可以选择保存到本地。并且为了重温很久没碰的React，前端使用了React，使用Redux进行数据的管理(虽然简单到没必要使用),并且使用了css modules 以便直接在组件中使用css。当然这一切都是在使用webpack进行编译打包的情况下。</p>
+<p>这个Demo十分简单，特别适合React初学者食用，相信会对你的React学习有所帮助！</p>
+<h3 id="如何运行"><a href="#如何运行" class="headerlink" title="如何运行"></a>如何运行</h3><ol>
+<li>从我的<a href="https://github.com/xiaomoer/sample-canvas-with-react" target="_blank" rel="noopener">github</a>上clone到本地;</li>
+<li>进入Demo根目录, 执行npm init 安装依赖;</li>
+<li>安装完毕后，执行 npm run build 进行构建;</li>
+<li>在Chrome浏览器(下载功能只能在Chrome中使用，所以…)中打开index.html。</li>
+</ol>
+<p>至此，你可以体验这个简单的Demo了。</p>
+<h3 id="像什么"><a href="#像什么" class="headerlink" title="像什么"></a>像什么</h3><p>如果你觉得在你的机器上run很麻烦，或者你只是想看看长得怎么样。</p>
+<p>在浏览器器中打开，是这个样子的：</p>
+<p><img src="http://olro3ke8a.bkt.clouddn.com/init.png" alt="初始化效果"></p>
+<p>我承认的确很简单，简单到显得简陋了！接下来你可以选左下角的选择文件按钮来选择任何一张图片，比如我选择了一张图片后:</p>
+<p><img src="http://olro3ke8a.bkt.clouddn.com/init_pic.png" alt="初始化图片"></p>
+<p>任何被选中的图片都会被居中显示，宽高都会适应600*400的图片操作区域。现在，可以对图片进行操作了：</p>
+<p><img src="http://olro3ke8a.bkt.clouddn.com/after.png" alt="处理后"></p>
+<p>我们选择对图片的R、G、B、以及透明度进行调整，实时调整的效果将会在左侧的图片区域实时显示出来。</p>
+<p>第四步，点击图片区下的按钮，就可以吧处理过的图片下载到本地了，我们打开下载后的图片和处理的图片进行对比，就像这样：<br><img src="http://olro3ke8a.bkt.clouddn.com/save.png" alt="保存与对比"></p>
+<p>至此，我已经演示完了所有的功能。</p>
+<h3 id="不足"><a href="#不足" class="headerlink" title="不足"></a>不足</h3><p>如果你细心一点的话，你会发现这个Demo还有很多问题：</p>
+<ol>
+<li>我们导入任何宽高的图片，其都会被自适应到框中，所以处理后的图片品质会下降。</li>
+<li>保存图片只能在Chrome浏览器中进行，已测试在Firfox中无法使用这个功能。</li>
+<li>右侧的工具栏在选择新图片后不会被初始化。</li>
+<li>功能单一。</li>
+<li>界面简陋</li>
+<li>…</li>
+</ol>
+<h3 id="你需要注意的是"><a href="#你需要注意的是" class="headerlink" title="你需要注意的是"></a>你需要注意的是</h3><p>如果你想学习React和canvas，那么我希望我的这个Demo会对你有所帮助，这里提几个需要注意的点，这些点也是我在开发过程中遇到的问题：</p>
+<ol>
+<li>如何使用input file来选择一张图片并绘制到canvas中。</li>
+<li>如何保存图片。</li>
+<li>图片在React中绘制的时机。</li>
+<li>如何使用redux进行数据管理，特别是如何使用带参数的action。</li>
+<li>你所关注的。</li>
+</ol>
+<h3 id="未来"><a href="#未来" class="headerlink" title="未来"></a>未来</h3><p>这虽然是一个很简单的Demo，但是我会在此基础上进行继续跟进，现在能想到的是解决上面提到的不足，比如设置两种模式，处理图片品质下降的问题；兼容主流浏览器；增添新功能；修改工具栏的状态初始化的bug；以及其它我以后能够想到并且我能够实现的。</p>
+<p>以及…我目前有想法开发一个可交互的视频编辑器，有兴趣的同学可以关注下咯！</p>
+<h3 id="写到后面"><a href="#写到后面" class="headerlink" title="写到后面"></a>写到后面</h3><p>还有不到3个小时我就21岁了，想想前面走过的20年，尤其是上大学的三年来，感慨颇多。谢天谢地，就算无论如何，我都完好无损的度过了。接下来的一岁中，我将面临人生中一个个重大的转折点，实习、毕业、工作、走向社会。从小到大，我对我所有的事情做出选择，接下来，也不例外。我做好准备了，并且一直在准备着！</p>
+<p>共勉！</p>
+<h3 id="新！"><a href="#新！" class="headerlink" title="新！"></a>新！</h3><p>5.28日 </p>
+<ol>
+<li>解决了再次选择图片工具栏初始化的问题；</li>
+<li>工具栏的调节精度下沉到0.01；</li>
+<li>修改页面细节。</li>
+</ol>
+<p>现在看起来长这样！<br><img src="http://olro3ke8a.bkt.clouddn.com/new.png" alt="新的页面"></p>
+<p>6.3日</p>
+<ol>
+<li>同样的功能，不同的界面和实现方式，采用react但是去除redux使用state进行状态管理；</li>
+<li>操作更加主流和人性化；</li>
+<li>已知BUG，下载某些图片的时候可能会失败，暂不知原因。</li>
+</ol>
+<p>新版地址：<a href="https://github.com/xiaomoer/picture-editor-with-canvas" target="_blank" rel="noopener">https://github.com/xiaomoer/picture-editor-with-canvas</a></p>
+<p>看起来是这样的：<br><img src="http://olro3ke8a.bkt.clouddn.com/%E5%88%9D%E5%A7%8B%E6%95%88%E6%9E%9C.png" alt=""><br>还有这样：<br><img src="http://olro3ke8a.bkt.clouddn.com/style.png" alt=""></p>
+<p>加油！</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/" data-id="ck774sc9l0001h0j65j1aknin" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/05/27/Demo-Canvas-with-React/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-初识-requestAnimationFrame" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -270,7 +455,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="ck6w0hzlw001jjkj61u980md2" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/05/12/初识-requestAnimationFrame/" data-id="ck774scbc001mh0j6bkfdhvjv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -430,7 +615,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="ck6w0hzm1001ujkj63ykdcyit" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/04/21/实用的JavaScript技巧、经验总结/" data-id="ck774scbf001sh0j6iqin61m8" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -573,7 +758,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="ck6w0hzm2001wjkj66x0ujxyp" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/03/16/在express中使用cookie/" data-id="ck774scbj001zh0j6f66havqn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -725,7 +910,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="ck6w0hzkg0003jkj6gupf949a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/22/Flex弹性布局/" data-id="ck774scau000sh0j6z98spt90" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -869,7 +1054,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="ck6w0hzmc002ejkj6e0p91gal" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/11/生成器/" data-id="ck774scbs002hh0j6f0zu689z" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1027,7 +1212,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="ck6w0hzl8000gjkj6pazpto83" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/03/Prototype/" data-id="ck774scal000fh0j6zvt6sflj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1173,7 +1358,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="ck6w0hzls001djkj6dkx70fmd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/02/01/this/" data-id="ck774scb40017h0j6b9lh9n0r" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1319,7 +1504,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="ck6w0hzm60023jkj6s12iej9r" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/30/提升/" data-id="ck774scbl0023h0j69t4v2k91" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1461,7 +1646,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="ck6w0hzkj0005jkj62jllx4rk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/01/28/JS作用域浅析/" data-id="ck774scae0007h0j69jaqpu1k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1539,150 +1724,6 @@
 
 
 
-    <article id="post-词法作用域" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/01/27/词法作用域/">词法作用域</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/01/27/词法作用域/">
-            <time datetime="2017-01-27T06:54:05.000Z" itemprop="datePublished">2017-01-27</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>作用域模式有两种，一种是词法作用域，另一种是动态作用域，JavaScript采用的是词法作用域。</p>
-</blockquote>
-<p>大部分的编译器会在编译阶段把程序进行词法化，也就是会对源代码中的字符进行解析，并且赋予词语语义。简单来讲，词法作用域就是词法阶段的作用域，词法作用域是由你在写代码时讲变量和块写在哪里决定的，当词法分析器在处理代码时会保持作用域不变。</p>
-<p>考虑下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showNameAPI</span>(<span class="params">name</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> city = <span class="string">'Chongqing'</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">showCity</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> cid = <span class="string">'CN'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(city + cid);</span><br><span class="line">  &#125;</span><br><span class="line">  showCity();</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line">showNameAPI(name)</span><br></pre></td></tr></table></figure></p>
-<p>这个代码一共包含三个逐级嵌套的作用域，全局作用域中声明了变量name，全局函数showNameAPI,函数作用域中showNameAPI所创建的作用域，包含标识符city以及showCity，最后是showCity创建的作用域,包含了标识符cid。</p>
-<p>作用域查找会在找到第一个匹配的标识符时停止。这里的查找是由内而外的，并且在多级嵌套的作用域内可以定义同名的标识符，但是会产生覆盖。因为<strong>作用域查找的规则就是找到第一个匹配的标识符后停止</strong>。</p>
-<p>无论函数在哪里被调用，也无论其是怎么被调用的，其词法作用域只与其被声明的位置有关。</p>
-<h3 id="欺骗词法"><a href="#欺骗词法" class="headerlink" title="欺骗词法"></a>欺骗词法</h3><p>上面说到词法作用域是在是完全在书写代码是就已经决定，但是也可以通过下面的两种方式在运行时来改变词法作用域。</p>
-<p>当然，不出意外的，这两种方式会是不那么讨人喜欢的eval()和with。</p>
-<p>我们首先来回顾一下eval()，这个函数接收一个字符串作为参数，这个字符串好像是运行时写在这里的代码一样。这明显是一种词法欺骗，其假装是在书写期间就在那里，而在运行时修改词法作用域。但是引擎对此并不知情，所以其依旧照常按照词法作用域进行查找。<br>看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name = <span class="string">'limoer'</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showName</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">eval</span>(str);</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line">showName(<span class="string">"var name = 'lindo'"</span>) <span class="comment">// lindo</span></span><br></pre></td></tr></table></figure></p>
-<p>eval(‘name=”lindo”‘)会被引擎误认为在书写时就在那里，由于执行了上面的语句，此时name的值已经被修改了，并且产生了覆盖，遮蔽了外部同名的变量name。</p>
-<p>在默认的情况下，如果eval中所执行代码中存在一个或者多个申明，其就会对eval()所处的作用域进行修改。无论何情况，eval(..) 都可以在运行期修改书写期的词法作用域。</p>
-<p>再来谈with关键字，我们都知道with关键字用于重复引用一个对象的多个属性的快捷方式，而不需要重复引用对象本身。<br>看下面的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  name: <span class="string">'limoer'</span>,</span><br><span class="line">  age: <span class="number">20</span>,</span><br><span class="line">  city: <span class="string">'Chongqing'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(obj.name)</span><br><span class="line"><span class="built_in">console</span>.log(obj.age)</span><br><span class="line"><span class="built_in">console</span>.log(obj.city)</span><br><span class="line"><span class="comment">// 重复</span></span><br><span class="line"><span class="keyword">with</span>(obj)&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(name);</span><br><span class="line">  <span class="built_in">console</span>.log(age);</span><br><span class="line">  <span class="built_in">console</span>.log(city);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面的这段代码突出了with关键字优点，它可以简化我们的代码，但是我们这里谈的是with关键字的词法欺骗，看下面一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">info</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">with</span>(obj)&#123;</span><br><span class="line">    name = <span class="string">'lindo'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> p1 = &#123;</span><br><span class="line">  name: <span class="string">'limoer'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> p2 = &#123;</span><br><span class="line">  city: <span class="string">'Jinan'</span></span><br><span class="line">&#125;</span><br><span class="line">info(p1)</span><br><span class="line"><span class="built_in">console</span>.log(p1.name) <span class="comment">// 'lindo'</span></span><br><span class="line">info(p2)</span><br><span class="line"><span class="built_in">console</span>.log(p2.name) <span class="comment">// undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(name) <span class="comment">//lindo!</span></span><br></pre></td></tr></table></figure></p>
-<p>上面的这个例子很好的展示了with关键字的词法欺骗，这里创建了两个对象p1和p2，并通过info函数执行with(obj){…}，这里进行了简单的LHS查找，并将新值赋给name属性。但是请注意，这里p2对象并不存在name属性，也不会创建name属性，所以p2.name为undefined；这里很好理解，但是为什么神奇的是竟然多出了一个全局变量name呢!？</p>
-<p>这里执行with(obj){…}的时候，执行的LHS查找，所以当查找不成功时自动隐式创建一个全局变量，如果这样考虑，那么出乎意料的name属性就不难理解了。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>JavaScript拥有的是词法作用域，所谓的词法作用域就是在进行词法分析时的作用域，也就是说，JS的作用域在代码一旦书写完成就能确定(靠书写位置来确定)。词法作用域的理解很简单，但是我们还是需要注意使用eval()和with语句带来的词法欺骗的原因。也许有人会说，在运行时修改词法作用域有利于实现复杂的功能，又利于扩展，何乐而不为呢？可我们在前面提到，在进行编译的时候，JS引擎会对代码进行优化，而这个优化则是根据代码的词法作用域，预先确定变量和函数的位置，才能在执行过程中快速找到标识符。而eval()和with的出现则有可能打破这样的格局，因为引擎在词法分析阶段并不能知道传入的代码到底是什么，会对词法作用域造成怎样的影响。所以，一切优化都是徒劳的，因为在运行时谁都不能确定此时此法作用域到底是怎么样的，所以JS引擎并不会进行优化，导致代码运行缓慢，性能并不好。所以，尽量不要使用它们。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/01/27/词法作用域/" data-id="ck6w0hzma002ajkj67yn8342b" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/01/27/词法作用域/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/01/27/词法作用域/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
@@ -1697,7 +1738,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1706,7 +1747,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript-AST/">TypeScript AST</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1715,7 +1756,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/TypeScript-AST/" style="font-size: 10px;">TypeScript AST</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 
