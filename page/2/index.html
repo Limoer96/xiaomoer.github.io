@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                42
+                43
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,172 @@
 
             
             <section id="main">
+    <article id="post-eject" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2019/06/05/eject/">关于eject需要知道的</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/06/05/eject/">
+            <time datetime="2019-06-05T00:37:22.000Z" itemprop="datePublished">2019-06-05</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Webpack/">Webpack</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>整理：使用<code>create-react-app</code>构建的项目在<code>yarn run eject</code>后的一些问题。</p>
+<h3 id="eject之前"><a href="#eject之前" class="headerlink" title="eject之前"></a>eject之前</h3><p><code>create-react-app</code>脚手架把关于<code>webpack</code>配置和其它脚本封装到了一个叫做<code>react-scripts</code>的<code>package</code>里。默认情况下所有的配置是不可见的，但是可以通过<code>react-app-rewired</code>在不<code>eject</code>的条件下修改某些<code>webpack</code>配置。这样的方式在绝大多数情况下是可行的，但是如果我们想更精确的控制，比如修改默认的css打包方式、使用<code>less</code>、组件库按需加载等，即使也能够做，但或多或少会用到<code>hack</code>的方式。</p>
+<p>在运行<code>yarn run eject</code>后，所有关于<code>webpack</code>配置将会暴露出来，在根目录会生成<strong>config</strong>和<strong>scripts</strong>两个目录，并且<code>react-script</code>将不复存在，所有<code>react-script</code>的依赖都将注入到项目中。</p>
+<p><code>eject</code>是单项操作，一旦完成，就没办法还原，这就意味着复杂的<code>webpack</code>管理将交由我们自己管理。</p>
+<h3 id="eject进行时"><a href="#eject进行时" class="headerlink" title="eject进行时"></a>eject进行时</h3><ol>
+<li><p>步骤1 运行<code>yarn run eject</code>，稍等片刻，观察到生成新增了<strong>config</strong>和<strong>scripts</strong>两个目录，并且<code>package.json</code>文件被修改。</p>
+</li>
+<li><p>打开<code>package.json</code>文件，由于我们已经不使用<code>react-scripts</code>了，所以这里需要修改<code>start build test</code>等命令。使用<code>scripts</code>目录中对应的脚本即可，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">  <span class="string">"start"</span>: <span class="string">"node scripts/start.js"</span>,</span><br><span class="line">  <span class="string">"build"</span>: <span class="string">"node scripts/build.js"</span>,</span><br><span class="line">  <span class="string">"test"</span>: <span class="string">"node scriprs/test.js"</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行<code>yarn start</code>，不出意外的话，项目正常运行，如果提示<em>can’t find module xxx</em>，删除<code>node_modules</code>和<code>yarn.lock</code>(如果有的话)，重新运行<code>yarn install</code>安装依赖即可。</p>
+</li>
+</ol>
+<h3 id="eject后出现了问题"><a href="#eject后出现了问题" class="headerlink" title="eject后出现了问题"></a>eject后出现了问题</h3><p>如果是<code>eject</code>后运行项目报错，重新安装依赖后仍然报错，那么就要考虑是依赖版本的问题了。就比如笔者的这个项目，使用老版本的<code>react-react-app</code>生成，并且在中期升级了<code>react-scripts</code>和<code>react</code>等，且使用了特定版本的<code>eslint</code>规则。在根据报错提示进行修复后，运行项目仍然报错且无任何报错提示。</p>
+<p>我们需要弄清楚到底是什么依赖有问题，这个过程是复杂且繁琐的，并且可能由于依赖前后版本已经发生了巨大的变化，即使找到存在问题的依赖也可能不能仅通过升级该依赖的版本解决问题。</p>
+<p>所以一个备选方案是把项目整体迁移到新版本的<code>create-react-app</code>上，这里有两个做法：使用<code>create-react-app</code>新生成一个项目，我们把源码和依赖都迁移到新项目中，在新的项目中进行<code>eject</code>；使用<code>create-react-app</code>生成一个空的项目并<code>eject</code>，使用新的<em>config</em>和<em>scripts</em>替换当前项目的脚本和配置，并且比较<code>packahe.json</code>，更新依赖的版本，重新安装依赖，大功告成。</p>
+<p>在实际的情况下，受制于项目版本控制、团队协作、迁移成本等，第一种方式，基本不可用。</p>
+<p>解决完问题，接下来我们需要将写在<code>config-overrides.js</code>中的自定义配置进行迁移。</p>
+<h3 id="自定义配置"><a href="#自定义配置" class="headerlink" title="自定义配置"></a>自定义配置</h3><blockquote>
+<p>在进行自定义配置之前，如果项目因<code>eslint</code>规则，无法运行成功，可以尝试在<code>config/webpack.config.js</code>中找到<code>eslint-loader</code>并且注释掉这个配置，此时在开发模式下，<code>eslint</code>并不会对源码进行规则校验。</p>
+</blockquote>
+<h4 id="less支持"><a href="#less支持" class="headerlink" title="less支持"></a>less支持</h4><p>因为<code>create-react-app</code>脚手架并不支持<code>less</code>，我们需要手动添加对<code>less</code>的支持。首先安装<code>less-loader</code>，并在<code>webpack.config.js</code>中的<code>module.rules</code>下添加：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> lessRegex = <span class="regexp">/\.less$/</span>;</span><br><span class="line"><span class="built_in">module</span>: &#123;</span><br><span class="line">  rules: [</span><br><span class="line">    ...</span><br><span class="line">    &#123;</span><br><span class="line">      test: lessRegex,</span><br><span class="line">      use: getStyleLoaders(</span><br><span class="line">        &#123;</span><br><span class="line">          importLoaders: <span class="number">2</span>,</span><br><span class="line">          sourceMap: isEnvProduction &amp;&amp; shouldUseSourceMap,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'less-loader'</span></span><br><span class="line">      ),</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意到这里使用到了一个封装好的函数<code>getStyleLoaders</code>，其针对不同的css预处理器，生成适用的<code>loader</code>，源码非常简单：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> getStyleLoaders = <span class="function">(<span class="params">cssOptions, preProcessor</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> loaders = [</span><br><span class="line">      isEnvDevelopment &amp;&amp; <span class="built_in">require</span>.resolve(<span class="string">'style-loader'</span>),</span><br><span class="line">      isEnvProduction &amp;&amp; &#123;</span><br><span class="line">        loader: MiniCssExtractPlugin.loader,</span><br><span class="line">        options: shouldUseRelativeAssetPaths ? &#123; <span class="attr">publicPath</span>: <span class="string">'../../'</span> &#125; : &#123;&#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        loader: <span class="built_in">require</span>.resolve(<span class="string">'css-loader'</span>),</span><br><span class="line">        options: cssOptions,</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        loader: <span class="built_in">require</span>.resolve(<span class="string">'postcss-loader'</span>),</span><br><span class="line">        options: &#123;</span><br><span class="line">          ident: <span class="string">'postcss'</span>,</span><br><span class="line">          plugins: <span class="function"><span class="params">()</span> =&gt;</span> [</span><br><span class="line">            <span class="built_in">require</span>(<span class="string">'postcss-flexbugs-fixes'</span>),</span><br><span class="line">            <span class="built_in">require</span>(<span class="string">'postcss-preset-env'</span>)(&#123;</span><br><span class="line">              autoprefixer: &#123;</span><br><span class="line">                flexbox: <span class="string">'no-2009'</span>,</span><br><span class="line">              &#125;,</span><br><span class="line">              stage: <span class="number">3</span>,</span><br><span class="line">            &#125;),</span><br><span class="line">            postcssNormalize(),</span><br><span class="line">          ],</span><br><span class="line">          sourceMap: isEnvProduction &amp;&amp; shouldUseSourceMap,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    ].filter(<span class="built_in">Boolean</span>);</span><br><span class="line">    <span class="keyword">if</span> (preProcessor) &#123;</span><br><span class="line">      loaders.push(&#123;</span><br><span class="line">        loader: <span class="built_in">require</span>.resolve(preProcessor),</span><br><span class="line">        options: &#123;</span><br><span class="line">          sourceMap: isEnvProduction &amp;&amp; shouldUseSourceMap,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> loaders;</span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>我们知道如果使用了<code>css</code>预处理器，在设置<code>loader</code>的时候，可能需要多个<code>loaders</code>，例如:</p>
+<ul>
+<li><code>less-loader</code>: 把<code>less</code>编译成<code>css</code></li>
+<li><code>css-loader</code>: 解决<code>css</code>使用<code>import</code>、<code>require</code>引入的问题</li>
+<li><code>style-loader</code>: 通过style标签把<code>css</code>注入到<code>DOM</code>中。</li>
+<li>生产环境下可能还需要生成单独的css文件，css压缩等。</li>
+</ul>
+<p>而<code>getStyleLoaders</code>就是生成这些<code>loaders</code>的一个公共方法。</p>
+<h4 id="组件库按需加载"><a href="#组件库按需加载" class="headerlink" title="组件库按需加载"></a>组件库按需加载</h4><p>在开发过程中，如果使用到了组件库且该组件库支持按需加载(例如<em>antd</em>)，那么我们可以根据相关的教程配置即可。</p>
+<p>比如在当前项目中使用到了<code>xx-ui</code>这个组件库，该组件库支持<code>babel-plugin-import</code>按需加载，在安装好依赖后，我们只需要在<code>package.json</code>的<code>babel</code>下配置<code>plugin</code>：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"babel"</span>: &#123;</span><br><span class="line">  <span class="string">"presets"</span>: [</span><br><span class="line">    <span class="string">"react-app"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"plugins"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"import"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"libraryName"</span>: <span class="string">"@wind/xx-ui"</span>,</span><br><span class="line">        <span class="string">"libraryDirectory"</span>: <span class="string">"es"</span>,</span><br><span class="line">        <span class="string">"style"</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这和传统的<code>.babelrc</code>中进行<code>plugin</code>配置无区别，但总算不用再维护额外的一个文件了。</p>
+<h4 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h4><p>比如我们在构建时需要对代码进行拆分，我们可以在<code>webpack.config.js</code>的<code>optimization</code>中使用<code>splitChunks</code>进行自定义、分离<code>runtimeChunk等</code>。</p>
+<p>比如我们构建时不想使用默认的<code>static/js/[name].[contenthash:8].chunk.js</code>作为<code>chunks</code>的文件名，直接修改即可。注意，在代码分割时，相应的<code>css</code>也会被分割，如果想修改<code>css</code>的配置可以直接找到<code>MiniCssExtractPlugin</code>进行修改即可。</p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>经过上面所有的步骤，项目已经能够完全正常运行，和<code>eject</code>之前一样。接下来我们可以详细阅读<code>webpack.config.js</code>，进行更进一步的定制，也可以删除某些项目中不需要的配置，减轻<code>webpack.config.js</code>的复杂性。</p>
+<p>如果项目是老项目的话，为了项目能够在<code>eject</code>后不会因为<code>eslint</code>报错而无法正常运行，可以注释掉<code>eslint-loader</code>来避免每次构建时候的预检，但此时对代码风格的约束只限于编辑器本身<code>eslint</code>的支持，对代码质量和团队代码风格可能造成一定的影响。</p>
+<p>更好的方式是使用一个适合这个项目的<code>eslint</code>规则，如<code>eslint-config-airbnb-base</code>，并且对这个第三方规则进行定制，直至这个规则适合这个项目。</p>
+<p>完。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="ckdjzjuas000f7gj61ldjkie7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2019/06/05/eject/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/06/05/eject/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-老项目Webpack构建优化" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -302,7 +468,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="ck774scbu002kh0j6o3gancfw" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/01/老项目Webpack构建优化/" data-id="ckdjzjuby002l7gj65sny2qy7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -548,7 +714,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ck774scbg001uh0j60lo0so6e" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/02/25/webpack-in-thinking/" data-id="ckdjzjubb001e7gj671m5f9x5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -790,7 +956,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="ck774scb50019h0j60lvo2xrf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/01/06/webpack-dllplugin/" data-id="ckdjzjub600147gj6i4alx5sr" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -946,7 +1112,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="ck774scbk0021h0j612lppbqx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2018/04/05/前端路由拦截和http响应拦截/" data-id="ckdjzjubk001w7gj6c2lljssd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1091,7 +1257,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="ck774scaq000kh0j6pjrn4s0c" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/10/23/SQL参数化查询/" data-id="ckdjzjuai00067gj6l9e1pzmi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1237,7 +1403,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/09/01/使用react-transition-group实现路由切换动画/" data-id="ck774scb7001eh0j6h4sn2jdu" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/09/01/使用react-transition-group实现路由切换动画/" data-id="ckdjzjub9001b7gj65x8hg8iw" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1378,7 +1544,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="ck774scbd001oh0j6t8hr6pn1" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/28/使用antd和css-modules冲突的解决办法/" data-id="ckdjzjubx002j7gj6w2aw7iu4" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1518,7 +1684,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="ck774scb10012h0j6q989k7vb" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/24/three-js/" data-id="ckdjzjub3000z7gj6ed5fkfgz" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1699,7 +1865,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="ck774scb9001gh0j6p54onsto" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2017/08/02/从decorator到Mobx/" data-id="ckdjzjubc001g7gj6ir0ao9xm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1777,158 +1943,6 @@
 
 
 
-    <article id="post-响应式布局的那些事" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/07/31/响应式布局的那些事/">响应式布局的那些事</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/07/31/响应式布局的那些事/">
-            <time datetime="2017-07-31T10:16:53.000Z" itemprop="datePublished">2017-07-31</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/CSS/">CSS</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <blockquote>
-<p>响应式设计在如今的web开发过程中已经是必不可少，它可以针对不同的设备环境对页面进行调整，并且可以在PC端和移动端达到很好效果的情况下，不用开发多套页面，可以提升开发速度，可维护性打打增强。</p>
-</blockquote>
-<h3 id="响应式布局"><a href="#响应式布局" class="headerlink" title="响应式布局"></a>响应式布局</h3><p>响应式布局的一种实现方式的原理是使用CSS3新引入的Media Query来调整元素在不同分辨率下的显示效果，并且通过JavaScript进行交互。总结起来，响应式布局有以下几个需要注意的点：</p>
-<ol>
-<li>设置Viewport</li>
-</ol>
-<p>我们知道，在移动设备中，页面被放置在虚拟的窗口中，这个窗口也称作视口(Viewport),对于未进行移动端适配或者是未进行响应式设计的页面，往往页面的宽高都会大于移动设备的宽高，所以为了能够在移动设备上进行页面交互，缩放是不可避免的，但是频繁的放大缩小带来的浏览体验肯定不会好。所以，在响应式设计的第一步，就是要禁止移动设备的缩放，这很容易实现，我们只需要在html页面中的head元素下添加一个meta标签用于规定禁止缩放就可以了：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0, user-scalable=no, maxinum-scale=1.0"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>使用Media Query</li>
-</ol>
-<p>媒介查询才是响应式布局的关键所在，我们使用Media Query 来实现在不同尺寸下使用不同的样式。Media Query的规则有很多，例如<code>@media screen and (max-width: 980px){...}</code>就表示了在980px下的屏幕下使用在此定义的各种样式，同样还有<code>min-width</code>、<code>orientation(设备方向)</code>等属性，我们需要按需进行设置。</p>
-<ol start="3">
-<li>使用JavaScript</li>
-</ol>
-<p>如果能做到上面的两点，在一般情况下，响应式布局是可以实现的。但是如果在布局的过程中需要改变交互，那么JavaScript久必须派上用场了。例如一个菜单栏，在十分小的屏幕下需要折叠，那么就需要用到JavaScript。</p>
-<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><p>上面是我能够想到的响应式布局的一些要点，在实际学习过程中，我并没有在一些项目中使用相应式设计的方式(貌似很悲哀…)。在目前移动为先的时代，为移动端做更好的优化是不可避免的，无论是使用重新写一套移动端页面，还是使用响应式布局，或者使用其他的例如Flex Box来进行布局。作为一个工作在浏览器端的🐒，这都是我们必须具备的素质。</p>
-<p>好了，写一个简单的小例子吧。如果你从未接触过响应式布局，那么希望接下来的code会帮助你更快地了解并应用它。</p>
-<p>我们来写一个菜单栏，其HTML结构‍如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"nav"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">ul</span> <span class="attr">id</span>=<span class="string">"nav-list"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"home"</span>&gt;</span>Home<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"topic"</span>&gt;</span>Topic<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"today"</span>&gt;</span>Today<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"about"</span>&gt;</span>About<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">id</span>=<span class="string">"concat"</span>&gt;</span>Concat<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>CSS如下：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">* &#123;</span><br><span class="line">	<span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">	<span class="attribute">padding</span>: <span class="number">0</span>;	</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav</span> &#123;</span><br><span class="line">	<span class="attribute">position</span>: relative;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span> &#123;</span><br><span class="line">	<span class="attribute">list-style</span>: none;</span><br><span class="line">	<span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">	<span class="attribute">width</span>: <span class="number">20%</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">	<span class="attribute">display</span>: block;</span><br><span class="line">	<span class="attribute">text-align</span>: center;</span><br><span class="line">	<span class="attribute">text-decoration</span>: none;</span><br><span class="line">	<span class="attribute">color</span>: <span class="number">#FFF</span>;</span><br><span class="line">	<span class="attribute">line-height</span>: <span class="number">4em</span>;</span><br><span class="line">	<span class="attribute">font-size</span>: <span class="number">1.4em</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(1)</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">	<span class="attribute">background-color</span>: <span class="number">#bcbcbc</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(2)</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">	...</span><br><span class="line">	<span class="comment">/*添加背景色*/</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(1)</span> <span class="selector-tag">a</span><span class="selector-pseudo">:hover</span> &#123;</span><br><span class="line">	<span class="attribute">background-color</span>: <span class="built_in">rgba</span>(188, 188, 188, .8);</span><br><span class="line">	<span class="comment">/*添加鼠标移上去的样式*/</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#nav-list</span> <span class="selector-tag">ul</span> <span class="selector-tag">li</span><span class="selector-pseudo">:nth-child(1)</span> <span class="selector-tag">a</span><span class="selector-pseudo">::before</span> &#123;</span><br><span class="line">	<span class="attribute">content</span>: <span class="string">''</span></span><br><span class="line">	<span class="comment">/*使用伪类来添加图标字体等*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>现在，我们来为屏幕宽度小于768px写一个样式：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">media</span> screen and (max-width: <span class="number">768px</span>) &#123;</span><br><span class="line">	<span class="selector-tag">ul</span> <span class="selector-tag">li</span> <span class="selector-tag">a</span><span class="selector-pseudo">::before</span> &#123;</span><br><span class="line">		<span class="attribute">font-size</span>: <span class="number">20px</span>;</span><br><span class="line">		<span class="attribute">line-height</span>: <span class="number">60px</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="selector-tag">ul</span> <span class="selector-tag">li</span> <span class="selector-tag">a</span> &#123;</span><br><span class="line">		<span class="attribute">font-size</span>: <span class="number">0</span>;</span><br><span class="line">		<span class="attribute">height</span>: <span class="number">60px</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">		上面的的样式指明了再768px宽度及以下，我们设置a标签的font-size为0，不显示字体。</span></span><br><span class="line"><span class="comment">		设置伪元素所在的图标字体的行高等于a标签的宽度，使其垂直居中。</span></span><br><span class="line"><span class="comment">		通过上面的简单设置，我们在小于768px跨度的屏幕下，对于该菜单就只能看到图标了。</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>接着，我们可以为更窄的屏幕设置折叠菜单，我们通过css来绘制折菜单，使用JS来显示和隐藏。具体的实现这里就不贴出来了。</p>
-<p>ok，到此为止，我们已经写好了一个响应式菜单栏了(虽然…)。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2017/07/31/响应式布局的那些事/" data-id="ck774scbh001wh0j6n9zcksda" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2017/07/31/响应式布局的那些事/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2017/07/31/响应式布局的那些事/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">下一页 &raquo;</a>
     </nav>
@@ -1943,7 +1957,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1952,7 +1966,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript-AST/">TypeScript AST</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript-AST/">TypeScript AST</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1961,7 +1975,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/TypeScript-AST/" style="font-size: 10px;">TypeScript AST</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/TypeScript-AST/" style="font-size: 10px;">TypeScript AST</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 

@@ -154,7 +154,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                42
+                43
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -207,6 +207,183 @@
 
             
             <section id="main">
+    <article id="post-local-search" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2020/08/07/local-search/">浏览器Ctrl+F功能的JS实现</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2020/08/07/local-search/">
+            <time datetime="2020-08-07T06:24:15.000Z" itemprop="datePublished">2020-08-07</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <blockquote>
+<p>浏览器提供的查找功能(<code>Ctrl+F</code>唤起)可以方便我们检索页面中的关键字以及标记它们出现在页面中的位置。在某个需求中，我需要实现一个类似的静态页面文本检索功能，<code>JS</code>并不能直接调用浏览器提供的检索功能，在不借助任何后端和云搜索(例如<code>Algolia</code>)的前提下，实现页面文本搜索。</p>
+</blockquote>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><blockquote>
+<p>检索工具的运行流程是这样的：1）用户输入关键字，点击<code>搜索</code>按钮，检索完成，并标记第一个出现的位置；2）点击<code>下一个</code>按钮，页面滚动到下一个匹配关键字的元素的位置，并标记文本；3）使用中途，可以切换关键字，重新开始步骤 1)2)。</p>
+</blockquote>
+<p>我们要实现的<em>文本搜索工具</em>主要有两个功能：</p>
+<ol>
+<li>文本检索</li>
+<li>文本标记</li>
+</ol>
+<p>此外，我们还可以在这两个基础功能上进行扩展，比如：</p>
+<ul>
+<li>既然支持了关键字查询，那么可以让是否模糊查询可选</li>
+<li>同样，让搜索起点可选</li>
+<li>增加对<code>CSS</code>选择器的支持</li>
+</ul>
+<p>确定了要实现的功能后，再想一下大致的实现方式，这里有几个问题，解决完所有的问题，文本检索工具就完成了。</p>
+<ol>
+<li>接口该如何设计？</li>
+<li>为了保证搜索性能，需要建立<code>文本</code>到<code>HTMLElement</code>的映射，如何实现这个过程？</li>
+<li>基于建立的映射，如何处理同一个元素下<strong>多个文本</strong>的标记？</li>
+<li>其它可能遇到的问题。</li>
+</ol>
+<blockquote>
+<p>带着这些问题，开始！</p>
+</blockquote>
+<h3 id="如何设计接口？"><a href="#如何设计接口？" class="headerlink" title="如何设计接口？"></a>如何设计接口？</h3><p>基于上面描述的检索工具的运行流程和将要实现的功能，在工具初始化时，可以配置用户初始输入<code>input</code>/是否模糊查询<code>useRegexp</code>/检索入口<code>scope</code>；初始化完成后，通过调用<code>search</code>接口，开始检索并返回检索结果；检索完成后，通过调用<code>next</code>接口，开始在页面中标记文本；最后，还需要一个<code>setSearch</code>接口来设置用户检索文本。</p>
+<p>最终设计的接口如下：</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">declare</span> <span class="keyword">const</span> TypeSelector = <span class="string">"selector"</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">declare</span> <span class="keyword">const</span> TypeText = <span class="string">"text"</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IDomFormated &#123;</span><br><span class="line">  dom: HTMLElement;</span><br><span class="line">  <span class="keyword">type</span>: <span class="keyword">typeof</span> TypeSelector | <span class="keyword">typeof</span> TypeText;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">declare</span> <span class="keyword">type</span> KeywordsOrSelector =</span><br><span class="line">  | <span class="built_in">string</span></span><br><span class="line">  | keyof HTMLElementTagNameMap</span><br><span class="line">  | keyof SVGElementTagNameMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IOptions &#123;</span><br><span class="line">  useRegexp?: <span class="built_in">boolean</span>;</span><br><span class="line">  scope?: HTMLElement | <span class="built_in">string</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> IProps <span class="keyword">extends</span> IOptions &#123;</span><br><span class="line">  input?: KeywordsOrSelector;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">declare</span> <span class="keyword">class</span> LocalSearch &#123;</span><br><span class="line">  <span class="keyword">private</span> input;</span><br><span class="line">  <span class="keyword">private</span> config;</span><br><span class="line">  <span class="keyword">private</span> current;</span><br><span class="line">  <span class="keyword">private</span> result;</span><br><span class="line">  <span class="keyword">private</span> prevDomText;</span><br><span class="line">  <span class="keyword">private</span> prevDom;</span><br><span class="line">  <span class="keyword">private</span> updateList;</span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params">props: IProps</span>);</span><br><span class="line">  setSearch(<span class="params">input: KeywordsOrSelector</span>): void;</span><br><span class="line">  begin(<span class="params"></span>): Promise&lt;IDomFormated[]&gt; | undefined;</span><br><span class="line">  next(<span class="params"></span>): boolean;</span><br><span class="line">&#125;</span><br><span class="line">export default LocalSearch;</span><br></pre></td></tr></table></figure>
+<h3 id="如何实现搜索过程？"><a href="#如何实现搜索过程？" class="headerlink" title="如何实现搜索过程？"></a>如何实现搜索过程？</h3><p>调用<code>localSearchInstance.begin</code>其内部会调用<code>search(input: KeywordsOrSelector, params?: IOptions): Promise&lt;IDomFormated[]&gt;</code>函数开始检索流程，整个流程又分为<em>关键字匹配</em>和<em>选择器查询</em>。</p>
+<h4 id="选择器查询"><a href="#选择器查询" class="headerlink" title="选择器查询"></a>选择器查询</h4><p>选择器查询很简单，就是调用<code>dom.querSelectorAll(input)</code>，需要注意的是，如果<code>input</code>不是一个合法的<code>selectors</code>，会抛出错误，在实现的时候，捕获该错误，抛出<code>[]</code>即可。</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">querySelector</span>(<span class="params">input: KeywordsOrSelector, scope: HTMLElement</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> doms: HTMLElement[] = [];</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    doms = <span class="built_in">Array</span>.from(scope.querySelectorAll(input));</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="built_in">console</span>.warn(<span class="string">"invalid selector"</span>);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.resolve(doms);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="关键字检索"><a href="#关键字检索" class="headerlink" title="关键字检索"></a>关键字检索</h4><p>关键字检索就是遍历已经建立好的文本与元素间的映射。首次检索时，映射未建立，需要从指定的根元素开始，进行 DOM 遍历。</p>
+<p>在<code>DOM</code>遍历过程中，为了更好的建立映射，需要建立以下几条约定：</p>
+<ul>
+<li>当前节点如果是文本节点<code>nodeType = 3</code>和以及注释<code>nodeType = 8</code>和<code>[ &#39;SCRIPT&#39;, &#39;NOSCRIPT&#39;, &#39;BR&#39;, &#39;HR&#39;, &#39;IMG&#39;, &#39;INPUT&#39;, &#39;COL&#39;, &#39;FRAME&#39;, &#39;LINK&#39;, &#39;AREA&#39;, &#39;PARAM&#39;, &#39;EMBED&#39;, &#39;KEYGEN&#39;, &#39;SOURCE&#39;, ]</code>这些自闭合元素，不再向下遍历</li>
+<li>如果元素的<code>display: inline*</code>，不在向下遍历</li>
+<li>如果某个元素中只包含<code>TextNode</code>，不再向下遍历<br>代码如下：</li>
+</ul>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">generateTextMapString</span>(<span class="params">parent: HTMLElement</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!first) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 非element类型</span></span><br><span class="line">  <span class="keyword">if</span> (!isValidNode(parent)) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> isInline = <span class="regexp">/^inline/</span>.test(getStyle(parent, <span class="string">"display"</span>));</span><br><span class="line">  <span class="comment">// 如果是行内元素</span></span><br><span class="line">  <span class="keyword">if</span> (isInline) &#123;</span><br><span class="line">    setCaches(parent.innerText, parent);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 如果某个元素中只包含TextNode，则取父元素的innerText</span></span><br><span class="line">  <span class="keyword">const</span> childNodes = <span class="built_in">Array</span>.from(parent.childNodes);</span><br><span class="line">  <span class="keyword">if</span> (childNodes.every(<span class="function">(<span class="params">node</span>) =&gt;</span> node.nodeType === <span class="number">3</span>)) &#123;</span><br><span class="line">    setCaches(parent.innerText, parent);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 遍历所有childNode</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> node of childNodes) &#123;</span><br><span class="line">    <span class="keyword">if</span> (node.nodeType === <span class="number">3</span> &amp;&amp; node.textContent !== <span class="string">""</span> &amp;&amp; !isWrapMark(node)) &#123;</span><br><span class="line">      setCaches(node.textContent!, parent);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      generateTextMapString(node <span class="keyword">as</span> HTMLElement);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意：考虑到可能存在多个元素有相同文本，在建立映射时，<code>value</code>需要被设置成一个数组。</p>
+<p>待到两种搜索都完成后，返回所有检索到的<code>HTMLElement</code>即可。</p>
+<h3 id="文本标记"><a href="#文本标记" class="headerlink" title="文本标记"></a>文本标记</h3><p>针对关键字检索和<code>CSS</code>选择器查询两种不同的类型，各设置了标记策略，如果是关键字检索，使用特定的背景和文字颜色标记<strong>文本</strong>，如果是<code>CSS</code>选择器查询，则改变<strong>元素</strong>的背景色。</p>
+<p>挡调用<code>next</code>方法时，会对下一个匹配到的文本进行标记，这包含两个过程：1）清空上一个标记（如果有的话）， 2）标记当前文本</p>
+<h4 id="清空上一个标记"><a href="#清空上一个标记" class="headerlink" title="清空上一个标记"></a>清空上一个标记</h4><p>与其说叫<code>清空上一个标记</code>，不如叫做<strong>还原到未标记时的状态</strong>，在此之前，我们需要保存上一次标记的元素以及该元素未标记时的文本，有了这两个数据，清空操作就很好实现了：</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">restoreMarked</span>(<span class="params">domObj: IDomFormated | <span class="literal">null</span>, text?: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!domObj || !domObj!.dom) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> &#123; dom, <span class="keyword">type</span> &#125; = domObj;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">type</span> === TypeText) &#123;</span><br><span class="line">    dom.innerHTML = text!;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">type</span> === TypeSelector) &#123;</span><br><span class="line">    <span class="keyword">const</span> prevBgColor = dom.dataset[<span class="string">"bgc"</span>] || <span class="string">""</span>;</span><br><span class="line">    dom.style.backgroundColor = prevBgColor;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="标记当前元素文本"><a href="#标记当前元素文本" class="headerlink" title="标记当前元素文本"></a>标记当前元素文本</h4><p>由于第一步<code>search</code>返回的是匹配到的<strong>元素</strong>，那么当某个元素中的文本含有多个匹配时，应当多次标记。所以，在标记过程中，使用<code>updateList</code>保存该元素中所有匹配结果所对应次更新的文本。在每次调用<code>next</code>方法时，如果<code>updateList</code>不为空，则取<code>updateList</code>中第一项作为当次更新的文本，否则取下一个匹配到的元素。基本实现如下：</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">markKeywords</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  keywords: KeywordsOrSelector,</span></span></span><br><span class="line"><span class="function"><span class="params">  domObj: IDomFormated,</span></span></span><br><span class="line"><span class="function"><span class="params">  useRegexp: <span class="built_in">boolean</span></span></span></span><br><span class="line"><span class="function"><span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; dom, <span class="keyword">type</span> &#125; = domObj;</span><br><span class="line">  <span class="keyword">let</span> updateList: <span class="built_in">string</span>[] = [];</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">type</span> === TypeText) &#123;</span><br><span class="line">    <span class="keyword">let</span> newText;</span><br><span class="line">    <span class="keyword">if</span> (!useRegexp) &#123;</span><br><span class="line">      newText = dom.innerHTML.replace(</span><br><span class="line">        keywords,</span><br><span class="line">        <span class="string">`&lt;span style="background-color: #169fe6; color: #ffffff;"&gt;<span class="subst">$&#123;keywords&#125;</span>&lt;/span&gt;`</span></span><br><span class="line">      );</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 存入所有结果到更新队列</span></span><br><span class="line">      <span class="keyword">const</span> reg = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">`(<span class="subst">$&#123;keywords&#125;</span>)`</span>, <span class="string">"g"</span>);</span><br><span class="line">      <span class="keyword">const</span> domString = dom.innerHTML;</span><br><span class="line">      <span class="keyword">let</span> result = reg.exec(domString);</span><br><span class="line">      <span class="keyword">while</span> (result) &#123;</span><br><span class="line">        <span class="keyword">const</span> updateString =</span><br><span class="line">          dom.innerHTML.substring(<span class="number">0</span>, result.index) +</span><br><span class="line">          <span class="string">`&lt;span style="background-color: #169fe6; color: #ffffff;"&gt;<span class="subst">$&#123;result[0]&#125;</span>&lt;/span&gt;`</span> +</span><br><span class="line">          dom.innerHTML.substring(result.index + result[<span class="number">0</span>].length);</span><br><span class="line">        updateList.push(updateString);</span><br><span class="line">        result = reg.exec(domString);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (newText) &#123;</span><br><span class="line">      dom.innerHTML = newText;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">type</span> === TypeSelector) &#123;</span><br><span class="line">    <span class="keyword">const</span> prevBgColor = dom.style.backgroundColor;</span><br><span class="line">    dom.dataset[<span class="string">"bgc"</span>] = prevBgColor!;</span><br><span class="line">    <span class="comment">// 保存背景色，便于后续恢复</span></span><br><span class="line">    dom.style.backgroundColor = <span class="string">"#169fe6"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> updateList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>标记完后，使用<code>dom.scrollIntoView()</code>即可滚动当前元素到标记位置</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>页面文本搜索工具主要包含两个流程：<em>文本检索</em>和<em>文本标记</em>，为了加快检索速度，构建了文本到<code>HTMLElement</code>的映射缓存，该映射的生成遵守几个约定(<code>可能会出现问题</code>)，文本标记则分为两个子步骤：1.还原到未标记状态；2.标记当前文本。如果遇到一个元素中有多个匹配结果，建立了一个更新列表(<code>updateList</code>)，将分多次标记。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2020/08/07/local-search/" data-id="ckdjzksew00003cj6v1t94exj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://yoursite.com/2020/08/07/local-search/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2020/08/07/local-search/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-compiler-apis" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -264,10 +441,10 @@
 <h3 id="transform"><a href="#transform" class="headerlink" title="transform"></a>transform</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">transform</span>&lt;<span class="title">T</span> <span class="title">extends</span> <span class="title">Node</span>&gt;(<span class="params">source: T | T[], transformers: TransformerFactory&lt;T&gt;[], compilerOptions?: CompilerOptions</span>): <span class="title">TransformationResult</span>&lt;<span class="title">T</span>&gt;;</span></span><br></pre></td></tr></table></figure>
 <p>生成<code>AST</code>后就要开始处理了，<code>ts</code>也提供了一系列的<code>API</code>用于遍历<code>AST</code>，<code>forEachChild</code>和<code>visitEachChild</code>都可以遍历<code>AST</code>，初次之外<code>visitEachChild</code>还可以修改节点，并返回修改后节点。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">visitEachChild</span>&lt;<span class="title">T</span> <span class="title">extends</span> <span class="title">Node</span>&gt;(<span class="params">node: T, visitor: Visitor, context: TransformationContext</span>): <span class="title">T</span>;</span></span><br><span class="line"><span class="function"><span class="title">function</span> <span class="title">forEachChild</span>&lt;<span class="title">T</span>&gt;(<span class="params">node: Node, cbNode: (node: Node</span>) =&gt; <span class="title">T</span> | <span class="title">undefined</span>, <span class="title">cbNodes</span>?: (<span class="params">nodes: NodeArray&lt;Node&gt;</span>) =&gt; <span class="title">T</span> | <span class="title">undefined</span>): <span class="title">T</span> | <span class="title">undefined</span>;</span></span><br></pre></td></tr></table></figure>
-<p><code>transform</code>方法就和其字面意思一样，使用该方法可以转换<code>AST</code>。它接收多个<code>transformer</code>，最简单的<code>transformer</code>可以是下面这样：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> transformer = &lt;T extends ts.Node&gt;(context: ts.TransformationContext) =&gt; (rootNode: T) =&gt; &#123;</span><br><span class="line">  function visit(node: T) &#123;</span><br><span class="line">    console.log(node.kind)</span><br><span class="line">    return ts.visitEachChild(node, visit, context)</span><br><span class="line">  &#125;</span><br><span class="line">  return ts.visitNode(rootNode, visit)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>transform</code>方法就和其字面意思一样，使用该方法可以转换<code>AST</code>。它接收多个<code>transformer</code>，最简单的<code>transformer</code>可以是下面这样：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> transformer = <span class="xml"><span class="tag">&lt;<span class="name">T</span> <span class="attr">extends</span> <span class="attr">ts.Node</span>&gt;</span>(context: ts.TransformationContext) =&gt; (rootNode: T) =&gt; &#123;</span></span><br><span class="line"><span class="xml">  function visit(node: T) &#123;</span></span><br><span class="line"><span class="xml">    console.log(node.kind)</span></span><br><span class="line"><span class="xml">    return ts.visitEachChild(node, visit, context)</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">  return ts.visitNode(rootNode, visit)</span></span><br><span class="line"><span class="xml">&#125;</span></span><br></pre></td></tr></table></figure></p>
 <p>上面的<code>transformer</code>访问了每个节点，并且打印出当前访问节点的<code>kind</code>。</p>
 <p>下面再写一个比较实际的<code>transformer</code>，找到所有的中文字符串节点，并使用变量来替换该节点。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> transformer = &lt;T extends ts.Node&gt;(context: ts.TransformationContext) =&gt; (rootNode: T) =&gt; &#123;</span><br><span class="line">  function visit(node: T) &#123;</span><br><span class="line">    if (node.kind === ts.SyntaxKind.StringLiteral &amp;&amp; node.text.match(/[^\x00-\xff]/g)) &#123;</span><br><span class="line">      return ts.createIdentifier('placeholder')</span><br><span class="line">    &#125;</span><br><span class="line">    return ts.visitEachChild(node, visit, context)</span><br><span class="line">  &#125;</span><br><span class="line">  return ts.visitNode(rootNode, visit)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> transformer = <span class="xml"><span class="tag">&lt;<span class="name">T</span> <span class="attr">extends</span> <span class="attr">ts.Node</span>&gt;</span>(context: ts.TransformationContext) =&gt; (rootNode: T) =&gt; &#123;</span></span><br><span class="line"><span class="xml">  function visit(node: T) &#123;</span></span><br><span class="line"><span class="xml">    if (node.kind === ts.SyntaxKind.StringLiteral &amp;&amp; node.text.match(/[^\x00-\xff]/g)) &#123;</span></span><br><span class="line"><span class="xml">      return ts.createIdentifier('placeholder')</span></span><br><span class="line"><span class="xml">    &#125;</span></span><br><span class="line"><span class="xml">    return ts.visitEachChild(node, visit, context)</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">  return ts.visitNode(rootNode, visit)</span></span><br><span class="line"><span class="xml">&#125;</span></span><br></pre></td></tr></table></figure>
 <p>使用上面的<code>transformer</code>，<code>var name = &#39;张三&#39;</code>将会被转换成<code>var name = placeholder</code>，文件中所有的<code>StringLiteral</code>节点中只要包含中文都会被转成指定的<code>Identifier</code>。</p>
 <p><code>TS</code>还提供了<code>create*</code>和<code>update*</code>多个<code>API</code>用于创建和更新节点，当对<code>compiler API</code>更加了解后，我们就可以做更多的事，例如<code>var total = 1 + 2</code> 变成<code>var t = 3</code>类似的代码压缩，自定义lint规则等等。</p>
 <h2 id="Compiler-APIs的应用"><a href="#Compiler-APIs的应用" class="headerlink" title="Compiler APIs的应用"></a><code>Compiler APIs</code>的应用</h2><p>基于<code>Compiler APIs</code>实现了一款React国际化工具 <a href="https://github.com/xiaomoer/ext-intl" target="_blank" rel="noopener">ext-intl</a>，实现了<code>React</code>项目词条提取、词条key生成、代码原处替换等功能。该工具目前是可用的，一定程度上可以提升<code>React</code>项目国际化效率。</p>
@@ -284,7 +461,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2020/02/29/compiler-apis/" data-id="ck774scaj000dh0j6l81ffdfx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2020/02/29/compiler-apis/" data-id="ckdjzjuar000d7gj6thy0xvcm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -448,7 +625,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2020/02/21/use-battery/" data-id="ck774scay0010h0j60en3wjuh" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2020/02/21/use-battery/" data-id="ckdjzjubh001p7gj6z3zfx7b6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -605,7 +782,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/12/19/global-component/" data-id="ck774scaw000vh0j63f5t03dh" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/12/19/global-component/" data-id="ckdjzjuaw000k7gj67hx74tjs" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -729,13 +906,13 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tab nav配置</span></span><br><span class="line"><span class="keyword">const</span> RouteConfigs: TabOptions = &#123;</span><br><span class="line">  Home: &#123; <span class="attr">screen</span>: Home &#125;,</span><br><span class="line">  Purchase: &#123; <span class="attr">screen</span>: Purchase &#125;,</span><br><span class="line">  Brand: &#123; <span class="attr">screen</span>: Brand &#125;,</span><br><span class="line">  Sell: &#123; <span class="attr">screen</span>: Sell &#125;,</span><br><span class="line">  Management: &#123; <span class="attr">screen</span>: Management &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 创建底部tab路由</span></span><br><span class="line"><span class="keyword">const</span> BottomTabRoutes = createBottomTabNavigator(RouteConfigs, &#123;</span><br><span class="line">  ...TabNavigatorConfig</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 接入到App路由中</span></span><br><span class="line"><span class="keyword">const</span> AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; <span class="attr">screen</span>: BottomTabRoutes &#125;,</span><br><span class="line">    ...pageRoutes</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 <p><code>createBottomTabNavigator</code>接收<code>RouteConfigs</code>作为参数，返回一个类型为<code>NavigationContainer</code>的值：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// NavigationContainer 类型定义</span></span><br><span class="line">interface NavigationContainer extends React.ComponentClass&lt;NavigationContainerProps NavigationNavigatorProps&lt;any&gt;&gt; &#123;...&#125;</span><br></pre></td></tr></table></figure></p>
 <p>通过查看<code>NavigationContainer</code>的定义，可以发现其是一个<code>React</code>组件。所以第一种方式就是自定义一个组件，在该组件中返回<code>NavigationContainer</code>实例即可。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigater</span> <span class="keyword">extends</span> <span class="title">Compoent</span> </span>&#123;</span><br><span class="line">  _genNav() &#123;</span><br><span class="line">    <span class="keyword">let</span> NavConfig = [....]</span><br><span class="line">    <span class="comment">// 对`NavConfig`的一系列的处理</span></span><br><span class="line">    <span class="keyword">return</span> createBottomTabNavigator(NavConfig, &#123; ...otherConfig &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Tabs = <span class="keyword">this</span>._genNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">const AppNavigator = createStackNavigator(</span><br><span class="line">  &#123;</span><br><span class="line">    TabRouter: &#123; screen: DynamicTabNavigator &#125;,</span><br><span class="line">    ...otherRouter</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigater</span> <span class="keyword">extends</span> <span class="title">Compoent</span> </span>&#123;</span><br><span class="line">  _genNav() &#123;</span><br><span class="line">    <span class="keyword">let</span> NavConfig = [....]</span><br><span class="line">    <span class="comment">// 对`NavConfig`的一系列的处理</span></span><br><span class="line">    <span class="keyword">return</span> createBottomTabNavigator(NavConfig, &#123; ...otherConfig &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Tabs = <span class="keyword">this</span>._genNav()</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Tabs</span> /&gt;</span></span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml">const AppNavigator = createStackNavigator(</span></span><br><span class="line"><span class="xml">  &#123;</span></span><br><span class="line"><span class="xml">    TabRouter: &#123; screen: DynamicTabNavigator &#125;,</span></span><br><span class="line"><span class="xml">    ...otherRouter</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">)</span></span><br></pre></td></tr></table></figure>
 <p>这种方式在该<a href="https://github.com/react-navigation/react-navigation/issues/3945" target="_blank" rel="noopener">issue</a>被证实是可行的，但是在<code>React Navigation</code><strong><em>3.x</em></strong>版本中报错，显示缺少<code>AppContainer</code>，所以还需要使用<code>createAppContainer</code>创建一个容器。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">render() &#123;</span><br><span class="line">  <span class="keyword">const</span> Tabs = createAppContainer(<span class="keyword">this</span>._genNav())</span><br><span class="line">  <span class="keyword">return</span> &lt;Tabs /&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">render() &#123;</span><br><span class="line">  <span class="keyword">const</span> Tabs = createAppContainer(<span class="keyword">this</span>._genNav())</span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Tabs</span> /&gt;</span></span></span><br><span class="line"><span class="xml">&#125;</span></span><br></pre></td></tr></table></figure>
 <p>这样动态路由就实现了，并且能够在<strong>绝大部分情况下</strong>使用正常，由于使用<code>createAppContainer</code>创建了一个<em>容器</em>，如果该容器并无法包含所有路由，那么还需要的<code>AppContainer</code>，此时就会导航异常。</p>
 <h3 id="实现二"><a href="#实现二" class="headerlink" title="实现二"></a>实现二</h3><p>继续关注<code>createBottomTabNavigator(RouteConfigs, TabNavigatorConfig)</code>方法，第二个参数<code>TabNavigatorConfig</code>包含一个属性<code>tabBarComponent?: React.ReactType</code>，该属性用于设置<code>tabBar</code>如何显示，该属性设置为一个组件。</p>
 <p>所以机会来了！</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; BottomTabBar &#125; <span class="keyword">from</span> <span class="string">'react-navigation-tabs'</span></span><br><span class="line"><span class="keyword">import</span> &#123; DeviceEventEmitter &#125; <span class="keyword">from</span> <span class="string">'react-native'</span></span><br><span class="line"></span><br><span class="line">interface NavigatorState &#123;</span><br><span class="line">  showBrandPage: boolean</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigator</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">any</span>, <span class="title">NavigatorState</span>&gt; </span>&#123;</span><br><span class="line">  state: NavigatorState = &#123;</span><br><span class="line">    showBrandPage: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  subscribe: any</span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>.subscribe = DeviceEventEmitter.addListener(</span><br><span class="line">      <span class="string">'showBrand'</span>,</span><br><span class="line">      (data: boolean) =&gt; &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123; <span class="attr">showBrandPage</span>: data &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// tslint:disable-next-line: no-unused-expression</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe &amp;&amp; <span class="keyword">this</span>.subscribe.remove()</span><br><span class="line">  &#125;</span><br><span class="line">  _tabNav = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; routes, index &#125; = <span class="keyword">this</span>.props.navigation.state</span><br><span class="line">    <span class="keyword">const</span> finalRoutes = [...routes]</span><br><span class="line">    <span class="keyword">const</span> &#123; showBrandPage &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="comment">// ...一系列的操作</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      state: &#123;</span><br><span class="line">        index: finalRoutes.findIndex(<span class="function"><span class="params">route</span> =&gt;</span> currentRoute.key === route.key),</span><br><span class="line">        routes: finalRoutes</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; navigation, ...restProps &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    <span class="keyword">const</span> tabNavConfig = <span class="keyword">this</span>._tabNav()</span><br><span class="line">    <span class="keyword">return</span> &lt;BottomTabBar &#123;...restProps&#125; navigation=&#123;tabNavConfig&#125; /&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default DynamicTabNavigator</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const BottomTabRoutes = createBottomTabNavigator(tabNav, &#123;</span><br><span class="line">  tabBarComponent: DynamicTabNavigator</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; BottomTabBar &#125; <span class="keyword">from</span> <span class="string">'react-navigation-tabs'</span></span><br><span class="line"><span class="keyword">import</span> &#123; DeviceEventEmitter &#125; <span class="keyword">from</span> <span class="string">'react-native'</span></span><br><span class="line"></span><br><span class="line">interface NavigatorState &#123;</span><br><span class="line">  showBrandPage: boolean</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicTabNavigator</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">any</span>, <span class="title">NavigatorState</span>&gt; </span>&#123;</span><br><span class="line">  state: NavigatorState = &#123;</span><br><span class="line">    showBrandPage: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  subscribe: any</span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>.subscribe = DeviceEventEmitter.addListener(</span><br><span class="line">      <span class="string">'showBrand'</span>,</span><br><span class="line">      (data: boolean) =&gt; &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123; <span class="attr">showBrandPage</span>: data &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// tslint:disable-next-line: no-unused-expression</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe &amp;&amp; <span class="keyword">this</span>.subscribe.remove()</span><br><span class="line">  &#125;</span><br><span class="line">  _tabNav = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; routes, index &#125; = <span class="keyword">this</span>.props.navigation.state</span><br><span class="line">    <span class="keyword">const</span> finalRoutes = [...routes]</span><br><span class="line">    <span class="keyword">const</span> &#123; showBrandPage &#125; = <span class="keyword">this</span>.state</span><br><span class="line">    <span class="comment">// ...一系列的操作</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      state: &#123;</span><br><span class="line">        index: finalRoutes.findIndex(<span class="function"><span class="params">route</span> =&gt;</span> currentRoute.key === route.key),</span><br><span class="line">        routes: finalRoutes</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; navigation, ...restProps &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    <span class="keyword">const</span> tabNavConfig = <span class="keyword">this</span>._tabNav()</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">BottomTabBar</span> &#123;<span class="attr">...restProps</span>&#125; <span class="attr">navigation</span>=<span class="string">&#123;tabNavConfig&#125;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml">export default DynamicTabNavigator</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml">const BottomTabRoutes = createBottomTabNavigator(tabNav, &#123;</span></span><br><span class="line"><span class="xml">  tabBarComponent: DynamicTabNavigator</span></span><br><span class="line"><span class="xml">&#125;)</span></span><br></pre></td></tr></table></figure>
 <p>通过<code>eventListener</code>的方式接收路由变更信号，最终渲染<code>BottomTabBar</code>时使用修改过后的配置即可。</p>
 <p>这种方式其实是一种<em>障眼法</em>，我们需要在配置静态Tab路由<code>RouteConfigs</code>时配置所有的Tab路由，在<code>DynamicTabNavigator</code>中通过<code>props</code>注入的<code>navigation.state.routes</code>拿到配置的静态路由，并经过一系列的处理最终得到渲染到<code>BottomTabBar</code>中的路由。需要注意的是，如果最终的路由相比静态路由有调整，那么需要更新<code>index</code>，否则点击路由跳转时会出现错误。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
@@ -755,7 +932,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ck774scap000jh0j6qymw07hm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ckdjzjuay000n7gj69culi9y5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -910,7 +1087,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ck774scar000nh0j67xw51owd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ckdjzjub2000x7gj69ff6x9ip" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1095,7 +1272,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ck774scao000hh0j6teoodja3" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ckdjzjuaz000p7gj6jayknjs9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1246,7 +1423,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ck774scas000oh0j6mbvt0s23" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ckdjzjub0000s7gj60vwgan4z" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1406,7 +1583,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ck774scb20015h0j6h4q1128n" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ckdjzjub400117gj6q04og120" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1567,7 +1744,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ck774scax000xh0j60yqjou5m" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ckdjzjub1000u7gj6gmew9v3a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1645,172 +1822,6 @@
 
 
 
-    <article id="post-eject" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2019/06/05/eject/">关于eject需要知道的</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2019/06/05/eject/">
-            <time datetime="2019-06-05T00:37:22.000Z" itemprop="datePublished">2019-06-05</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/Webpack/">Webpack</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>整理：使用<code>create-react-app</code>构建的项目在<code>yarn run eject</code>后的一些问题。</p>
-<h3 id="eject之前"><a href="#eject之前" class="headerlink" title="eject之前"></a>eject之前</h3><p><code>create-react-app</code>脚手架把关于<code>webpack</code>配置和其它脚本封装到了一个叫做<code>react-scripts</code>的<code>package</code>里。默认情况下所有的配置是不可见的，但是可以通过<code>react-app-rewired</code>在不<code>eject</code>的条件下修改某些<code>webpack</code>配置。这样的方式在绝大多数情况下是可行的，但是如果我们想更精确的控制，比如修改默认的css打包方式、使用<code>less</code>、组件库按需加载等，即使也能够做，但或多或少会用到<code>hack</code>的方式。</p>
-<p>在运行<code>yarn run eject</code>后，所有关于<code>webpack</code>配置将会暴露出来，在根目录会生成<strong>config</strong>和<strong>scripts</strong>两个目录，并且<code>react-script</code>将不复存在，所有<code>react-script</code>的依赖都将注入到项目中。</p>
-<p><code>eject</code>是单项操作，一旦完成，就没办法还原，这就意味着复杂的<code>webpack</code>管理将交由我们自己管理。</p>
-<h3 id="eject进行时"><a href="#eject进行时" class="headerlink" title="eject进行时"></a>eject进行时</h3><ol>
-<li><p>步骤1 运行<code>yarn run eject</code>，稍等片刻，观察到生成新增了<strong>config</strong>和<strong>scripts</strong>两个目录，并且<code>package.json</code>文件被修改。</p>
-</li>
-<li><p>打开<code>package.json</code>文件，由于我们已经不使用<code>react-scripts</code>了，所以这里需要修改<code>start build test</code>等命令。使用<code>scripts</code>目录中对应的脚本即可，例如：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">  <span class="string">"start"</span>: <span class="string">"node scripts/start.js"</span>,</span><br><span class="line">  <span class="string">"build"</span>: <span class="string">"node scripts/build.js"</span>,</span><br><span class="line">  <span class="string">"test"</span>: <span class="string">"node scriprs/test.js"</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>运行<code>yarn start</code>，不出意外的话，项目正常运行，如果提示<em>can’t find module xxx</em>，删除<code>node_modules</code>和<code>yarn.lock</code>(如果有的话)，重新运行<code>yarn install</code>安装依赖即可。</p>
-</li>
-</ol>
-<h3 id="eject后出现了问题"><a href="#eject后出现了问题" class="headerlink" title="eject后出现了问题"></a>eject后出现了问题</h3><p>如果是<code>eject</code>后运行项目报错，重新安装依赖后仍然报错，那么就要考虑是依赖版本的问题了。就比如笔者的这个项目，使用老版本的<code>react-react-app</code>生成，并且在中期升级了<code>react-scripts</code>和<code>react</code>等，且使用了特定版本的<code>eslint</code>规则。在根据报错提示进行修复后，运行项目仍然报错且无任何报错提示。</p>
-<p>我们需要弄清楚到底是什么依赖有问题，这个过程是复杂且繁琐的，并且可能由于依赖前后版本已经发生了巨大的变化，即使找到存在问题的依赖也可能不能仅通过升级该依赖的版本解决问题。</p>
-<p>所以一个备选方案是把项目整体迁移到新版本的<code>create-react-app</code>上，这里有两个做法：使用<code>create-react-app</code>新生成一个项目，我们把源码和依赖都迁移到新项目中，在新的项目中进行<code>eject</code>；使用<code>create-react-app</code>生成一个空的项目并<code>eject</code>，使用新的<em>config</em>和<em>scripts</em>替换当前项目的脚本和配置，并且比较<code>packahe.json</code>，更新依赖的版本，重新安装依赖，大功告成。</p>
-<p>在实际的情况下，受制于项目版本控制、团队协作、迁移成本等，第一种方式，基本不可用。</p>
-<p>解决完问题，接下来我们需要将写在<code>config-overrides.js</code>中的自定义配置进行迁移。</p>
-<h3 id="自定义配置"><a href="#自定义配置" class="headerlink" title="自定义配置"></a>自定义配置</h3><blockquote>
-<p>在进行自定义配置之前，如果项目因<code>eslint</code>规则，无法运行成功，可以尝试在<code>config/webpack.config.js</code>中找到<code>eslint-loader</code>并且注释掉这个配置，此时在开发模式下，<code>eslint</code>并不会对源码进行规则校验。</p>
-</blockquote>
-<h4 id="less支持"><a href="#less支持" class="headerlink" title="less支持"></a>less支持</h4><p>因为<code>create-react-app</code>脚手架并不支持<code>less</code>，我们需要手动添加对<code>less</code>的支持。首先安装<code>less-loader</code>，并在<code>webpack.config.js</code>中的<code>module.rules</code>下添加：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> lessRegex = <span class="regexp">/\.less$/</span>;</span><br><span class="line"><span class="built_in">module</span>: &#123;</span><br><span class="line">  rules: [</span><br><span class="line">    ...</span><br><span class="line">    &#123;</span><br><span class="line">      test: lessRegex,</span><br><span class="line">      use: getStyleLoaders(</span><br><span class="line">        &#123;</span><br><span class="line">          importLoaders: <span class="number">2</span>,</span><br><span class="line">          sourceMap: isEnvProduction &amp;&amp; shouldUseSourceMap,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'less-loader'</span></span><br><span class="line">      ),</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>注意到这里使用到了一个封装好的函数<code>getStyleLoaders</code>，其针对不同的css预处理器，生成适用的<code>loader</code>，源码非常简单：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> getStyleLoaders = <span class="function">(<span class="params">cssOptions, preProcessor</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> loaders = [</span><br><span class="line">      isEnvDevelopment &amp;&amp; <span class="built_in">require</span>.resolve(<span class="string">'style-loader'</span>),</span><br><span class="line">      isEnvProduction &amp;&amp; &#123;</span><br><span class="line">        loader: MiniCssExtractPlugin.loader,</span><br><span class="line">        options: shouldUseRelativeAssetPaths ? &#123; <span class="attr">publicPath</span>: <span class="string">'../../'</span> &#125; : &#123;&#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        loader: <span class="built_in">require</span>.resolve(<span class="string">'css-loader'</span>),</span><br><span class="line">        options: cssOptions,</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        loader: <span class="built_in">require</span>.resolve(<span class="string">'postcss-loader'</span>),</span><br><span class="line">        options: &#123;</span><br><span class="line">          ident: <span class="string">'postcss'</span>,</span><br><span class="line">          plugins: <span class="function"><span class="params">()</span> =&gt;</span> [</span><br><span class="line">            <span class="built_in">require</span>(<span class="string">'postcss-flexbugs-fixes'</span>),</span><br><span class="line">            <span class="built_in">require</span>(<span class="string">'postcss-preset-env'</span>)(&#123;</span><br><span class="line">              autoprefixer: &#123;</span><br><span class="line">                flexbox: <span class="string">'no-2009'</span>,</span><br><span class="line">              &#125;,</span><br><span class="line">              stage: <span class="number">3</span>,</span><br><span class="line">            &#125;),</span><br><span class="line">            postcssNormalize(),</span><br><span class="line">          ],</span><br><span class="line">          sourceMap: isEnvProduction &amp;&amp; shouldUseSourceMap,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    ].filter(<span class="built_in">Boolean</span>);</span><br><span class="line">    <span class="keyword">if</span> (preProcessor) &#123;</span><br><span class="line">      loaders.push(&#123;</span><br><span class="line">        loader: <span class="built_in">require</span>.resolve(preProcessor),</span><br><span class="line">        options: &#123;</span><br><span class="line">          sourceMap: isEnvProduction &amp;&amp; shouldUseSourceMap,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> loaders;</span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure></p>
-<p>我们知道如果使用了<code>css</code>预处理器，在设置<code>loader</code>的时候，可能需要多个<code>loaders</code>，例如:</p>
-<ul>
-<li><code>less-loader</code>: 把<code>less</code>编译成<code>css</code></li>
-<li><code>css-loader</code>: 解决<code>css</code>使用<code>import</code>、<code>require</code>引入的问题</li>
-<li><code>style-loader</code>: 通过style标签把<code>css</code>注入到<code>DOM</code>中。</li>
-<li>生产环境下可能还需要生成单独的css文件，css压缩等。</li>
-</ul>
-<p>而<code>getStyleLoaders</code>就是生成这些<code>loaders</code>的一个公共方法。</p>
-<h4 id="组件库按需加载"><a href="#组件库按需加载" class="headerlink" title="组件库按需加载"></a>组件库按需加载</h4><p>在开发过程中，如果使用到了组件库且该组件库支持按需加载(例如<em>antd</em>)，那么我们可以根据相关的教程配置即可。</p>
-<p>比如在当前项目中使用到了<code>xx-ui</code>这个组件库，该组件库支持<code>babel-plugin-import</code>按需加载，在安装好依赖后，我们只需要在<code>package.json</code>的<code>babel</code>下配置<code>plugin</code>：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"babel"</span>: &#123;</span><br><span class="line">  <span class="string">"presets"</span>: [</span><br><span class="line">    <span class="string">"react-app"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"plugins"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"import"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"libraryName"</span>: <span class="string">"@wind/xx-ui"</span>,</span><br><span class="line">        <span class="string">"libraryDirectory"</span>: <span class="string">"es"</span>,</span><br><span class="line">        <span class="string">"style"</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这和传统的<code>.babelrc</code>中进行<code>plugin</code>配置无区别，但总算不用再维护额外的一个文件了。</p>
-<h4 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h4><p>比如我们在构建时需要对代码进行拆分，我们可以在<code>webpack.config.js</code>的<code>optimization</code>中使用<code>splitChunks</code>进行自定义、分离<code>runtimeChunk等</code>。</p>
-<p>比如我们构建时不想使用默认的<code>static/js/[name].[contenthash:8].chunk.js</code>作为<code>chunks</code>的文件名，直接修改即可。注意，在代码分割时，相应的<code>css</code>也会被分割，如果想修改<code>css</code>的配置可以直接找到<code>MiniCssExtractPlugin</code>进行修改即可。</p>
-<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>经过上面所有的步骤，项目已经能够完全正常运行，和<code>eject</code>之前一样。接下来我们可以详细阅读<code>webpack.config.js</code>，进行更进一步的定制，也可以删除某些项目中不需要的配置，减轻<code>webpack.config.js</code>的复杂性。</p>
-<p>如果项目是老项目的话，为了项目能够在<code>eject</code>后不会因为<code>eslint</code>报错而无法正常运行，可以注释掉<code>eslint-loader</code>来避免每次构建时候的预检，但此时对代码风格的约束只限于编辑器本身<code>eslint</code>的支持，对代码质量和团队代码风格可能造成一定的影响。</p>
-<p>更好的方式是使用一个适合这个项目的<code>eslint</code>规则，如<code>eslint-config-airbnb-base</code>，并且对这个第三方规则进行定制，直至这个规则适合这个项目。</p>
-<p>完。</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://yoursite.com/2019/06/05/eject/" data-id="ck774scat000qh0j6c5znebrn" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="http://yoursite.com/2019/06/05/eject/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://yoursite.com/2019/06/05/eject/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
@@ -1825,7 +1836,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1834,7 +1845,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript-AST/">TypeScript AST</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTML5-API/">HTML5 API</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/">Node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React/">React</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React-Native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript-AST/">TypeScript AST</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/">Vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/心灵记事/">心灵记事</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1843,7 +1854,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/CSS/" style="font-size: 13.33px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 20px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/TypeScript-AST/" style="font-size: 10px;">TypeScript AST</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 16.67px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
+            <a href="/tags/CSS/" style="font-size: 12.5px;">CSS</a> <a href="/tags/HTML5-API/" style="font-size: 10px;">HTML5 API</a> <a href="/tags/JavaScript/" style="font-size: 20px;">JavaScript</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/React/" style="font-size: 17.5px;">React</a> <a href="/tags/React-Native/" style="font-size: 10px;">React-Native</a> <a href="/tags/TypeScript-AST/" style="font-size: 10px;">TypeScript AST</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Webpack/" style="font-size: 15px;">Webpack</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/心灵记事/" style="font-size: 10px;">心灵记事</a>
         </div>
     </div>
 
