@@ -296,6 +296,7 @@
 <figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">markKeywords</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  keywords: KeywordsOrSelector,</span></span></span><br><span class="line"><span class="function"><span class="params">  domObj: IDomFormated,</span></span></span><br><span class="line"><span class="function"><span class="params">  useRegexp: <span class="built_in">boolean</span></span></span></span><br><span class="line"><span class="function"><span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; dom, <span class="keyword">type</span> &#125; = domObj;</span><br><span class="line">  <span class="keyword">let</span> updateList: <span class="built_in">string</span>[] = [];</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">type</span> === TypeText) &#123;</span><br><span class="line">    <span class="keyword">let</span> newText;</span><br><span class="line">    <span class="keyword">if</span> (!useRegexp) &#123;</span><br><span class="line">      newText = dom.innerHTML.replace(</span><br><span class="line">        keywords,</span><br><span class="line">        <span class="string">`&lt;span style="background-color: #169fe6; color: #ffffff;"&gt;<span class="subst">$&#123;keywords&#125;</span>&lt;/span&gt;`</span></span><br><span class="line">      );</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 存入所有结果到更新队列</span></span><br><span class="line">      <span class="keyword">const</span> reg = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">`(<span class="subst">$&#123;keywords&#125;</span>)`</span>, <span class="string">"g"</span>);</span><br><span class="line">      <span class="keyword">const</span> domString = dom.innerHTML;</span><br><span class="line">      <span class="keyword">let</span> result = reg.exec(domString);</span><br><span class="line">      <span class="keyword">while</span> (result) &#123;</span><br><span class="line">        <span class="keyword">const</span> updateString =</span><br><span class="line">          dom.innerHTML.substring(<span class="number">0</span>, result.index) +</span><br><span class="line">          <span class="string">`&lt;span style="background-color: #169fe6; color: #ffffff;"&gt;<span class="subst">$&#123;result[0]&#125;</span>&lt;/span&gt;`</span> +</span><br><span class="line">          dom.innerHTML.substring(result.index + result[<span class="number">0</span>].length);</span><br><span class="line">        updateList.push(updateString);</span><br><span class="line">        result = reg.exec(domString);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (newText) &#123;</span><br><span class="line">      dom.innerHTML = newText;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">type</span> === TypeSelector) &#123;</span><br><span class="line">    <span class="keyword">const</span> prevBgColor = dom.style.backgroundColor;</span><br><span class="line">    dom.dataset[<span class="string">"bgc"</span>] = prevBgColor!;</span><br><span class="line">    <span class="comment">// 保存背景色，便于后续恢复</span></span><br><span class="line">    dom.style.backgroundColor = <span class="string">"#169fe6"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> updateList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>标记完后，使用<code>dom.scrollIntoView()</code>即可滚动当前元素到标记位置</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>页面文本搜索工具主要包含两个流程：<em>文本检索</em>和<em>文本标记</em>，为了加快检索速度，构建了文本到<code>HTMLElement</code>的映射缓存，该映射的生成遵守几个约定(<code>可能会出现问题</code>)，文本标记则分为两个子步骤：1.还原到未标记状态；2.标记当前文本。如果遇到一个元素中有多个匹配结果，建立了一个更新列表(<code>updateList</code>)，将分多次标记。</p>
+<p>查看更多<code>LocalSearch</code>的信息<a href="https://www.npmjs.com/package/local-search" target="_blank" rel="noopener">npm</a><a href="https://github.com/Limoer96/local-search" target="_blank" rel="noopener">github</a>，为此，还写了一个简易的<a href="http://212.64.77.74:8080/localsearch/" target="_blank" rel="noopener">demo</a>欢迎把玩。在掘金上第一次发文，欢迎各位大佬指教。</p>
 
         
         </div>
@@ -306,7 +307,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2020/08/07/local-search/" data-id="ckdjzksew00003cj6v1t94exj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2020/08/07/local-search/" data-id="ckdjzmg71000sy0j64ztcn2cw" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -461,7 +462,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2020/02/29/compiler-apis/" data-id="ckdjzjuar000d7gj6thy0xvcm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2020/02/29/compiler-apis/" data-id="ckdjzmg6w000hy0j6x43o908x" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -625,7 +626,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2020/02/21/use-battery/" data-id="ckdjzjubh001p7gj6z3zfx7b6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2020/02/21/use-battery/" data-id="ckdjzmg780017y0j66flkjdm6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -782,7 +783,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/12/19/global-component/" data-id="ckdjzjuaw000k7gj67hx74tjs" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/12/19/global-component/" data-id="ckdjzmg6z000oy0j6hz682vip" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -932,7 +933,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ckdjzjuay000n7gj69culi9y5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/11/30/dynamic-navigator/" data-id="ckdjzmg6x000jy0j66pvq4rgs" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1087,7 +1088,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ckdjzjub2000x7gj69ff6x9ip" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/21/polyfill/" data-id="ckdjzmg72000vy0j63o9gjiqc" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1272,7 +1273,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ckdjzjuaz000p7gj6jayknjs9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/08/07/barrage/" data-id="ckdjzmg6o0009y0j645v2u7fc" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1423,7 +1424,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ckdjzjub0000s7gj60vwgan4z" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/hooks/" data-id="ckdjzmg70000qy0j6glunnop7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1583,7 +1584,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ckdjzjub400117gj6q04og120" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/07/07/resolve/" data-id="ckdjzmg74000xy0j63p3upz4k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1744,7 +1745,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ckdjzjub1000u7gj6gmew9v3a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://yoursite.com/2019/06/27/scrollload/" data-id="ckdjzmg760012y0j6wdnlcuxf" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
